@@ -176,7 +176,7 @@ const CAT_NAMES = {
 // ===== 加载本地存储 =====
 function loadState() {
   try {
-    const saved = JSON.parse(localStorage.getItem('youth2_state'));
+    const saved = JSON.parse(localStorage.getItem('essence25_state'));
     if (saved) {
       history = saved.history || [];
       doneSet = new Set(history.map(h => h.qid));
@@ -186,7 +186,7 @@ function loadState() {
   } catch(e) {}
 }
 function saveState() {
-  localStorage.setItem('youth2_state', JSON.stringify({ history, catStats }));
+  localStorage.setItem('essence25_state', JSON.stringify({ history, catStats }));
 }
 
 // ===== 开始 =====
@@ -460,7 +460,7 @@ function restart() {
     growth: { right: 0, total: 0 }
   };
   currentIndex = -1;
-  localStorage.removeItem('youth2_state');
+  localStorage.removeItem('essence25_state');
   document.getElementById('finishPage').style.display = 'none';
   document.getElementById('startPage').style.display = 'flex';
 }
