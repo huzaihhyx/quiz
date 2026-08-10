@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>四季通关 · 成长的旅程</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#0f0f1a;color:#e0d8cf;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% -20%,#1a1a3e 0%,#0f0f1a 70%);z-index:-1}
+.container{max-width:600px;margin:0 auto;padding:20px 16px 60px}
+
+/* ── Login ── */
+#login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,15,26,.97);z-index:100;display:flex;align-items:center;justify-content:center}
+.login-box{width:90%;max-width:380px;text-align:center}
+.login-box h1{font-size:26px;margin-bottom:6px;background:linear-gradient(135deg,#f39c12,#e74c3c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-box .sub{font-size:13px;color:#8a8594;margin-bottom:28px}
+.login-box input,.login-box select{width:100%;padding:14px 16px;margin-bottom:12px;border-radius:10px;border:1px solid #2a2a3e;background:#1a1a2e;color:#e0d8cf;font-size:15px;outline:none;transition:border .2s}
+.login-box input:focus,.login-box select:focus{border-color:#f39c12}
+.login-box select{appearance:none;-webkit-appearance:none}
+.login-box button{width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.login-box button:active{opacity:.85}
+.login-box .err{color:#e74c3c;font-size:13px;margin-top:8px;min-height:20px}
+
+/* ── Hall ── */
+.hall-header{text-align:center;padding:30px 0 10px}
+.hall-header .welcome{font-size:13px;color:#6b6478;margin-bottom:4px}
+.hall-header h2{font-size:24px;font-weight:700}
+.hall-header .player-info{font-size:12px;color:#8a8594;margin-top:4px}
+.round-tabs{display:flex;gap:8px;margin:20px 0 30px;overflow-x:auto;padding-bottom:4px}
+.round-tab{padding:8px 18px;border-radius:20px;border:1px solid #2a2a3e;background:transparent;color:#6b6478;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .2s}
+.round-tab.active{border-color:#f39c12;color:#f39c12;background:rgba(243,156,18,.08)}
+.round-tab.locked{opacity:.4;cursor:not-allowed}
+.season-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.season-card{border-radius:16px;padding:24px 18px;text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.season-card:hover{transform:translateY(-2px)}
+.season-card.locked{opacity:.35;cursor:not-allowed;pointer-events:none}
+.season-card.locked::after{content:'🔒';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:36px;opacity:.6}
+.season-card .icon{font-size:40px;margin-bottom:10px}
+.season-card .name{font-size:15px;font-weight:600;margin-bottom:4px}
+.season-card .sub{font-size:11px;opacity:.7}
+.season-card.summer{background:linear-gradient(135deg,#1a3a1a,#2d5a1e);border:1px solid #3d7a2e}
+.season-card.autumn{background:linear-gradient(135deg,#3a2010,#5a3a1e);border:1px solid #7a4a2e}
+.season-card.winter{background:linear-gradient(135deg,#1a1a3a,#1e1e5a);border:1px solid #2e2e7a}
+.season-card.spring{background:linear-gradient(135deg,#1a2a1a,#1e4a2a);border:1px solid #3a6a3a}
+.season-card .check{color:#2ecc71;font-size:14px;margin-top:6px}
+
+/* ── Quiz ── */
+.quiz-header{display:flex;align-items:center;gap:12px;padding:16px 0;position:sticky;top:0;background:#0f0f1a;z-index:10;border-bottom:1px solid #1a1a2e}
+.quiz-header .back{background:none;border:none;color:#8a8594;font-size:20px;cursor:pointer;padding:4px 8px}
+.quiz-header .title{font-size:16px;font-weight:600;flex:1}
+.quiz-header .progress{font-size:12px;color:#8a8594}
+.quiz-scene{background:#1a1a2e;border-radius:14px;padding:20px;margin-bottom:20px;font-size:13px;color:#8a8594;line-height:1.7;border-left:3px solid #f39c12}
+.quiz-question{margin-bottom:28px;opacity:0;transform:translateY(10px);animation:fadeIn .35s ease forwards}
+@keyframes fadeIn{to{opacity:1;transform:translateY(0)}}
+.quiz-question .q-num{font-size:11px;color:#6b6478;margin-bottom:6px}
+.quiz-question .q-type{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px}
+.quiz-question .q-type.choice{background:rgba(52,152,219,.15);color:#3498db}
+.quiz-question .q-type.truefalse{background:rgba(46,204,113,.15);color:#2ecc71}
+.quiz-question .q-type.match{background:rgba(155,89,182,.15);color:#9b59b6}
+.quiz-question .stem{font-size:15px;line-height:1.7;margin:8px 0 16px}
+/* choices */
+.choice-option{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;margin-bottom:8px;border-radius:12px;border:1px solid #2a2a3e;cursor:pointer;transition:all .2s;background:#1a1a2e}
+.choice-option:hover{border-color:#4a4a5e}
+.choice-option.selected{border-color:#f39c12;background:rgba(243,156,18,.08)}
+.choice-option .letter{width:28px;height:28px;border-radius:50%;border:1px solid #3a3a4e;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;transition:all .2s}
+.choice-option.selected .letter{background:#f39c12;border-color:#f39c12;color:#fff}
+.choice-option .opt-text{font-size:14px;line-height:1.55;padding-top:3px}
+/* truefalse */
+.tf-options{display:flex;gap:12px}
+.tf-btn{flex:1;padding:16px;border-radius:12px;border:1px solid #2a2a3e;background:#1a1a2e;color:#e0d8cf;font-size:15px;cursor:pointer;text-align:center;transition:all .2s}
+.tf-btn:hover{border-color:#4a4a5e}
+.tf-btn.selected.true-btn{border-color:#2ecc71;background:rgba(46,204,113,.08)}
+.tf-btn.selected.false-btn{border-color:#e74c3c;background:rgba(231,76,60,.08)}
+/* match */
+.match-area{display:flex;gap:20px;margin-top:12px}
+.match-col{flex:1}
+.match-item{padding:12px 14px;margin-bottom:8px;border-radius:10px;border:1px solid #2a2a3e;background:#1a1a2e;font-size:13px;cursor:pointer;transition:all .2s;text-align:center;user-select:none}
+.match-item:hover{border-color:#4a4a5e}
+.match-item.active{border-color:#f39c12;background:rgba(243,156,18,.12)}
+.match-item.paired{border-color:#2ecc71;background:rgba(46,204,113,.08);cursor:default}
+.match-item.wrong{border-color:#e74c3c!important;background:rgba(231,76,60,.08)!important}
+.match-hint{font-size:11px;color:#6b6478;text-align:center;margin-top:8px}
+
+/* ── Submit ── */
+.submit-area{text-align:center;margin:30px 0}
+.submit-btn{padding:16px 48px;border-radius:12px;border:none;background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.submit-btn:active{opacity:.85}
+.submit-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── Result ── */
+.result-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,15,26,.95);z-index:200;display:flex;align-items:center;justify-content:center}
+.result-box{width:90%;max-width:400px;text-align:center;padding:30px 24px}
+.result-box .emoji{font-size:60px;margin-bottom:14px}
+.result-box h2{font-size:22px;margin-bottom:8px}
+.result-box .score{font-size:40px;font-weight:700;margin:12px 0}
+.result-box .msg{font-size:14px;color:#8a8594;margin-bottom:24px;line-height:1.6}
+.result-box button{padding:14px 32px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin:6px 4px}
+.result-box .btn-review{background:#2a2a3e;color:#e0d8cf}
+.result-box .btn-retry{background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff}
+.result-box .btn-hall{background:transparent;border:1px solid #3a3a4e;color:#8a8594}
+
+/* ── Explanation (review mode) ── */
+.explanation-box{margin-top:16px;padding:16px;border-radius:12px;background:rgba(46,204,113,.06);border:1px solid rgba(46,204,113,.15);display:none}
+.explanation-box.show{display:block}
+.explanation-box .exp-label{font-size:11px;color:#2ecc71;margin-bottom:6px}
+.explanation-box .exp-text{font-size:13px;line-height:1.7;color:#b0a8bd}
+.explanation-box .exp-source{font-size:11px;color:#6b6478;margin-top:8px;font-style:italic}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2a2a3e;color:#e0d8cf;padding:12px 24px;border-radius:24px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+
+@media(max-width:400px){
+  .match-area{flex-direction:column;gap:10px}
+  .season-card{padding:18px 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen">
+<div class="login-box">
+  <h1>四季通关</h1>
+  <div class="sub">一场关于成长、选择和自我发现的旅程</div>
+  <input type="text" id="li-nick" placeholder="你的昵称（不用真名）" maxlength="20">
+  <input type="number" id="li-age" placeholder="年龄" min="10" max="99">
+  <select id="li-gender"><option value="">性别</option><option>女</option><option>男</option><option>不想说</option></select>
+  <select id="li-edu"><option value="">学段</option><option>初中</option><option>高中</option><option>大学</option><option>已工作</option></select>
+  <button onclick="doLogin()">开始旅程</button>
+  <div class="err" id="login-err"></div>
+</div>
+</div>
+
+<!-- Hall -->
+<div id="hall-screen" style="display:none">
+<div class="container">
+  <div class="hall-header">
+    <div class="welcome" id="hall-welcome"></div>
+    <h2>成长的四季</h2>
+    <div class="player-info" id="hall-player"></div>
+  </div>
+  <div class="round-tabs">
+    <button class="round-tab active" onclick="switchRound(0)">🌱 第一轮 · 高三的四季</button>
+    <button class="round-tab locked" onclick="switchRound(1)">☀️ 第二轮 · 一日之序</button>
+  </div>
+  <div class="season-grid" id="season-grid"></div>
+</div>
+</div>
+
+<!-- Quiz -->
+<div id="quiz-screen" style="display:none">
+<div class="container">
+  <div class="quiz-header">
+    <button class="back" onclick="backToHall()">←</button>
+    <div class="title" id="quiz-title"></div>
+    <div class="progress" id="quiz-progress"></div>
+  </div>
+  <div class="quiz-scene" id="quiz-scene"></div>
+  <div id="quiz-content"></div>
+  <div class="submit-area">
+    <button class="submit-btn" id="submit-btn" onclick="submitQuiz()">提交答案</button>
+  </div>
+</div>
+</div>
+
+<!-- Result overlay -->
+<div class="result-overlay" id="result-overlay" style="display:none">
+<div class="result-box" id="result-box"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+const USER_KEY = 'four_seasons_user';
+const STATE_KEY = 'four_seasons_state';
+const SERVER_URL = ''; // TODO: 填入你的后端地址
+
+let user = null;
+let state = null; // {round0: {summer:true/false, autumn:false, ...}, ...}
+let currentSeason = null;
+let currentSeasonData = null;
+let answers = {}; // {qid: answer}
+let reviewMode = false;
+
+// ═══════════════════════ SEASON DEFINITIONS ═══════════════════════
+const SEASONS = [
+  {id:'summer', round:0, name:'夏 · 躺在床上的暑假', icon:'🌞', cls:'summer',
+   scene:'2026年8月，高三前的暑假。窗外蝉鸣，空调嗡嗡响。你应该在学雅思，但已经好几天没有翻开过一本正经书了。'},
+  {id:'autumn', round:0, name:'秋 · 申请季的风', icon:'🍂', cls:'autumn',
+   scene:''},
+  {id:'winter', round:0, name:'冬 · 等Offer的冬天', icon:'❄️', cls:'winter',
+   scene:''},
+  {id:'spring', round:0, name:'春 · 毕业与答案', icon:'🌸', cls:'spring',
+   scene:''}
+];
+
+const ROUNDS = [
+  {name:'第一轮 · 高三的四季', emoji:'🌱'},
+  {name:'第二轮 · 一日之序', emoji:'☀️'}
+];
+
+// ═══════════════════════ INIT ═══════════════════════
+function init() {
+  const savedUser = localStorage.getItem(USER_KEY);
+  const savedState = localStorage.getItem(STATE_KEY);
+  if (savedUser) {
+    user = JSON.parse(savedUser);
+    state = savedState ? JSON.parse(savedState) : getDefaultState();
+    showHall();
+  }
+  // else: login screen stays visible
+}
+
+function getDefaultState() {
+  return {
+    round0: {summer:false, autumn:false, winter:false, spring:false},
+    round1: {morning:false, noon:false, evening:false, night:false}
+  };
+}
+
+// ═══════════════════════ LOGIN ═══════════════════════
+function doLogin() {
+  const nick = document.getElementById('li-nick').value.trim();
+  const age = document.getElementById('li-age').value.trim();
+  const gender = document.getElementById('li-gender').value;
+  const edu = document.getElementById('li-edu').value;
+  const errEl = document.getElementById('login-err');
+
+  if (!nick) { errEl.textContent = '请输入昵称'; return; }
+  if (!age || isNaN(age) || age<10) { errEl.textContent = '请输入有效年龄'; return; }
+  if (!gender) { errEl.textContent = '请选择性别'; return; }
+  if (!edu) { errEl.textContent = '请选择学段'; return; }
+
+  user = {nick, age:parseInt(age), gender, edu, startedAt:new Date().toISOString()};
+  state = getDefaultState();
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  showHall();
+}
+
+// ═══════════════════════ HALL ═══════════════════════
+function showHall() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-overlay').style.display = 'none';
+  document.getElementById('hall-screen').style.display = 'block';
+
+  document.getElementById('hall-welcome').textContent = '欢迎回来，' + user.nick;
+  document.getElementById('hall-player').textContent =
+    user.gender + ' · ' + user.age + '岁 · ' + user.edu;
+
+  renderHall();
+  updateRoundTabs(0);
+}
+
+function updateRoundTabs(roundIdx) {
+  const tabs = document.querySelectorAll('.round-tab');
+  tabs.forEach((t,i) => {
+    t.classList.toggle('active', i===roundIdx);
+    if (i>0 && !isRoundUnlocked(i)) t.classList.add('locked');
+  });
+}
+
+function isRoundUnlocked(roundIdx) {
+  if (roundIdx === 0) return true;
+  // Unlock round N when all seasons of round N-1 are done
+  const prev = state['round'+(roundIdx-1)];
+  if (!prev) return false;
+  return Object.values(prev).every(v => v === true);
+}
+
+function switchRound(idx) {
+  if (idx > 0 && !isRoundUnlocked(idx)) return;
+  updateRoundTabs(idx);
+  renderHall();
+}
+
+function renderHall() {
+  const grid = document.getElementById('season-grid');
+  grid.innerHTML = '';
+
+  SEASONS.forEach(s => {
+    const unlocked = isSeasonUnlocked(s);
+    const completed = state['round'+s.round][s.id];
+    const card = document.createElement('div');
+    card.className = 'season-card ' + s.cls + (unlocked ? '' : ' locked');
+    card.innerHTML = '<div class="icon">' + s.icon + '</div>' +
+      '<div class="name">' + s.name + '</div>' +
+      '<div class="sub">' + (completed ? '✅ 已通关' :
+        (unlocked ? '15题·全对通关' : '先行季节未通关')) +
+      '</div>';
+    if (unlocked) card.onclick = () => startSeason(s);
+    grid.appendChild(card);
+  });
+}
+
+function isSeasonUnlocked(season) {
+  if (season.id === 'summer') return true; // first season always unlocked
+  const roundState = state['round'+season.round];
+  const seasonOrder = SEASONS.filter(s => s.round === season.round).map(s => s.id);
+  const idx = seasonOrder.indexOf(season.id);
+  if (idx <= 0) return true;
+  // Must complete all previous seasons in same round
+  for (let i = 0; i < idx; i++) {
+    if (!roundState[seasonOrder[i]]) return false;
+  }
+  return true;
+}
+
+// ═══════════════════════ QUIZ ═══════════════════════
+function startSeason(season) {
+  currentSeason = season;
+  answers = {};
+  reviewMode = false;
+
+  // Load season data
+  const dataKey = 'SEASON1';
+  if (typeof SEASON1 === 'undefined') {
+    loadScript('season1_summer.js', () => {
+      currentSeasonData = SEASON1;
+      renderQuiz();
+    });
+  } else {
+    currentSeasonData = SEASON1;
+    renderQuiz();
+  }
+
+  document.getElementById('hall-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.getElementById('result-overlay').style.display = 'none';
+
+  document.getElementById('quiz-title').textContent = season.icon + ' ' + season.name;
+  document.getElementById('quiz-scene').textContent = currentSeasonData.scene;
+  document.getElementById('submit-btn').textContent = '提交答案';
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function loadScript(src, cb) {
+  const s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quiz-content');
+  const Q = currentSeasonData.questions;
+  container.innerHTML = '';
+
+  Q.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-question';
+    div.style.animationDelay = (i*0.05)+'s';
+    div.id = 'q-'+q.id;
+
+    let typeLabel = '';
+    if (q.type === 'choice') typeLabel = '<span class="q-type choice">选择题</span>';
+    if (q.type === 'truefalse') typeLabel = '<span class="q-type truefalse">判断题</span>';
+    if (q.type === 'match') typeLabel = '<span class="q-type match">连线题</span>';
+
+    let body = '';
+    if (q.type === 'choice') body = renderChoice(q);
+    if (q.type === 'truefalse') body = renderTrueFalse(q);
+    if (q.type === 'match') body = renderMatch(q);
+
+    div.innerHTML = '<div class="q-num">第' + q.id + '题 ' + typeLabel + '</div>' +
+      '<div class="stem">' + q.stem + '</div>' + body +
+      '<div class="explanation-box" id="exp-'+q.id+'">' +
+      '<div class="exp-label">💡 解析</div>' +
+      '<div class="exp-text"></div>' +
+      '<div class="exp-source"></div></div>';
+
+    container.appendChild(div);
+  });
+}
+
+function renderChoice(q) {
+  let html = '';
+  q.options.forEach(opt => {
+    html += '<div class="choice-option" onclick="selectChoice('+q.id+',\''+opt.letter+'\',this)" id="opt-'+q.id+'-'+opt.letter+'">' +
+      '<div class="letter">'+opt.letter+'</div>' +
+      '<div class="opt-text">'+opt.text+'</div></div>';
+  });
+  return html;
+}
+
+function renderTrueFalse(q) {
+  return '<div class="tf-options">' +
+    '<div class="tf-btn true-btn" onclick="selectTF('+q.id+',true,this)" id="tf-'+q.id+'-true">✔ 正确</div>' +
+    '<div class="tf-btn false-btn" onclick="selectTF('+q.id+',false,this)" id="tf-'+q.id+'-false">✘ 错误</div>' +
+    '</div>';
+}
+
+function renderMatch(q) {
+  // Shuffle right column
+  const right = q.pairs.map(p=>p.right);
+  shuffle(right);
+
+  let leftHtml = '', rightHtml = '';
+  q.pairs.forEach((p,i) => {
+    leftHtml += '<div class="match-item left-item" onclick="selectMatchLeft('+q.id+','+i+',this)" id="ml-'+q.id+'-'+i+'">'+p.left+'</div>';
+    rightHtml += '<div class="match-item right-item" onclick="selectMatchRight('+q.id+','+i+',\''+escapeHtml(right[i])+'\',this)" id="mr-'+q.id+'-'+i+'" data-right="'+escapeHtml(right[i])+'">'+right[i]+'</div>';
+  });
+
+  return '<div class="match-area">' +
+    '<div class="match-col">'+leftHtml+'</div>' +
+    '<div class="match-col">'+rightHtml+'</div>' +
+    '</div><div class="match-hint" id="mh-'+q.id+'">点左列一个，再点右列一个，连起来</div>';
+
+  // Initialize match state
+  if (!answers[q.id]) answers[q.id] = [];
+}
+
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'<').replace(/>/g,'>'); }
+
+let matchLeftSelected = null;
+
+function selectMatchLeft(qid, idx, el) {
+  if (reviewMode) return;
+  // Remove previous active
+  document.querySelectorAll('#q-'+qid+' .left-item.active').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  matchLeftSelected = {qid, idx};
+}
+
+function selectMatchRight(qid, idx, rightText, el) {
+  if (reviewMode) return;
+  if (!matchLeftSelected || matchLeftSelected.qid !== qid) {
+    toast('请先点左列的一个选项');
+    return;
+  }
+
+  const leftIdx = matchLeftSelected.idx;
+  const leftEl = document.getElementById('ml-'+qid+'-'+leftIdx);
+
+  // Check if left is already paired
+  if (leftEl.classList.contains('paired')) return;
+  // Check if right is already paired
+  if (el.classList.contains('paired')) return;
+
+  // Pair them
+  leftEl.classList.add('paired');
+  el.classList.add('paired');
+  matchLeftSelected = null;
+
+  // Save answer
+  if (!answers[qid]) answers[qid] = [];
+  answers[qid].push({leftIdx, right:rightText});
+
+  // Update hint
+  const hint = document.getElementById('mh-'+qid);
+  if (answers[qid].length === 4) {
+    hint.textContent = '✅ 四组全部连线完成';
+    hint.style.color = '#2ecc71';
+  } else {
+    hint.textContent = '已连' + answers[qid].length + '/4 组，继续';
+  }
+}
+
+function selectChoice(qid, letter, el) {
+  if (reviewMode) return;
+  // Deselect siblings
+  const parent = el.parentElement;
+  parent.querySelectorAll('.choice-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qid] = letter;
+}
+
+function selectTF(qid, value, el) {
+  if (reviewMode) return;
+  const parent = el.parentElement;
+  parent.querySelectorAll('.tf-btn').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qid] = value;
+}
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+}
+
+// ═══════════════════════ SUBMIT ═══════════════════════
+function submitQuiz() {
+  const Q = currentSeasonData.questions;
+
+  // Check all answered
+  let missing = [];
+  Q.forEach(q => {
+    if (q.type === 'match') {
+      if (!answers[q.id] || answers[q.id].length !== 4) missing.push(q.id);
+    } else {
+      if (answers[q.id] === undefined) missing.push(q.id);
+    }
+  });
+
+  if (missing.length > 0) {
+    toast('还有 ' + missing.length + ' 道题没答完，请全部完成后再提交');
+    // Scroll to first missing
+    const firstMissing = document.getElementById('q-'+missing[0]);
+    if (firstMissing) firstMissing.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  // Grade
+  let correct = 0;
+  const details = [];
+  Q.forEach(q => {
+    let isCorrect = false;
+    if (q.type === 'choice') {
+      isCorrect = answers[q.id] === q.correct;
+    } else if (q.type === 'truefalse') {
+      isCorrect = answers[q.id] === q.correct;
+    } else if (q.type === 'match') {
+      // Check all pairs match
+      const userPairs = answers[q.id];
+      isCorrect = userPairs.every(p => {
+        const expectedPair = q.pairs.find(ep => ep.left === q.pairs[p.leftIdx].left);
+        return expectedPair && expectedPair.right === p.right;
+      });
+    }
+    if (isCorrect) correct++;
+    details.push({qid:q.id, type:q.type, category:q.category, answer:answers[q.id], correct:isCorrect});
+  });
+
+  const allCorrect = correct === Q.length;
+
+  // Save to state if all correct
+  if (allCorrect) {
+    state['round'+currentSeason.round][currentSeason.id] = true;
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  }
+
+  // Submit to server
+  postResults(details, correct, Q.length);
+
+  // Show result
+  showResult(correct, Q.length, allCorrect, details);
+
+  // Show explanations
+  reviewMode = true;
+  Q.forEach(q => {
+    const expBox = document.getElementById('exp-'+q.id);
+    if (expBox) {
+      expBox.classList.add('show');
+      const detail = details.find(d=>d.qid===q.id);
+      if (q.type === 'choice') {
+        expBox.querySelector('.exp-text').textContent =
+          (detail.correct ? '✅ 正确！' : '❌ 错误。正确答案是 ' + q.correct + '。') +
+          ' ' + (q.explanations[q.correct] || '');
+        expBox.querySelector('.exp-source').textContent = q.source || '';
+      } else if (q.type === 'truefalse') {
+        expBox.querySelector('.exp-text').textContent =
+          (detail.correct ? '✅ 正确！' : '❌ 错误。') + ' ' + (q.explanation||'');
+        expBox.querySelector('.exp-source').textContent = q.source || '';
+      } else if (q.type === 'match') {
+        const allGood = detail.correct;
+        expBox.querySelector('.exp-text').textContent =
+          (allGood ? '✅ 全部匹配正确！' : '❌ 有不匹配的项。') + ' ' + (q.explanation||'');
+        expBox.querySelector('.exp-source').textContent = q.source || '';
+      }
+      if (!detail.correct) expBox.style.borderColor = 'rgba(231,76,60,.3)';
+    }
+  });
+
+  // Scroll to top
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('submit-btn').textContent = '查看解析 ↑';
+  document.getElementById('submit-btn').disabled = true;
+}
+
+function showResult(correct, total, allCorrect, details) {
+  const overlay = document.getElementById('result-overlay');
+  const box = document.getElementById('result-box');
+
+  const pct = Math.round(correct/total*100);
+  let emoji, title, msg;
+
+  if (allCorrect) {
+    emoji = '🎉';
+    title = '全部通关！';
+    msg = '15/15 全对！你解锁了下一个季节。<br>旅程继续。';
+  } else {
+    emoji = '🌤️';
+    title = '还差一点';
+    msg = '答对了 ' + correct + '/' + total + ' 题。<br>需要全部答对才能通关。看看解析，然后重来吧。';
+  }
+
+  box.innerHTML = '<div class="emoji">'+emoji+'</div>' +
+    '<h2>'+title+'</h2>' +
+    '<div class="score">'+pct+'%</div>' +
+    '<div class="msg">'+msg+'</div>' +
+    (!allCorrect ? '<button class="btn-retry" onclick="retryQuiz()">重新答题</button>' : '') +
+    '<button class="btn-hall" onclick="showHall()">回到大厅</button>';
+
+  overlay.style.display = 'flex';
+}
+
+function retryQuiz() {
+  answers = {};
+  reviewMode = false;
+  document.getElementById('result-overlay').style.display = 'none';
+  document.getElementById('submit-btn').textContent = '提交答案';
+  document.getElementById('submit-btn').disabled = false;
+  // Reset all selections
+  document.querySelectorAll('.choice-option.selected,.tf-btn.selected,.match-item.paired,.match-item.active').forEach(el => {
+    el.classList.remove('selected','paired','active');
+  });
+  document.querySelectorAll('.explanation-box').forEach(el => {
+    el.classList.remove('show');
+    el.style.borderColor = '';
+  });
+  // Reset match hints
+  document.querySelectorAll('.match-hint').forEach(el => {
+    el.textContent = '点左列一个，再点右列一个，连起来';
+    el.style.color = '#6b6478';
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══════════════════════ DATA SUBMISSION ═══════════════════════
+function postResults(details, correct, total) {
+  if (!SERVER_URL) return; // No server configured yet
+
+  const payload = {
+    user: user,
+    season: currentSeason.id,
+    season_name: currentSeason.name,
+    score: correct + '/' + total,
+    all_correct: correct === total,
+    timestamp: new Date().toISOString(),
+    answers: details,
+    user_agent: navigator.userAgent
+  };
+
+  try {
+    fetch(SERVER_URL + '/api/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    }).catch(() => {}); // Silent fail if server unreachable
+  } catch(e) {}
+}
+
+// ═══════════════════════ UTILS ═══════════════════════
+function backToHall() {
+  if (!reviewMode && Object.keys(answers).length > 0) {
+    if (!confirm('确定退出？当前答题进度将丢失。')) return;
+  }
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-overlay').style.display = 'none';
+  showHall();
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════ START ═══════════════════════
+init();
+</script>
+<script src="season1_summer.js"></script>
+</body>
+</html>
