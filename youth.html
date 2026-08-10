@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>青春修炼手册 · 20道来自经典书籍的成长副本</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0f0f23; color: #e0e0e0; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; line-height: 1.8; -webkit-tap-highlight-color: transparent; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+
+/* 前言 */
+.intro { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 20px; padding: 32px 24px; text-align: center; margin-bottom: 28px; border: 1px solid #2a2a4a; }
+.intro .game-tag { display: inline-block; background: #f0c060; color: #0f0f23; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin-bottom: 16px; letter-spacing: 2px; }
+.intro h1 { color: #f0c060; font-size: 24px; margin-bottom: 12px; }
+.intro .sub { color: #8899aa; font-size: 14px; margin-bottom: 20px; }
+.intro .desc { color: #b0b8c8; font-size: 14px; text-align: left; line-height: 2; }
+.intro .desc strong { color: #f0c060; }
+.intro .start-btn { display: inline-block; background: #f0c060; color: #0f0f23; font-size: 16px; font-weight: 700; padding: 12px 40px; border-radius: 30px; margin-top: 24px; border: none; cursor: pointer; transition: all .2s; }
+.intro .start-btn:active { transform: scale(.96); }
+
+/* 单元 */
+.unit-header { display: flex; align-items: center; gap: 12px; margin: 32px 0 16px; }
+.unit-header .icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.unit-header h2 { font-size: 18px; color: #f0c060; }
+.unit-header .line { flex: 1; height: 1px; background: linear-gradient(90deg, #f0c06033, transparent); }
+.unit-1 .icon { background: #e74c3c22; } .unit-1 h2 { color: #e74c3c; }
+.unit-2 .icon { background: #f39c1222; } .unit-2 h2 { color: #f39c12; }
+.unit-3 .icon { background: #9b59b622; } .unit-3 h2 { color: #9b59b6; }
+.unit-4 .icon { background: #3498db22; } .unit-4 h2 { color: #3498db; }
+
+/* 题目卡片 */
+.card { background: #1a1a2e; border-radius: 16px; padding: 24px 20px; margin-bottom: 16px; border: 1px solid #2a2a4a; transition: border-color .3s; }
+.card.q-locked { border-color: #2ecc7133; }
+.card .q-tag { font-size: 11px; color: #667788; margin-bottom: 12px; display: flex; gap: 8px; align-items: center; }
+.card .q-num { background: #2a2a4a; color: #f0c060; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
+.card .q-type { color: #556677; }
+.card .stem { font-size: 15px; color: #c8d0e0; margin-bottom: 20px; line-height: 2; }
+.card .stem b { color: #f0c060; font-weight: normal; }
+
+/* 选项 */
+.opts { display: flex; flex-direction: column; gap: 10px; }
+.opt { background: #1e1e3a; border: 1.5px solid #2e2e4e; border-radius: 12px; padding: 14px 16px; font-size: 14px; color: #b0b8c8; cursor: pointer; transition: all .15s; display: flex; gap: 10px; align-items: flex-start; }
+.opt:active { transform: scale(.99); }
+.opt .letter { font-weight: 700; color: #667788; flex-shrink: 0; }
+.opt:hover { border-color: #f0c06044; }
+.opt.selected { background: #1a2a4a; border-color: #f0c060; }
+.opt.selected .letter { color: #f0c060; }
+.opt.correct { background: #0d3d1a; border-color: #2ecc71; }
+.opt.correct .letter { color: #2ecc71; }
+.opt.correct .text { color: #a0d8a0; }
+.opt.wrong { background: #3d0d0d; border-color: #e74c3c; }
+.opt.wrong .letter { color: #e74c3c; }
+
+/* 简答题 */
+.text-area { width: 100%; background: #1e1e3a; border: 1.5px solid #2e2e4e; border-radius: 12px; padding: 14px; color: #c8d0e0; font-size: 14px; font-family: inherit; resize: vertical; min-height: 100px; line-height: 1.8; }
+.text-area:focus { outline: none; border-color: #f0c060; }
+.submit-btn { background: #f0c060; color: #0f0f23; border: none; padding: 8px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; margin-top: 10px; cursor: pointer; }
+.submit-btn:active { transform: scale(.96); }
+
+/* 解析 */
+.exp { display: none; margin-top: 18px; padding-top: 18px; border-top: 1px solid #2a2a4a; }
+.exp.show { display: block; animation: fadeIn .3s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.exp .exp-title { font-size: 13px; font-weight: 700; color: #f0c060; margin-bottom: 8px; }
+.exp .exp-body { font-size: 14px; color: #a0a8b8; line-height: 2; }
+.exp .exp-source { font-size: 12px; color: #556677; margin-top: 10px; padding: 8px 12px; background: #0f0f23; border-radius: 8px; border-left: 3px solid #f0c06044; }
+
+/* 后记 */
+.outro { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 20px; padding: 32px 24px; text-align: center; margin-top: 32px; border: 1px solid #2a2a4a; }
+.outro h2 { color: #f0c060; font-size: 20px; margin-bottom: 16px; }
+.outro p { color: #b0b8c8; font-size: 14px; line-height: 2; text-align: left; }
+
+/* 成绩 */
+.score-bar { position: sticky; top: 0; background: #0f0f23ee; backdrop-filter: blur(8px); padding: 12px 0; margin: 0 -16px 16px; border-bottom: 1px solid #2a2a4a; z-index: 10; }
+.score-inner { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; }
+.score-text { font-size: 14px; color: #8899aa; }
+.score-text b { color: #f0c060; }
+.progress-ring { width: 36px; height: 36px; }
+.progress-ring circle { fill: none; stroke-width: 3; }
+.progress-ring .bg { stroke: #2a2a4a; }
+.progress-ring .fg { stroke: #f0c060; stroke-dasharray: 100; stroke-dashoffset: 100; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset .3s; line-cap: round; }
+.progress-ring text { fill: #f0c060; font-size: 12px; text-anchor: middle; dominant-baseline: central; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- 前言 -->
+<div class="intro">
+  <div class="game-tag">🎮 NEW DUNGEON UNLOCKED</div>
+  <h1>青春修炼手册</h1>
+  <div class="sub">20道来自经典书籍的成长副本 · 4个单元 · 约30分钟</div>
+  <div class="desc">
+    嗨，我是林小棠。<br>
+    高三，国际部，AP考试倒计时87天。<br>
+    我的生活一团糟：零花钱永远不够花，游戏皮肤出了新款又想买，网上认识的"男朋友"第三次已读不回，隔壁班那个打篮球的男生连我名字都叫不出来。<br><br>
+    但最近我翻了一些书，发现——<br>
+    <strong>那些让我焦虑的事，几百年前就有人想明白了。</strong><br><br>
+    这套题是我的"通关攻略"，也是我的故事。<br>
+    你帮我一起做，看看这些选择我会怎么选。<br>
+    准备好了吗？
+  </div>
+  <button class="start-btn" onclick="document.getElementById('unit1').scrollIntoView({behavior:'smooth'})">▶ 开始冒险</button>
+</div>
+
+<!-- 进度条 -->
+<div class="score-bar" id="scoreBar" style="display:none;">
+  <div class="score-inner">
+    <div class="score-text">已完成 <b id="doneNum">0</b>/20 题 · 正确 <b id="correctNum">0</b> 题</div>
+    <svg class="progress-ring" viewBox="0 0 36 36">
+      <circle class="bg" cx="18" cy="18" r="15.9"/>
+      <circle class="fg" id="progRing" cx="18" cy="18" r="15.9"/>
+      <text id="progText" x="18" y="18">0%</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ============ 单元一：金钱与消费 ============ -->
+<div class="unit-header unit-1" id="unit1">
+  <div class="icon">💰</div>
+  <h2>单元一 · 金钱与消费</h2>
+  <div class="line"></div>
+</div>
+
+<!-- Q1 -->
+<div class="card" id="q1">
+  <div class="q-tag"><span class="q-num">Q1</span><span class="q-type">选择题</span></div>
+  <div class="stem">周六下午，林小棠窝在沙发上刷王者荣耀，突然弹出新皮肤——"瑶·时之祈愿"，限定传说品质，售价<b>168元</b>。她看了一眼余额：这个月零花钱还剩200块，撑到月底还有12天。<br><br>
+  但她实在太想要了。室友张芋昨天刚抽到"貂蝉·圣诞恋歌"，在宿舍群里发了截图，收获了一片"好好看！"和"羡慕死了"。林小棠上次买皮肤还是两个月前。<br><br>
+  她打开花呗看了一眼——还有3000额度。<br>
+  "先用花呗付，下个月还上就行了。"她心想。<br><br>
+  但她突然想起上次花呗账单差点没还清，最后找同学借了200块才过关。<br><br>
+  如果你是林小棠，最合理的做法是？</div>
+  <div class="opts" data-q="1" data-answer="C">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">直接花呗付了。168又不贵，下月省两杯奶茶就还上了，快乐最重要</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">绝对不买。200块撑12天已经很紧了，买完连吃饭都成问题</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">先不买。把皮肤加心愿单，等下个月零花钱到账后，如果预算有剩余再考虑</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">找同学借。好朋友之间借点钱很正常，总比欠花呗好</span></div>
+  </div>
+  <div class="exp" id="exp1">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《有钱人和你想的不一样》里有一个核心观点：富人买东西会看<b>"性价比"和"长期价值"</b>，而不只是看"我想要"。一把便宜的塑料伞500日元看起来划算，但容易坏、丢了又买，一年下来反而比一把10000日元的好伞花得更多。这叫<b>"低价陷阱"</b>。<br><br>
+      再看《富爸爸穷爸爸》的思路：资产是把钱放进口袋的，负债是把钱从口袋拿走的。皮肤是典型的"负债"——买完就贬值，不能带来任何回报。这不是说不能买，而是要在<b>有余力的情况下</b>买。<br><br>
+      林小棠的零花钱只剩200块撑12天，这是"生存线"。花呗看似解决了眼前的问题，但《有钱人和你想的不一样》专门提醒：信用卡/花呗的最大危害不是利息，而是让你<b>误以为自己有钱</b>。上个月差点没还清就是信号。<br><br>
+      C选项不是"克制欲望"，而是"推迟满足"——等确认有余钱再买。这不是委屈自己，是尊重自己未来的钱包。
+    </div>
+    <div class="exp-source">【知识点来源：《有钱人和你想的不一样》·性价比思维与负债循环 +《富爸爸穷爸爸》·资产与负债 +《思考，快与慢》·系统1冲动消费vs系统2理性规划】</div>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="card" id="q2">
+  <div class="q-tag"><span class="q-num">Q2</span><span class="q-type">选择题</span></div>
+  <div class="stem">周一中午，林小棠和好朋友程程在食堂吃饭。程程掏出一个崭新的iPhone 16 Pro Max，钛金色，笑着说是她爸奖励她考过雅思7分的。<br><br>
+  林小棠低头看了看自己用了两年的iPhone 13，屏幕边角有一道细小的裂纹。其实她的手机还能用，微信、抖音、游戏都不卡。但看着程程的新手机在灯光下闪着钛金色的光，她突然觉得自己"好穷"。<br><br>
+  "你手机什么时候换啊？"程程随口问了一句。<br>"快了吧。"林小棠笑了笑，心里却在算：换一台Pro Max要一万多，她存了一年多的"小金库"一共才3200块。<br><br>
+  放学后她打开京东，看到iPhone 16 Pro Max原价10999，"限时优惠"只要9999。她感觉这个优惠"不买就亏了"。<br><br>
+  林小棠正在犯什么思维错误？</div>
+  <div class="opts" data-q="2" data-answer="B">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">没有犯错误。追求更好的生活品质是人之常情，该换就换</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">被"限时优惠"和攀比心理同时影响——9999不是"省1000"，而是"花9999"。她的手机还能用，这不是刚需</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">错误在于不该用iPhone 13。两年前的手机已经严重影响她的社交形象，该早点换</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">应该找爸妈要钱换。高中生用新手机很正常，父母有义务提供</span></div>
+  </div>
+  <div class="exp" id="exp2">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      这里同时发生了两个认知陷阱。《思考，快与慢》卡尼曼称之为<b>"锚定效应"</b>——当你看到"原价10999"时，这个数字就成了你脑子里的"锚"。相比之下"9999"感觉赚了，但真相是：你花了9999块，不是省了1000块。<br><br>
+      《黑天鹅》塔勒布讲过<b>"沉默的证据"</b>：你在社交媒体上看到的都是换新手机的人，那些用着旧手机也很开心的人不会发朋友圈说"我的iPhone 13还能再战两年"。这给你一种错觉——"大家都在换"。其实沉默的大多数没有换。<br><br>
+      再说攀比。《有钱人和你想的不一样》说得很直接：用别人的消费水平来定义自己的需求，是穷人思维的典型特征。程程的手机是她爸奖励考过雅思的——那是<b>earned</b>的。换手机的前提不是"别人也换了"，而是"我有需要+我有预算"。<br><br>
+      买不买不重要，重要的是：<b>你做决定的依据是"我需要"还是"我怕被比下去"？</b>前者是理性消费，后者是焦虑消费。
+    </div>
+    <div class="exp-source">【知识点来源：《思考，快与慢》·锚定效应 +《黑天鹅》·沉默的证据/幸存者偏差 +《有钱人和你想的不一样》·长远眼光vs攀比消费】</div>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="card" id="q3">
+  <div class="q-tag"><span class="q-num">Q3</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠的王者荣耀账号已经充了<b>4287元</b>。她有时候会打开充值记录翻看：第一个皮肤288点券，后来买夺宝抽荣耀水晶花了快两千，再后来每个赛季的战令、星元部件、回城特效……零零碎碎加起来居然这么多。<br><br>
+  她室友说："你充了这么多，不玩就太亏了，不如继续充，把号养好了以后还能卖。"<br><br>
+  林小棠其实最近对游戏的兴趣在下降，连每日签到都经常忘了。但每次想退坑，就觉得"已经投了这么多钱，现在走全白费了"。<br><br>
+  以下哪种说法最能帮她看清这件事？</div>
+  <div class="opts" data-q="3" data-answer="D">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">室友说得对。已经投了4287元，不继续玩就亏了，应该坚持</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">游戏充值的钱都是打水漂。早知道就不该碰王者荣耀，太后悔了</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">赶紧把号卖了回血。虽然可能只能卖一两千，但至少能止损</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">4287元已经花掉了，不管你继续玩还是退坑，这笔钱都回不来。应该问的是"从现在起，怎么花时间让我最开心"</span></div>
+  </div>
+  <div class="exp" id="exp3">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      这是《牛奶可乐经济学》和《思考，快与慢》共同讨论的经典误区：<b>沉没成本谬误</b>。已经花掉的4287元是"沉没成本"——不管你接下来做什么决定，这笔钱都回不来了。理性的决策应该只看<b>未来的投入和收益</b>，而不是回头看"我已经投了多少"。<br><br>
+      卡尼曼在《思考，快与慢》中用实验证明：人类天生有<b>"损失厌恶"</b>——失去100块的痛苦大约等于得到200块的快乐。所以"放弃"感觉像是"失去"，让人本能地想继续投入，即使这件事已经不再带来快乐。<br><br>
+      《有钱人和你想的不一样》也有类似提醒：时间比钱更值钱。继续花时间在一个已经不想玩的游戏上，只是为了"不浪费"过去的钱——等于在浪费现在的时间去陪葬过去的钱。<br><br>
+      正确的思路是D：把过去归零，问自己——<b>"如果我现在一分钱都没充过，我还会玩这个游戏吗？"</b>如果答案是"不会"，那退坑就是合理的，不管充了多少。
+    </div>
+    <div class="exp-source">【知识点来源：《牛奶可乐经济学》·沉没成本 +《思考，快与慢》·损失厌恶 +《有钱人和你想的不一样》·时间价值】</div>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="card" id="q4">
+  <div class="q-tag"><span class="q-num">Q4</span><span class="q-type">简答题</span></div>
+  <div class="stem">学校要组织秋季研学旅行，有三个选项：<br>
+  ① 北京高校参观（免费，学校组织）<br>
+  ② 新加坡国立大学交流营（7天，自费9800元）<br>
+  ③ 暑期去肯尼亚做志愿者（14天，自费28000元）<br><br>
+  林小棠家里能拿出的预算大约5000块。她的好朋友都选了新加坡项目。林小棠很想去新加坡——好朋友的IG story里肯定全是滨海湾的夜景和大学校园的照片。但她算了一下：9800-5000=4800的缺口，要么找爸妈额外要，要么动用"小金库"里的3200块，还是不够。<br><br>
+  肯尼亚项目太贵，想都不用想。北京项目"免费但没意思"。<br><br>
+  <b>请你帮林小棠分析：在做这个选择时，她需要考虑哪些"看不见的成本"？又有哪些"看不见的收益"是被她忽略的？</b></div>
+  <textarea class="text-area" id="ta4" placeholder="在这里写下你的想法..."></textarea>
+  <button class="submit-btn" onclick="showExp(4)">提交查看参考思路</button>
+  <div class="exp" id="exp4">
+    <div class="exp-title">📖 参考思路</div>
+    <div class="exp-body">
+      <b>看得见的成本</b>：新加坡9800元 vs 北京0元，差额9800元。<br><br>
+      <b>看不见的成本</b>（经济学叫"机会成本"，《牛奶可乐经济学》核心概念）：<br>
+      如果把这9800元（加上小金库3200+额外找父母要的4800）花在新加坡，这9800元就<b>不能用于其他任何事</b>了。可能错过的是：一门AP补习班、一台新电脑、大学申请的标化考试费用、甚至大学第一学期的生活费。这些"放弃掉的选项"就是机会成本。<br><br>
+      《富爸爸穷爸爸》清崎说：学校从来不教你怎么花钱。但花钱的能力比赚钱更重要。<b>花9800元买7天的体验值不值，取决于这9800元对你的"替代用途"有多重要。</b><br><br>
+      <b>看不见的收益</b>（被忽略的）：<br>
+      北京项目虽然免费，但可能：① 实际参观清华北大的实验室、旁听一节课——对升学决策有直接帮助；② 省下来的9800元可以投资自己（买书、学技能、考标化）；③ 独立体验而非跟朋友一起，反而是锻炼自主能力的机会。<br><br>
+      《有钱人和你想的不一样》关键提醒：<b>不要因为别人去了你就去</b>。花钱之前问一句——"这个消费是我需要的，还是我怕被落下的焦虑？"前者的钱花得值，后者的钱花完只会更焦虑。
+    </div>
+    <div class="exp-source">【知识点来源：《牛奶可乐经济学》·机会成本 +《富爸爸穷爸爸》·为学习而投资 +《有钱人和你想的不一样》·长远眼光vs社交焦虑】</div>
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="card" id="q5">
+  <div class="q-tag"><span class="q-num">Q5</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠在小红书上刷到一篇帖子："高中生副业搞钱指南｜月入3000不是梦！"博主的头像是个看起来跟她差不多大的女生，背景是一杯星巴克和一台MacBook，配文写着：<br><br>
+  "我高二开始做跨境电商，现在月入3000+，零花钱自由！课程原价999，<b>粉丝限时优惠只要199</b>！"<br><br>
+  评论区全是"求带！""怎么报名？"点赞2.3万。<br><br>
+  林小棠心动了。199块，如果能学到月入3000的本事，太划算了吧？她准备点付款，突然犹豫了——<br><br>
+  以下哪个信号最值得她警惕？</div>
+  <div class="opts" data-q="5" data-answer="A">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">博主晒收入+限时优惠+海量好评——这套组合拳专门制造紧迫感和信任感，但她无法验证任何一个数字是真实的</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">199元太贵了。真正好的课程应该免费或者更便宜，贵的都是骗人的</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">高中生不该搞副业。应该把全部精力放在学习上，赚钱是大学毕业以后的事</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">跨境电商已经过时了。应该等新的风口出来再做，追热点才是赚钱的关键</span></div>
+  </div>
+  <div class="exp" id="exp5">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《黑天鹅》塔勒布讲了一个关键概念：<b>"沉默的证据"</b>。你看到的博主是"成功"的那一个——但你看不到的是：同样花199买了课程、什么都没赚到的几百人、几千人。他们没有发小红书说自己亏了，因为<b>失败者不会晒失败</b>。<br><br>
+      这就是<b>幸存者偏差</b>：你只看到了活下来的那一个，以为成功率很高。实际上，如果这个方法真能月入3000，博主为什么要花时间卖199的课而不是自己多开几个店？<br><br>
+      《非对称风险》塔勒布另一本书有个更尖锐的概念：<b>"风险共担"</b>——也叫"皮肤在游戏里"。博主收了你199，但你的成功和失败跟她没有关系。她不需要为你赚不到钱负任何责任。<b>不承担后果的人给的建议，天然需要打折。</b><br><br>
+      再加上《思考，快与慢》里的<b>"限时优惠"锚定</b>——999→199这个价差让你觉得赚了800，但真相是你花了199，买了一个无法验证的东西。<br><br>
+      不是说199一定是骗局——而是：当你看到一个"好到不真实"的机会时，先停下来，让系统2（理性思考）接管一下。
+    </div>
+    <div class="exp-source">【知识点来源：《黑天鹅》·沉默的证据/幸存者偏差 +《非对称风险》·风险共担 +《思考，快与慢》·锚定效应】</div>
+  </div>
+</div>
+
+<!-- ============ 单元二：风险与判断 ============ -->
+<div class="unit-header unit-2">
+  <div class="icon">⚠️</div>
+  <h2>单元二 · 风险与判断</h2>
+  <div class="line"></div>
+</div>
+
+<!-- Q6 -->
+<div class="card" id="q6">
+  <div class="q-tag"><span class="q-num">Q6</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠刷抖音时看到一个视频：一个看起来二十出头的男生，坐在跑车里，对着镜头说："我18岁辍学做币圈，现在身价千万。读书无用，选择比努力重要。"<br><br>
+  视频有48万赞，评论区一半人喊"大佬带带我"，另一半人在争论读书到底有没有用。<br><br>
+  林小棠想起自己正在为AP考试焦虑，忽然觉得："如果选择比努力重要，那我这么辛苦学AP是不是方向就错了？万一我毕业后也能找到一条'捷径'呢？"<br><br>
+  这个视频最核心的误导在哪里？</div>
+  <div class="opts" data-q="6" data-answer="D">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">他说的是实话。确实有少数人不读书也能成功，这条路是可行的</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">完全在骗人。辍学做币圈不可能成功，这肯定是假的</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">他成功是因为运气好。普通人没有这种运气，所以不能学他</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">他可能是真的成功了，但你没看到的是：每个"他"背后有成千上万个辍学做币圈、最后血本无归的人——只是他们不会拍视频</span></div>
+  </div>
+  <div class="exp" id="exp6">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《黑天鹅》里塔勒布讲了一个比喻：假设有一百万只猴子在扔硬币，扔了10次，总有一些猴子连续10次都是正面。你会说这些猴子是"天才"吗？不会——因为你知道有大量"失败"的猴子你看不到。<br><br>
+      视频里这个男生的成功可能是真的，但他犯了<b>幸存者偏差</b>的错误。辍学做币圈的，成功的那一个上了抖音；失败的十万个——负债的、回家打工的、精神崩溃的——他们没有拍视频。<b>你看到的"成功"不是一个概率，是一个结果。</b><br><br>
+      《黑天鹅》还讲了<b>"叙事谬误"</b>：人脑天生喜欢故事。"他辍学做币圈成功了"是一个好故事。但真实世界不是故事——成功背后有时代机遇、家庭背景、初始资本、信息渠道……这些东西他不会在视频里说。<br><br>
+      《反脆弱》给了更深的视角：成功的辍学者之所以能承受风险，是因为他们的"失败成本"可控（也许家庭兜底了）。<b>如果你效仿他辍学，你的失败成本是什么？你能承受吗？</b>这是每个人必须自己回答的问题。
+    </div>
+    <div class="exp-source">【知识点来源：《黑天鹅》·沉默的证据+叙事谬误 +《反脆弱》·失败成本与可承受风险】</div>
+  </div>
+</div>
+
+<!-- Q7 -->
+<div class="card" id="q7">
+  <div class="q-tag"><span class="q-num">Q7</span><span class="q-type">选择题</span></div>
+  <div class="stem">期末考试周，林小棠压力很大。她连续一周每天只睡5个小时，靠奶茶和咖啡硬撑。周五晚上终于考完最后一科，她瘫在床上刷手机。<br><br>
+  朋友圈里：程程发了"AP化学满分！"配了个100分的试卷照片；张芋发了"虽然物理没考好但模考稳了！"底下32个赞。<br><br>
+  林小棠打开自己的成绩单——化学62，物理55，数学70。她突然觉得大家都考得很好，只有自己一个人在退步。胸口发闷，眼眶发酸。<br><br>
+  但其实，她不知道的是：全班化学平均分才58分，她62分已经是前30%。程程那个"满分"是某次练习不是期末考。张芋物理实际只考了41分，只不过没说具体分数。<br><br>
+  林小棠此刻的情绪波动，最贴切的解释是？</div>
+  <div class="opts" data-q="7" data-answer="B">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">她就是成绩太差了所以心虚。如果成绩好就不会有这种感觉</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">她掉进了"沉默证据"的陷阱——朋友圈只展示好的，她拿自己的全部去比别人的高光时刻</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">这是因为她不够自信。自信的人不会被别人的朋友圈影响情绪</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">这是考试压力造成的正常反应，休息一下就好了，不需要重视</span></div>
+  </div>
+  <div class="exp" id="exp7">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《黑天鹅》塔勒布的<b>"沉默的证据"</b>不只用在赚钱上——它解释了我们几乎所有的社交焦虑。<br><br>
+      朋友圈是一个<b>只展示"幸存者"的平台</b>。考得好的人发成绩，考得差的人不发。结果你看到的朋友圈就是"全世界都考得很好只有我考得差"——但这不是事实，这是<b>筛选后的假象</b>。<br><br>
+      《思考，快与慢》卡尼曼指出：人脑的系统1天生爱做<b>自动比较</b>。看到别人的好成绩，你不需要刻意去比——大脑已经自动完成了比较并释放了皮质醇。这不是你的错，是你大脑的出厂设置。<br><br>
+      但你可以用系统2覆盖它：问一句——<b>"我没有看到的那些人在经历什么？"</b>全班化学平均58分，你考了62分，这个信息朋友圈不会给你。<br><br>
+      《蛤蟆先生去看心理医生》也有相关概念——<b>"自证预言"</b>：当你认定"我比别人差"，你就会只关注那些"别人比我好"的证据，忽略自己进步的部分，最后真的越来越差。<br><br>
+      下次刷朋友圈感到焦虑时，记住：<b>你拿自己的花絮去比别人的预告片，当然输。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《黑天鹅》·沉默的证据 +《思考，快与慢》·系统1自动比较 +《蛤蟆先生去看心理医生》·自证预言】</div>
+  </div>
+</div>
+
+<!-- Q8 -->
+<div class="card" id="q8">
+  <div class="q-tag"><span class="q-num">Q8</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠的表姐大学毕业后在一家创业公司工作，经常跟她说："创业公司机会多，大公司就是螺丝钉。你看那些去大厂的，都是被规训的打工人。"说得多了，林小棠也觉得有道理——以后毕业了就该去创业公司，或者自己创业。<br><br>
+  后来她把这件事跟班主任聊了。班主任说："你表姐说得有道理。不过你知道吗，创业公司第一年倒闭率是90%，五年存活率不到10%。"林小棠愣住了。<br><br>
+  她回去又问表姐，表姐说："我们公司挺好的，已经活三年了。"<br><br>
+  林小棠该怎样理解这个矛盾的信息？</div>
+  <div class="opts" data-q="8" data-answer="C">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">班主任是老师，当然会偏保守。应该听表姐的，年轻人就该闯</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">表姐的数据只是个例。创业公司90%会倒闭，所以一定不能去创业公司</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">两个人都没说错，但都不完整。表姐看到的是"活下来的创业公司"，班主任看到的是整体概率——真实的决策需要同时看这两面</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">这种事没法判断，只能看运气。走一步看一步吧</span></div>
+  </div>
+  <div class="exp" id="exp8">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《非对称风险》有一个核心概念叫<b>"皮肤在游戏里"</b>（Skin in the Game）。表姐推荐创业公司，因为她在一家<b>活下来了</b>的创业公司——她的经验是真实的，但她的样本有偏差。<b>那些去了倒闭的创业公司、被欠薪、被裁员的人，不会跟你说"创业公司好"。</b>因为他们已经离开了。<br><br>
+      这就是《黑天鹅》的<b>"条件概率"</b>问题：表姐说的"创业公司好"有一个隐藏前提——<b>如果这家创业公司活下来了</b>。而班主任说的"90%倒闭"是<b>无条件概率</b>——任何一家创业公司的存活概率。<br><br>
+      《反脆弱》塔勒布给出了一个实用框架：<b>"杠铃策略"</b>。大部分资源放在安全的地方（比如先去大公司积累技能和人脉），小部分资源去冒险（比如业余参与创业项目）。这样你既能享受创业的上行收益，又不会被创业的下行风险击垮。<br><br>
+      <b>真正的独立思考不是选谁说得对，而是看到两边都没说的那部分。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《非对称风险》·风险共担/Skin in the Game +《黑天鹅》·条件概率与幸存者偏差 +《反脆弱》·杠铃策略】</div>
+  </div>
+</div>
+
+<!-- Q9 -->
+<div class="card" id="q9">
+  <div class="q-tag"><span class="q-num">Q9</span><span class="q-type">选择题</span></div>
+  <div class="stem">暑假，林小棠跟妈妈去日本旅游。在东京街头，妈妈提议去吃一家很有名的寿司店，人均3000日元（约150人民币）。林小棠在网上搜了搜，发现隔壁巷子里有一家看起来很普通的小店，人均只要800日元（约40人民币），Google评分4.6。<br><br>
+  妈妈说："3000的那家是米其林推荐，来都来了，吃好一点的。"<br>
+  林小棠犹豫了。150块确实不便宜，但妈妈在掏钱，不用自己出。而且……来都来了。<br><br>
+  她突然想起之前在书上看到过一句话："判断一笔消费值不值，不要看它便宜不便宜，要看——"<br><br>
+  这句话的后半段最可能是什么？</div>
+  <div class="opts" data-q="9" data-answer="A">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">"你为它付出的代价，换来的东西能陪你多久。"花150块吃一顿的体验可能很棒，但吃完就没了；花150块买一把好伞可以用来10年</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">"它便不便宜。"如果打折就是值得的，不打折就不值得</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">"是谁付钱。"如果别人付钱就随便选，自己付钱就选便宜的</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">"是不是名牌。"名店的品质一定比普通店好，贵有贵的道理</span></div>
+  </div>
+  <div class="exp" id="exp9">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《有钱人和你想的不一样》开篇就讲了一个<b>雨伞的故事</b>：出门下雨，便利店500日元的塑料伞 vs 大商场10000日元的高质伞。大多数人选便宜的——但塑料伞质量差、容易丢、反复买，一年下来反而比好伞贵。这就是<b>"性价比"≠"便宜"</b>。<br><br>
+      核心标准是<b>"使用时间"和"长期价值"</b>。一个东西如果每天都要用、能用很久，花多一点钱买好的反而是省钱的。一个东西如果只是一次性消费（比如一顿饭），那就需要在<b>"体验价值"</b>和<b>"价格"</b>之间做真实比较。<br><br>
+      不过这里有个微妙之处：旅行中的美食体验属于<b>"记忆资产"</b>——吃完就没了，但美好的记忆可以持续很久。《牛奶可乐经济学》弗兰克讲过一个概念：<b>"炫耀性消费"vs"体验性消费"</b>。如果你选3000的寿司店是为了拍照发朋友圈，那是炫耀性消费；如果是真的想体验日本饮食文化，那是体验性消费。<br><br>
+      <b>花钱之前问自己：我买的是"别人的羡慕"，还是"自己的体验"？前者越花越空虚，后者越花越富有。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《有钱人和你想的不一样》·性价比思维/雨伞的故事 +《牛奶可乐经济学》·炫耀性消费vs体验性消费】</div>
+  </div>
+</div>
+
+<!-- Q10 -->
+<div class="card" id="q10">
+  <div class="q-tag"><span class="q-num">Q10</span><span class="q-type">简答题</span></div>
+  <div class="stem">2026年春天，一个叫"AI写作日入过千"的项目在小红书上爆火。林小棠的班级群里有三个同学都在讨论要不要加入。<br><br>
+  小A说："肯定要试啊，错过这波风口就没了！"<br>
+  小B说："我觉得不靠谱，但大家都在说，应该有点道理吧？"<br>
+  小C说："我先看看有没有负面评价再说。"<br><br>
+  林小棠也犹豫。这学期她的零花钱已经花超了，确实想找个办法赚钱。<br><br>
+  <b>请你用《黑天鹅》和《反脆弱》的思想框架，帮林小棠分析：面对这种"突然爆火的赚钱项目"，应该怎么思考？怎样做才能既不错过机会、又不被割韭菜？</b></div>
+  <textarea class="text-area" id="ta10" placeholder="在这里写下你的想法..."></textarea>
+  <button class="submit-btn" onclick="showExp(10)">提交查看参考思路</button>
+  <div class="exp" id="exp10">
+    <div class="exp-title">📖 参考思路</div>
+    <div class="exp-body">
+      <b>第一步：识别"沉默的证据"</b>（《黑天鹅》）<br>
+      你看到的"日入过千"的人，是幸存者。每一个他们背后，可能有100个亏了学费、什么都没赚到的人——只是他们不会发小红书说"我被骗了"。先问自己：失败的人是什么样的？我能承受成为那个失败的人吗？<br><br>
+      <b>第二步：识别"叙事谬误"</b>（《黑天鹅》）<br>
+      "AI是风口，抓住风口就能赚钱"——这是一个事后编出来的故事。事实是：AI领域里赚钱的是极少数，而且他们赚钱的原因很可能不是"抓住了风口"，而是恰好在对的时间有对的资源。把成功归因于"选对了风口"是大脑偷懒的叙事。<br><br>
+      <b>第三步：用"杠铃策略"行动</b>（《反脆弱》）<br>
+      不需要"全进"或"全不进"。塔勒布的杠铃策略是：<b>大部分资源放在安全的地方，小部分资源去冒险。</b>比如：<br>
+      • 花30分钟免费研究这个项目（不花钱）<br>
+      • 找已经做过的人，问"你亏了多少"而不是"你赚了多少"<br>
+      • 如果真想试，只用你能承受全部损失的金额（比如50块）<br><br>
+      <b>第四步：判断"风险共担"</b>（《非对称风险》）<br>
+      卖课程/卖项目的人，赚的是你的学费，不是你以后赚到的钱。如果他们的收费模式是"先教会你，你再从利润里分给我"，那说明他们有信心。如果是"先交钱再说"，那风险全在你身上。<br><br>
+      <b>总结：遇到"爆火的机会"，不拒绝也不追进。先看沉默的证据，再用小成本试错。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《黑天鹅》·沉默的证据+叙事谬误 +《反脆弱》·杠铃策略+试错价值 +《非对称风险》·风险共担】</div>
+  </div>
+</div>
+
+<!-- ============ 单元三：人际与亲密关系 ============ -->
+<div class="unit-header unit-3">
+  <div class="icon">💜</div>
+  <h2>单元三 · 人际与亲密关系</h2>
+  <div class="line"></div>
+</div>
+
+<!-- Q11 -->
+<div class="card" id="q11">
+  <div class="q-tag"><span class="q-num">Q11</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠在游戏里认识了一个叫"阿泽"的男生。头像很帅（她后来才知道是网图），声音好听，每天陪她打排位，连麦到凌晨两点。两周后，阿泽说："我喜欢你，做我女朋友吧。"<br><br>
+  林小棠答应了。第三天，阿泽发来一个链接："帮我点一下这个投票链接呗，需要绑定手机号。"<br>
+  林小棠有点犹豫，但心想"他都表白了，连这个忙都不帮会不会让他觉得我不信任他？"<br><br>
+  她点了链接，输入了手机号。第二天，她妈收到了三条扣费短信，一共60块——订了某个她从没听说的会员服务。<br><br>
+  这件事最能说明什么？</div>
+  <div class="opts" data-q="11" data-answer="D">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">林小棠太天真了。网恋果然不靠谱，以后绝对不能在网上交朋友</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">阿泽是个骗子。但不影响真正的网恋——只是她运气不好遇到了坏人</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">60块不算多，当作交学费了。不值得大惊小怪</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">问题不在网恋本身，而在于——一个认识两周的人用"你信不信任我"来要求你做不确定的事时，这恰好是最需要警惕的信号</span></div>
+  </div>
+  <div class="exp" id="exp11">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《非对称风险》塔勒布有一个犀利的原则：<b>看一个人是否值得信任，不是看他说了什么，而是看他承担了什么风险。</b>阿泽让你绑手机号——如果出了事，损失的是你的话费和隐私，他承担零风险。<b>风险全在你身上的"帮忙"，天然需要打个问号。</b><br><br>
+      更关键的信号是那句<b>"你不帮我就是不信我"</b>。这在心理学上叫<b>"情感勒索"</b>——用你害怕失去这段关系的恐惧来迫使你让步。《蛤蟆先生去看心理医生》里称这种互动为<b>"心理游戏"</b>：对方设一个局——提出不合理要求→你犹豫→对方用"你不爱我/不信我"施压→你妥协→对方得逞。<br><br>
+      健康的关系里，<b>"信任"是慢慢建立的，不是用来要挟的筹码</b>。如果一个人认识你两周就需要你"证明信任"，这不是亲密，这是测试你的底线——下次可能是更大的要求。<br><br>
+      不是说网上交朋友一定不好。但《反脆弱》提醒我们：<b>过度信任一个你从未见过面的人，就像把玻璃杯放在桌子边上——不是一定会摔碎，但一旦摔碎，代价很大。</b>先让信任经历时间的考验。
+    </div>
+    <div class="exp-source">【知识点来源：《非对称风险》·风险共担/Skin in the Game +《蛤蟆先生去看心理医生》·心理游戏+情感勒索 +《反脆弱》·脆弱性与过度暴露】</div>
+  </div>
+</div>
+
+<!-- Q12 -->
+<div class="card" id="q12">
+  <div class="q-tag"><span class="q-num">Q12</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠又"失恋"了。这是她这学期第三次追男生失败。<br><br>
+  第一次是隔壁班的篮球队长，她托人递了情书，对方第二天在球赛结束后跟另一个女生走了。第二次是社团里的学长，她主动聊了两周，学长突然说"我们做朋友挺好的"。第三次是同年级的一个男生，她约对方周末看电影，对方说"最近比较忙"就再也没回消息。<br><br>
+  林小棠躺在宿舍床上翻来覆去地想："是不是我不够好看？是不是我性格有问题？我是不是注定没人喜欢？"<br><br>
+  如果用《蛤蟆先生去看心理医生》的框架来帮她分析，她此刻处于什么状态？什么状态会更有帮助？</div>
+  <div class="opts" data-q="12" data-answer="B">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">她处于"儿童自我状态"——感到被抛弃和不够好。需要进入"父母自我状态"，用严格的自我要求来改变自己</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">她处于"儿童自我状态"——把被拒绝等同于"我不够好"。需要进入"成人自我状态"，理性分析：三次失败可能是概率问题、匹配问题，不一定是"我有问题"</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">她处于"成人自我状态"——已经够理性了。她需要的是找个人倾诉一下、哭一场，回到"儿童自我状态"释放情绪</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">她处于"父母自我状态"——在批判自己。需要做的是马上行动：化妆、换造型、再追下一个，用行动打败焦虑</span></div>
+  </div>
+  <div class="exp" id="exp12">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《蛤蟆先生去看心理医生》是罗伯特·戴博德写的一本心理咨询入门书，核心框架是<b>三种自我状态</b>：<br><br>
+      <b>儿童自我状态</b>：像小时候一样，被情绪驱动——委屈、愤怒、害怕被抛弃。林小棠现在就在这个状态："是不是我不够好？"是典型的儿童式自我怀疑。<br><br>
+      <b>父母自我状态</b>：像父母一样批判和说教——"你就是太胖了/太作了/不会说话"。这不是解决之道，只是换了一种自我攻击的方式。<br><br>
+      <b>成人自我状态</b>：理性、当下、不评判。用数据和分析代替情绪和自我攻击。这才是最有帮助的状态。<br><br>
+      进入成人状态后会怎么看这件事？<br>
+      ① 追三次失败——在高中阶段，不管多优秀的人，主动追求被拒绝的概率本来就很高。<br>
+      ② 失败的原因可能是：时机不对、对方有喜欢的人、性格不合、她追的方式可能让对方有压力。这些是<b>"策略问题"</b>，不是<b>"人的价值问题"</b>。<br>
+      ③ 把"我被拒绝了"等同于"我不值得被爱"，这在书里叫做<b>"自证预言"</b>——你相信自己不值得，于是表现得越来越卑微，结果把人推得更远。<br><br>
+      <b>被拒绝不等于不够好。有时候只是没碰对的人，或者用了不对的方式。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《蛤蟆先生去看心理医生》·三种自我状态（P-A-C模型）+自证预言】</div>
+  </div>
+</div>
+
+<!-- Q13 -->
+<div class="card" id="q13">
+  <div class="q-tag"><span class="q-num">Q13</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠在网上认识了一个新朋友小K，聊了一周后约出来见面。小K长得还行，说话很温柔，约在了一家咖啡馆。聊了一个小时后，小K提议"去我家看电影吧，我家就在附近。"<br><br>
+  林小棠有点犹豫——才第一次见面。但小K说："就是看电影而已，你想太多了吧？我又不是坏人。你不来的话我有点伤心。"<br><br>
+  林小棠心里在打架：去吧，怕不安全；不去吧，怕对方觉得自己矫情、扫兴，以后不约她了。<br><br>
+  这时候她应该怎么做最合理？</div>
+  <div class="opts" data-q="13" data-answer="A">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">不去。"第一次见面去对方家里"这个边界是合理的。如果对方因此生气或不理她，说明他尊重的不是她的意愿，只是她的顺从</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">去。但提前把位置分享给好朋友，设置SOS紧急联系人，这样即使出事也能快速求助</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">去。如果不去，对方会觉得你不信任他，第一印象就毁了，以后没法发展</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">不去。并且拉黑对方。第一次见面就约去家里的人一定是坏人</span></div>
+  </div>
+  <div class="exp" id="exp13">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《初性之美》马登博士有一个核心理念：<b>身体自主权——你的身体、你的节奏、你的选择，不需要为任何人的"失望"负责。</b>说"不"不是伤害对方，是尊重自己。<br><br>
+      注意小K的措辞："你想太多了""我又不是坏人""你不来我有点伤心"——这三句话构成了一套典型的<b>情感施压模式</b>。《蛤蟆先生去看心理医生》称这种互动为<b>"心理游戏"</b>：对方用"你太敏感"来否定你的判断，用"我有点伤心"来制造愧疚，让你为了不"伤害"对方而放弃自己的边界。<br><br>
+      《非对称风险》提供了一个干净的判断标准：<b>如果出事，谁承担后果？</b>你。小K不需要承担任何风险。一个不承担风险的人在催促你放松警惕，这本身就是最大的警示信号。<br><br>
+      <b>真正尊重你的人会说："没关系，那下次再约，你想去哪里都行。"</b>不会因为你的拒绝而生气、施压、冷暴力。对方的反应就是最好的筛选——如果不去他就不理你了，那他本来就不是值得深交的人。<br><br>
+      守住边界不是"矫情"，是自爱。
+    </div>
+    <div class="exp-source">【知识点来源：《初性之美》·身体自主权 +《蛤蟆先生去看心理医生》·心理游戏+情感施压 +《非对称风险》·风险共担】</div>
+  </div>
+</div>
+
+<!-- Q14 -->
+<div class="card" id="q14">
+  <div class="q-tag"><span class="q-num">Q14</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠的好朋友程程谈了一个男朋友，是隔壁学校的大二学长。程程跟林小棠说："他对我特别好，什么都听我的。就是有时候会突然生气摔东西，但每次都会跟我道歉，道歉的时候特别温柔。"<br><br>
+  程程还说："他有时候会查我手机，问我在跟谁聊天。我说这是隐私，他就说'你要是没什么就没什么好藏的'。后来我也就让他看了。"<br><br>
+  林小棠觉得哪里不太对，但又说不出来具体哪里不对。以下哪种分析最准确？</div>
+  <div class="opts" data-q="14" data-answer="C">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">程程的男朋友只是太爱她了。爱一个人就会吃醋、会想看她手机，这说明他在乎</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">程程的男朋友肯定有问题。摔东西的人一定会家暴，程程应该马上分手</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">"突然生气摔东西→道歉→特别温柔"这个循环是危险信号——它叫"暴力-蜜月循环"，每一次循环都会让边界被进一步蚕食。林小棠应该提醒程程注意这个模式</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">这是程程的私事。朋友之间不应该评价对方的恋爱关系，尊重就好</span></div>
+  </div>
+  <div class="exp" id="exp14">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《蛤蟆先生去看心理医生》讲过一个重要的观察：<b>不健康的关系模式往往不是持续的恶，而是"恶-好-恶-好"的循环。</b>每次对方做了过分的事（摔东西、查手机），随后都会用"好"来弥补（道歉、温柔、送礼物）。这让你产生一种错觉——"他还是个好人的，只是偶尔失控"。<br><br>
+      心理学称之为<b>"暴力-蜜月循环"</b>（Violence-Honeymoon Cycle）：<br>
+      ① 紧张积累→ ② 爆发（摔东西/冷暴力/言语攻击）→ ③ 道歉+蜜月期（"我再也不会了"）→ ④ 平静→ ⑤ 再次紧张积累……<br><br>
+      每一次循环，底线都会被推低一点。一开始是查手机，后来是限制社交，再后来可能升级为更大的控制。<b>"你要是没什么就没什么好藏的"这句话，本质上是把"侵犯隐私"重新定义成了"坦诚"。</b><br><br>
+      《初性之美》马登博士强调：<b>健康的关系建立在平等和尊重上，而不是控制和"证明你没什么好藏的"。</b>如果一个人需要通过监视来维持安全感，问题在他不在你。<br><br>
+      作为朋友，林小棠不需要劝分手（D选项太消极，A和B选项判断错误），但可以用<b>"你最近开心吗？"</b>而不是"你男朋友有问题"来开启对话——前者是关心，后者是评判。
+    </div>
+    <div class="exp-source">【知识点来源：《蛤蟆先生去看心理医生》·心理游戏+不健康互动模式 +《初性之美》·健康关系的平等原则】</div>
+  </div>
+</div>
+
+<!-- Q15 -->
+<div class="card" id="q15">
+  <div class="q-tag"><span class="q-num">Q15</span><span class="q-type">选择题</span></div>
+  <div class="stem">周末，林小棠和程程逛街。程程说她最近在看一部恋爱综艺，里面一个女嘉宾说："如果你真的爱一个人，就应该把自己全部交给他。保留就是不够爱。"<br><br>
+  程程问她男朋友有没有提过"更进一步"的要求。程程说提过，她还没准备好，但不知道该怎么拒绝，因为"他会不会觉得我不够爱他"。<br><br>
+  林小棠想了想，觉得自己也不太确定这个问题。以下哪种理解是最健康的？</div>
+  <div class="opts" data-q="15" data-answer="D">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">恋爱综艺说的是对的。真爱就应该完全坦诚，设置边界说明你在保留、在防备</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">绝对不行。高中生谈恋爱不应该有任何身体接触，牵手都不行</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">看情况。如果对方真的对你好、在一起时间够长，就可以考虑。时间长短是关键</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">"把自己全部交给对方"听起来很浪漫，但实际上——真正的亲密不需要用身体来"证明爱"。你的身体属于你自己，任何时候说"我还没准备好"都是完整的、有力量的回答</span></div>
+  </div>
+  <div class="exp" id="exp15">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《初性之美》马登博士写了一整本书来回答这个问题。核心观点是：<b>身体自主权是一切亲密关系的前提。</b>你的身体属于你自己，不是对方的"奖品"或"考验"。什么时候准备好、什么程度可以——只有你自己说了算。<br><br>
+      恋爱综艺里那句"保留就是不够爱"听起来很美，但拆开看：<b>这是把你的身体当作"爱的证明"来索取。</b>《非对称风险》的逻辑同样适用——如果出了意外（怀孕、疾病、心理创伤），承担后果的是你，不是提要求的人。承担风险的人才有资格决定风险的大小。<br><br>
+      《蛤蟆先生去看心理医生》戴博德用<b>"人生坐标"</b>来解释：<br>
+      • "我不好-你好"的人容易在关系中放弃主导权，觉得"对方要求的一定是对的"<br>
+      • "我好-你好"的人知道：我和对方是平等的，我的感受和对方的感受同样重要<br><br>
+      一个值得你信任的人，听到"我还没准备好"会说"好的，我等你"，而不是"你不爱我"。对方的反应就是最好的筛选标准。<br><br>
+      <b>安全性行为不只是避孕和防病——它首先是"你准备好了吗"这个心理安全。</b>包括：你了解风险吗？你能在任何时候喊停吗？你信任对方会尊重你的决定吗？如果有一个答案是"不确定"，那就是还没准备好。
+    </div>
+    <div class="exp-source">【知识点来源：《初性之美》·身体自主权+安全性行为 +《非对称风险》·风险共担 +《蛤蟆先生去看心理医生》·人生坐标（我好-你好）】</div>
+  </div>
+</div>
+
+<!-- ============ 单元四：人生抉择与自我成长 ============ -->
+<div class="unit-header unit-4">
+  <div class="icon">🌟</div>
+  <h2>单元四 · 人生抉择与自我成长</h2>
+  <div class="line"></div>
+</div>
+
+<!-- Q16 -->
+<div class="card" id="q16">
+  <div class="q-tag"><span class="q-num">Q16</span><span class="q-type">选择题</span></div>
+  <div class="stem">升学指导老师问林小棠："你想申请什么专业？"<br><br>
+  林小棠说不知道。老师说："那你喜欢什么？"<br>
+  "打游戏。"<br>
+  "那……游戏设计？计算机？"<br>
+  "不是那种喜欢。就是……什么都不太喜欢。也什么都不太讨厌。"<br><br>
+  老师又问："你有没有什么特别讨厌的事？"<br>
+  林小棠想了想："我特别讨厌我爸让我学金融。他说金融赚钱，让我申商学院。但我一看到金融的课就觉得无聊到想死。"<br><br>
+  "那如果不学金融，你最差能接受什么？"<br>
+  "传播学？传媒？反正不知道，但比金融强。"<br><br>
+  老师说："其实你已经缩小了范围。"以下哪种思路最能帮到林小棠？</div>
+  <div class="opts" data-q="16" data-answer="A">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">"排除法"也是一种有效策略——你不一定知道想要什么，但先排除绝对不想要的，剩下的范围就在缩小</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">既然不知道想要什么，就应该听爸爸的。金融确实赚钱，不爱可以慢慢培养</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">不知道想做什么说明她没有目标。应该找到激情所在再申请，哪怕gap year</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">选什么专业不重要。反正大部分毕业生最后都不做本专业的工作</span></div>
+  </div>
+  <div class="exp" id="exp16">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《反脆弱》塔勒布有一个反直觉的观点：<b>"否定法"（via negativa）比"肯定法"更可靠。</b>意思是你不知道什么是对的，但你往往知道什么是错的。与其追求"找到热爱"，不如先<b>排除确定的错误</b>——林小棠确定讨厌金融，这就排除了一个巨大的错误方向。<br><br>
+      很多人以为"找不到热爱"是一种缺陷。但《心流》契克森米哈赖的研究发现：<b>大部分人的"热爱"不是找到的，而是在持续投入中慢慢形成的。</b>你先做一件事→做到一定水平→发现其中的乐趣→越做越好→越来越喜欢。心流不是"找到喜欢的事才进入"，而是"投入做一件事就会进入"。<br><br>
+      《有钱人和你想的不一样》也有类似观点：人生选择不需要一开始就"选对"，需要的是<b>边走边调整</b>。先排除最不想要的，从剩下的里选一个"最不讨厌的"开始尝试。做了半年发现不对，再调——这就是《反脆弱》说的<b>"试错的价值"</b>：小错误是信息，不是失败。<br><br>
+      <b>不知道自己想要什么不丢人。用排除法往前走，走着走着就知道了。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《反脆弱》·否定法+试错价值 +《心流》·热爱是投入中产生的 +《有钱人和你想的不一样》·长远眼光】</div>
+  </div>
+</div>
+
+<!-- Q17 -->
+<div class="card" id="q17">
+  <div class="q-tag"><span class="q-num">Q17</span><span class="q-type">选择题</span></div>
+  <div class="stem">最近林小棠觉得自己越来越"躺平"了。周末整天躺在床上刷抖音、看小红书。有时候打两把游戏。朋友叫她出门她说"懒得动"。作业拖到最后一晚才写。<br><br>
+  她不是不开心。她觉得刷视频挺快乐的——那些搞笑段子、萌宠视频、美食探店，看着就舒服。但她也有一种说不出来的"空"。<br>
+  刷完三小时手机，放下手机的那一刻，不开心。<br>
+  打完游戏，关掉iPad的那一刻，不开心。<br><br>
+  但第二天她又忍不住重复同样的事。<br><br>
+  用《心流》的理论来分析，林小棠的"空"最可能是因为？</div>
+  <div class="opts" data-q="17" data-answer="C">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">她天生就是懒人。有些人注定没有上进心，接受就好</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">手机和游戏设计得太上瘾了。应该完全戒掉手机和游戏，用读书和运动替代</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">刷视频和打游戏带来的是"享乐"（被动接受刺激），不是"乐趣"（主动投入技能）。享乐填不满内心的空洞，只有心流体验才能真正让人感到充实</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">这是正常的青春期反应。所有人到这个年龄都会迷茫，过了就好了</span></div>
+  </div>
+  <div class="exp" id="exp17">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《心流》契克森米哈赖做了一个关键区分：<b>享乐（pleasure）≠ 乐趣（enjoyment）。</b><br><br>
+      <b>享乐</b>是被动接受外部刺激：刷短视频、吃垃圾食品、买东西。特点：<b>不需要任何技能，即时满足，但结束后更空虚。</b>因为你的大脑被多巴胺"借"走了快乐，还的时候连利息一起扣。<br><br>
+      <b>乐趣/心流</b>是主动投入一项有挑战的活动：画画、写小说、弹吉他、解一道数学难题、甚至认真做一顿饭。特点：<b>需要投入技能，有一定难度，过程中可能"痛苦"，但结束后感到深深的满足。</b><br><br>
+      林小棠的"空"不是因为她"懒"——而是她把大部分时间花在了<b>享乐</b>上，几乎没有<b>心流</b>体验。享乐像喝盐水——越喝越渴。心流像喝水——喝完真正解渴。<br><br>
+      心流的三个条件：<b>①目标清晰 ②即时反馈 ③挑战难度≈你的技能水平。</b>打游戏其实符合这三个条件——所以游戏也能产生心流。但林小棠打完游戏也不开心，可能是因为游戏的挑战已经低于她的能力了（太简单了无聊），或者是游戏的动机是外在的（逃避无聊）而不是内在的（真的想变强）。<br><br>
+      <b>不是说不能刷视频、不能打游戏。而是每天需要至少留一点时间给"心流型活动"——哪怕只是认真画一幅画、认真写一篇日记。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《心流》·享乐vs乐趣+心流三条件 +《有钱人和你想的不一样》·主动vs被动】</div>
+  </div>
+</div>
+
+<!-- Q18 -->
+<div class="card" id="q18">
+  <div class="q-tag"><span class="q-num">Q18</span><span class="q-type">选择题</span></div>
+  <div class="stem">AP出分那天，林小棠的化学考了3分（满分5分）。她其实已经尽力了——每天刷题、看YouTube教程、还花200块买了一本练习册。但3分确实不太好，很多大学不认。<br><br>
+  她的第一反应是："我就是笨。别人考5分是因为他们聪明。我这种人不适合学理科。"<br><br>
+  她室友张芋说："你上学期化学不是考了58分吗？这次按换算等于考了72。你进步了14分诶。"<br><br>
+  林小棠愣了一下："好像是……但我还是不够好。"<br><br>
+  从《蛤蟆先生去看心理医生》的角度，林小棠陷入了什么模式？怎样可以走出来？</div>
+  <div class="opts" data-q="18" data-answer="B">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">她陷入了"父母自我状态"——在像父母一样批判自己。需要进入"儿童自我状态"，允许自己哭一场释放情绪</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">她陷入了"自证预言"和"我不好-你好"的人生坐标——认定自己笨，所以只看分数不看进步。需要进入"成人自我状态"，客观评估：从58到72是实打实的进步，3分不是终点</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">她需要的是安慰。告诉她"3分已经很棒了"就好，不需要分析什么心理模式</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">她就是不适合学化学。应该果断放弃理科，转向文科方向</span></div>
+  </div>
+  <div class="exp" id="exp18">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《蛤蟆先生去看心理医生》戴博德提出了<b>"人生坐标"</b>的四个象限：<br>
+      • 我好-你好 ✅（健康）<br>
+      • 我不好-你好 ❌（自卑）<br>
+      • 我好-你不好 ❌（自大）<br>
+      • 我不好-你不好 ❌（绝望）<br><br>
+      林小棠此刻就在<b>"我不好-你好"</b>象限："我就是笨，别人考5分是因为他们聪明。"这个坐标一旦固化，就会产生<b>自证预言</b>——你认定自己笨→不想努力（反正笨）→下次更差→看吧我果然笨。<br><br>
+      但张芋提供了一个关键的外部视角：<b>从58到72是真实的进步。</b>《心流》契克森米哈赖的研究发现：<b>进步本身就是最大的内在奖励</b>。不是"达到某个标准才值得开心"，而是"今天比昨天好一点点"就值得认可。<br><br>
+      《反脆弱》塔勒布也有一个概念：<b>反脆弱</b>——不只是"坚韧地扛住打击"，而是从打击中变得更强。一次3分的经验，如果被用来分析"哪里出了问题、下次怎么改进"，就是反脆弱的过程。如果被用来证明"我就是笨"，就是脆弱化。<br><br>
+      <b>走出自证预言的第一步：把"我考了3分因为我笨"换成"我考了3分因为方法还需要调整，而且我比上学期进步了14分"。</b>这不是自我安慰，是事实。
+    </div>
+    <div class="exp-source">【知识点来源：《蛤蟆先生去看心理医生》·人生坐标+自证预言 +《心流》·内在奖励+进步感 +《反脆弱》·反脆弱性】</div>
+  </div>
+</div>
+
+<!-- Q19 -->
+<div class="card" id="q19">
+  <div class="q-tag"><span class="q-num">Q19</span><span class="q-type">选择题</span></div>
+  <div class="stem">林小棠的爸爸最近总跟她念叨："你看你表姐，学金融的，毕业进投行，年薪30万。你再看看你张叔叔家的儿子，学哲学的，毕业找不到工作，现在在家考公。选专业就是选命运。"<br><br>
+  林小棠心里不舒服，但也反驳不了——表姐确实年薪30万，张叔叔家的儿子确实在家考公。数据很清楚。<br><br>
+  但她又隐约觉得哪里不对：表姐每天加班到半夜，朋友圈全是凌晨的办公室照片，看起来并不开心。而张叔叔家的儿子，虽然在家考公，但他B站上有一万个粉丝，做哲学普及视频，看起来反而挺快乐。<br><br>
+  以下哪种思维方式最能帮她看清这件事？</div>
+  <div class="opts" data-q="19" data-answer="D">
+    <div class="opt" data-letter="A"><span class="letter">A.</span><span class="text">爸爸说得对。赚钱比开心重要。不开心但有钱总比开心但没钱好</span></div>
+    <div class="opt" data-letter="B"><span class="letter">B.</span><span class="text">爸爸说得错。开心比赚钱重要。应该学自己喜欢的，哪怕赚不到钱</span></div>
+    <div class="opt" data-letter="C"><span class="letter">C.</span><span class="text">两个人各有一半道理。应该折中：选一个赚钱还行、自己也不太讨厌的专业</span></div>
+    <div class="opt" data-letter="D"><span class="letter">D.</span><span class="text">爸爸犯了"幸存者偏差"的错误——他看到的是金融行业的幸存者，没看到金融行业成千上万的普通从业者。"年薪30万"不是金融行业的均值，是极少数人的结果</span></div>
+  </div>
+  <div class="exp" id="exp19">
+    <div class="exp-title">📖 解析</div>
+    <div class="exp-body">
+      《黑天鹅》塔勒布讲的<b>"沉默的证据"</b>用在这里完美契合：<br><br>
+      表姐年薪30万——她是金融行业的<b>幸存者</b>。爸爸没看到的是：金融专业每年毕业几十万人，大部分进了银行柜员岗、保险销售岗、普通分析岗，年薪不到10万。那些人不会出现在你爸的"成功案例"里，因为他们是"沉默的"。<br><br>
+      张叔叔家学哲学的儿子——他在家考公看起来"失败"。但他做B站视频有1万粉丝，这其实是一种<b>反脆弱</b>（《反脆弱》核心概念）：他在主流评价体系里"失败"了，但他在一个新兴平台上建立了自己的影响力和技能。这种能力在未来的不确定性中<b>可能比投行加班更有价值</b>。<br><br>
+      《有钱人和你想的不一样》田口智隆提醒：人生选择不是"选最赚钱的路"，而是<b>"选能让你持续成长的路"</b>。表姐虽然年薪30万，但凌晨发朋友圈加班——她可能正在透支健康换来一个未来不确定的职位。<br><br>
+      《心流》契克森米哈赖的终极观点：<b>幸福感不取决于收入水平，取决于你是否经常体验心流。</b>做自己擅长且享受的事→经常进入心流→幸福感高。做"赚钱但不享受"的事→没有心流→收入再高也空虚。<br><br>
+      <b>选专业不是选命运。但选专业的方式——是基于恐惧选的还是基于了解自己选的——确实影响命运。</b>
+    </div>
+    <div class="exp-source">【知识点来源：《黑天鹅》·沉默的证据/幸存者偏差 +《反脆弱》·反脆弱性 +《有钱人和你想的不一样》·长远成长 +《心流》·心流与幸福】</div>
+  </div>
+</div>
+
+<!-- Q20 -->
+<div class="card" id="q20">
+  <div class="q-tag"><span class="q-num">Q20</span><span class="q-type">简答题</span></div>
+  <div class="stem">做完前面19道题的林小棠，坐在书桌前发呆。<br><br>
+  这一年她经历了很多：买了太贵的皮肤、追了三个男生都被拒、被网恋对象骗了60块、考试分数不高不低、不知道学什么专业、每天刷手机到半夜但又觉得空……<br><br>
+  她想起之前看过的一句话："人生不是轨道，是旷野。"<br><br>
+  <b>请你基于这套题里的书籍思想，给林小棠（其实是给你自己）写一段话——关于：18岁的你，未来不需要"正确答案"，需要的是什么？（150字左右）</b></div>
+  <textarea class="text-area" id="ta20" placeholder="在这里写下你的想法..."></textarea>
+  <button class="submit-btn" onclick="showExp(20)">提交查看参考回答</button>
+  <div class="exp" id="exp20">
+    <div class="exp-title">📖 参考回答</div>
+    <div class="exp-body">
+      18岁的你不需要"正确答案"，需要的是——<br><br>
+      <b>识别风险的眼睛。</b>当有人告诉你"月入三千不是梦"，你能看到沉默的证据；当有人催你"你不来我伤心"，你能识别情感施压。（《黑天鹅》《非对称风险》）<br><br>
+      <b>从小错误中恢复的韧性。</b>追男生失败三次不代表你不好，AP考3分不代表你笨——每次失败都是信息，不是判决。（《反脆弱》《蛤蟆先生》）<br><br>
+      <b>推迟满足的自控力。</b>不是每件想要的东西都要立刻拥有。先存再花、先学再玩、先成为再拥有。（《有钱人和你想的不一样》《富爸爸》）<br><br>
+      <b>投入一件事的心流体验。</b>不只是被动地被手机喂养，而是主动地、认真地、全神贯注地做一件事——那才是真正的快乐。（《心流》）<br><br>
+      <b>守住边界的勇气。</b>你的身体是你的，你的时间是你的，你的选择是你的。"不"是一个完整的句子。（《初性之美》《蛤蟆先生》）<br><br>
+      人生不是轨道，是旷野。旷野里没有标准路线——但有指南针：理性、勇气、自爱。<br>
+      带上它们，往前走就好。
+    </div>
+    <div class="exp-source">【知识点来源：本套习题全部10本书籍的综合回顾】</div>
+  </div>
+</div>
+
+<!-- 后记 -->
+<div class="outro">
+  <h2>🎯 通关！</h2>
+  <p>
+    恭喜你走完了林小棠的20关。<br><br>
+    这套题不打算"教会"你什么。它只是把10本书的智慧，藏在了你每天都在经历的故事里——零花钱、游戏充值、朋友圈焦虑、网上交友、考试压力、专业选择……<br><br>
+    如果你做错了某道题，没关系。做错本身就是信息。<br>
+    如果你做对了某道题，那说明你已经具备了某种判断力——好好保护它。<br><br>
+    这些书——《有钱人和你想的不一样》《富爸爸穷爸爸》《思考，快与慢》《黑天鹅》《反脆弱》《心流》《蛤蟆先生去看心理医生》《非对称风险》《牛奶可乐经济学》《初性之美》——它们不是为了让你变成一个"正确的人"，而是让你变成一个<b>能自己思考的人</b>。<br><br>
+    18岁的旷野，欢迎入场。
+  </p>
+</div>
+
+</div>
+
+<script>
+let answered = {};
+let correctCount = 0;
+let doneCount = 0;
+
+// 选择题
+document.querySelectorAll('.opts').forEach(group => {
+  const qId = group.dataset.q;
+  const answer = group.dataset.answer; // "A"/"B"/"C"/"D"
+  const opts = group.querySelectorAll('.opt');
+  opts.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (group.querySelector('.opt.correct, .opt.wrong')) return; // 已答过
+      const chosen = opt.dataset.letter;
+      opts.forEach(o => {
+        if (o.dataset.letter === answer) o.classList.add('correct');
+        else if (o === opt) o.classList.add('wrong');
+      });
+      const exp = document.getElementById('exp' + qId);
+      if (exp) exp.classList.add('show');
+      const card = document.getElementById('q' + qId);
+      if (card) card.classList.add('q-locked');
+      
+      if (!answered[qId]) {
+        answered[qId] = true;
+        doneCount++;
+        if (chosen === answer) correctCount++;
+        updateScore();
+      }
+      
+      // 滚动到解析
+      setTimeout(() => {
+        if (exp) exp.scrollIntoView({behavior:'smooth', block:'nearest'});
+      }, 300);
+    });
+  });
+});
+
+// 简答题提交
+function showExp(qId) {
+  const exp = document.getElementById('exp' + qId);
+  if (exp) exp.classList.add('show');
+  const card = document.getElementById('q' + qId);
+  if (card) card.classList.add('q-locked');
+  if (!answered[qId]) {
+    answered[qId] = true;
+    doneCount++;
+    updateScore();
+  }
+  setTimeout(() => {
+    if (exp) exp.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 300);
+}
+
+// 更新进度
+function updateScore() {
+  const bar = document.getElementById('scoreBar');
+  if (doneCount > 0) bar.style.display = 'block';
+  document.getElementById('doneNum').textContent = doneCount;
+  document.getElementById('correctNum').textContent = correctCount;
+  const pct = Math.round(doneCount / 20 * 100);
+  document.getElementById('progText').textContent = pct + '%';
+  const offset = 100 - (doneCount / 20 * 100);
+  document.getElementById('progRing').style.strokeDashoffset = offset;
+}
+
+// 滚动显示进度条
+window.addEventListener('scroll', () => {
+  const intro = document.querySelector('.intro');
+  if (window.scrollY > intro.offsetHeight) {
+    document.getElementById('scoreBar').style.display = doneCount > 0 ? 'block' : 'none';
+  }
+});
+</script>
+</body>
+</html>
