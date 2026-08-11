@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烟火寻趣 · 生活新知局</title>
+<style>* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: "Noto Serif CJK SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+  background: #1a1a2e; color: #e0d5b7; min-height: 100vh;
+  margin: 0; padding: 0;
+}
+.wrapper { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
+.container { width: 100%; }
+h1 {
+  text-align: center; font-size: 1.4rem; color: #f0c060;
+  border-bottom: 2px solid #f0c060; padding-bottom: 0.5rem; margin-bottom: 0.3rem;
+}
+.subtitle { text-align: center; color: #a09070; font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+.layer-tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.layer-tab {
+  flex: 1; min-width: 100px; padding: 0.6rem 0.5rem; text-align: center;
+  background: #262640; border: 1px solid #3a3a5a; color: #a09070;
+  border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+}
+.layer-tab:hover { background: #30305a; color: #d0c090; }
+.layer-tab.active { background: #3a3050; border-color: #f0c060; color: #f0c060; font-weight: bold; }
+.layer-label { display: block; font-size: 0.7rem; color: #706050; margin-top: 2px; }
+
+.question-area { background: #22223a; border: 1px solid #3a3a5a; border-radius: 8px; padding: 1.5rem; }
+.q-progress { font-size: 0.8rem; color: #706050; margin-bottom: 1rem; text-align: right; }
+.q-number { color: #f0c060; font-weight: bold; }
+
+.q-type-badge {
+  display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 3px;
+  margin-bottom: 0.8rem; font-weight: bold;
+}
+.type-choice { background: #2a4a3a; color: #4ecb71; }
+.type-tf { background: #4a3a2a; color: #e0a040; }
+.type-match { background: #3a2a4a; color: #b080e0; }
+
+.q-stem { font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.2rem; color: #d8cfa0; }
+
+.options { display: flex; flex-direction: column; gap: 8px; }
+.option {
+  padding: 0.7rem 1rem; background: #2a2a44; border: 1px solid #3a3a5a;
+  border-radius: 6px; cursor: pointer; transition: all 0.15s; line-height: 1.5;
+}
+.option:hover { background: #30305a; }
+.option.selected { border-color: #f0c060; background: #3a3050; }
+.option.correct { border-color: #4ecb71; background: #1a3a2a; color: #4ecb71; }
+.option.wrong { border-color: #e05050; background: #3a1a2a; color: #e05050; }
+.option.disabled { pointer-events: none; opacity: 0.7; }
+
+.tf-options { display: flex; gap: 12px; }
+.tf-btn {
+  flex: 1; padding: 0.8rem; text-align: center; border-radius: 6px;
+  cursor: pointer; background: #2a2a44; border: 1px solid #3a3a5a;
+  font-size: 1rem; transition: all 0.15s;
+}
+.tf-btn:hover { background: #30305a; }
+.tf-btn.selected { border-color: #f0c060; background: #3a3050; }
+.tf-btn.correct { border-color: #4ecb71; background: #1a3a2a; color: #4ecb71; }
+.tf-btn.wrong { border-color: #e05050; background: #3a1a2a; color: #e05050; }
+.tf-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+.match-area { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; }
+.match-col { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px; }
+.match-item {
+  padding: 0.5rem 0.8rem; background: #2a2a44; border: 1px solid #3a3a5a;
+  border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-align: center;
+  transition: all 0.15s; line-height: 1.4;
+}
+.match-item:hover { background: #30305a; }
+.match-item.src-selected { border-color: #f0c060 !important; background: #3a3050 !important; }
+.match-item.target-selected { border-color: #80c0f0 !important; background: #2a3050 !important; }
+.match-item.matched { border-color: #4ecb71 !important; background: #1a3a2a !important; color: #4ecb71; pointer-events: none; }
+.match-label { font-size: 0.75rem; color: #706050; text-align: center; margin-bottom: 6px; }
+
+.explanation {
+  margin-top: 1rem; padding: 0.8rem 1rem; background: #1a1a30; border-left: 3px solid #f0c060;
+  border-radius: 0 6px 6px 0; font-size: 0.85rem; line-height: 1.6; display: none;
+  color: #c0b090;
+}
+.explanation.show { display: block; }
+
+.score-area {
+  text-align: center; margin-top: 1.5rem; padding: 1rem; background: #1a1a30;
+  border-radius: 8px; display: none;
+}
+.score-area.show { display: block; }
+.score-number { font-size: 2rem; color: #f0c060; font-weight: bold; }
+.score-detail { color: #a09070; font-size: 0.85rem; margin-top: 0.3rem; }
+
+.btn-row { display: flex; gap: 10px; margin-top: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn {
+  padding: 0.5rem 1.2rem; border-radius: 6px; cursor: pointer; border: none;
+  font-size: 0.9rem; font-family: inherit; transition: all 0.15s;
+}
+.btn-correct { background: #2a4a3a; color: #4ecb71; }
+.btn-correct:hover { background: #3a5a4a; }
+.btn-reset { background: #3a3a5a; color: #a09070; }
+.btn-reset:hover { background: #4a4a6a; color: #d0c090; }
+.btn-all { background: #4a3a2a; color: #e0a040; }
+.btn-all:hover { background: #5a4a3a; }
+
+/* 导航按钮 */
+.nav-row { display: flex; gap: 10px; margin-top: 0.8rem; justify-content: center; align-items: center; }
+.nav-hint { color: #706050; font-size: 0.8rem; min-width: 80px; text-align: center; }
+.btn-nav {
+  background: #3a3a50; color: #c0b090; padding: 0.5rem 1.2rem;
+  border-radius: 6px; cursor: pointer; border: 1px solid #4a4a6a;
+  font-size: 0.9rem; font-family: inherit; transition: all 0.15s;
+}
+.btn-nav:hover { background: #4a4a60; color: #e0d5b7; }
+.btn-nav:disabled { background: #2a2a35; color: #5a5a5a; border-color: #3a3a3a; cursor: not-allowed; }
+
+.btn-summary { background: #cba6f7; color: #1e1e2e; }
+.btn-summary:hover { background: #b4befe; }
+
+#scoreboard { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 8px 16px; width: 100%; box-sizing: border-box; }
+#scoreboard > div { white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<div id="scoreboard">
+  <div>📊 总进度：<span id="sbProgress" style="color:#f5c2e7;font-weight:700;">0/49</span></div>
+  <div>✅ 正确：<span id="sbCorrect" style="color:#a6e3a1;font-weight:700;">0</span></div>
+  <div>❌ 错误：<span id="sbWrong" style="color:#f38ba8;font-weight:700;">0</span></div>
+  <div>🏆 得分：<span id="sbScore" style="color:#f9e2af;font-weight:700;font-size:18px;">0%</span></div>
+</div>
+
+<div class="container">
+  <h1>烟火寻趣</h1>
+  <p class="subtitle">纯爆解压日 · 7关49题 · 有趣的硬核新知</p>
+
+  <div class="layer-tabs" id="layerTabs"></div>
+
+  <div class="question-area">
+    <div class="q-progress" id="qProgress"></div>
+    <div class="q-type-badge" id="qTypeBadge"></div>
+    <div class="q-stem" id="qStem"></div>
+    <div id="qBody"></div>
+    <div class="explanation" id="qExplanation"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-nav" id="btnPrev" onclick="goPrev()">◀ 上一题</button>
+    <span class="nav-hint" id="navHint"></span>
+    <button class="btn btn-nav" id="btnNext" onclick="goNext()">下一题 ▶</button>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-summary" id="btnSummary" onclick="showSummary()">📋 查看总结</button>
+    <button class="btn btn-correct" onclick="showAllAnswers()">📖 显示全部答案</button>
+    <button class="btn btn-reset" onclick="resetCurrentLayer()">🔄 重做本层</button>
+    <button class="btn btn-all" onclick="resetAll()">🔁 全部重做</button>
+  </div>
+
+  <div id="summaryPanel" style="display:none;max-width:720px;margin:20px auto;padding:24px;background:#1e1e2e;border-radius:16px;color:#cdd6f4;font-size:14px;line-height:1.7;"></div>
+    <div class="score-area" id="scoreArea"></div>
+</div>
+
+<script>
+// ==================== 题库 ====================
+
+// 菩提道次第广论卷十四 · 止观双运
+// 宗喀巴大师 著
+// 2026-08-08 v4 -- 大白话版
+
+/* === DATA BLOCK START === */
+const L1 = [
+  {
+    "stem": "你去菜市场看到竹子,标牌写着禾本科。你愣了一下,竹子不是树吗?其实竹子在植物学上确实不是树。它到底是什么?",
+    "options": ["D. 竹子是独立的竹本科", "B. 竹子是一种多肉植物", "C. 竹子是松树的近亲", "A. 竹子是世界上最高的草本植物(草)"],
+    "answer": 3,
+    "explanation": "A: 没有竹本科这个分类。竹子老老实实待在禾本科里,跟路边狗尾巴草一个科。 | B: 不是。多肉是景天科/仙人掌科那些储水的胖植物,竹子跟它们差了十万八千里。 | C: 不是。松树是裸子植物,竹子是被子植物,差了几亿年的进化距离。 | D: ✅ 对!竹子属于禾本科,跟水稻、小麦、玉米是亲戚。它是世界上生长最快的植物之一,某些品种一天能长91厘米。竹林其实是超大号草坪。",
+    "type": "choice"
+  },
+  {
+    "stem": "你剥开无花果准备吃,有人问:无花果真的没有花吗?其实无花果的花藏在一个意想不到的地方。你吃的果肉里那些丝状物是什么?",
+    "options": ["D. 无花果靠风传播花粉不需要花", "C. 花开在外面但太小看不见", "A. 花藏在果实内部,那些丝状物就是花蕊", "B. 无花果真的没有花,丝状物是纤维"],
+    "answer": 2,
+    "explanation": "A: 无花果不靠风靠榕小蜂。每种无花果几乎都有专属榕小蜂,是高度专一的共生。 | B: 不是在外面。无花果的花序叫隐头花序,整朵花翻过来长在里面。 | C: ✅ 对!无花果的花长在果实内部,那些丝状物就是花蕊。一种叫榕小蜂的昆虫钻进小孔授粉。你吃的无花果其实是花+种子的集合体。 | D: 所有被子植物都要开花才能结果。无花果也不例外,只是花开在里面看不到。",
+    "type": "choice"
+  },
+  {
+    "stem": "网上有人说香蕉有放射性。你第一反应是谣言,查了一下发现香蕉确实有微弱放射性。原因是什么?",
+    "options": ["B. 香蕉表皮吸收土壤辐射", "D. 所有水果都有强放射性", "C. 香蕉被核电站污染了", "A. 香蕉含钾-40同位素,有极微弱放射性,吃100万根才有影响"],
+    "answer": 3,
+    "explanation": "A: 不是表皮问题。钾-40均匀分布在果肉里。你身体里也有钾-40,你也有一点点放射性。 | B: 不是强放射性。所有含钾食物都有一丢丢,但远低于有害水平。香蕉只是钾含量高被拿来举例。 | C: 跟核电站无关。钾-40天然存在,土壤、人体、所有含钾食物里都有。 | D: ✅ 对!香蕉富含钾,其中极少部分是天然钾-40。量极小,科学界用香蕉等效剂量来比喻辐射量。吃几千万根才到致死剂量。日常完全没事。",
+    "type": "choice"
+  },
+  {
+    "stem": "吃火锅被辣到猛灌水,发现越喝越辣。但喝牛奶好多了。为什么喝水解不了辣?",
+    "options": ["B. 辣味分子太大水冲不掉", "C. 水会把辣椒素扩散到更多区域", "A. 辣不是味觉而是疼痛感受器被激活,辣椒素不溶于水但溶于脂肪", "D. 以上都对"],
+    "answer": 3,
+    "explanation": "A: 部分正确。辣椒素不易被水带走,但溶于油脂所以牛奶能缓解。 | B: 这也是真的!水冲不走辣椒素反而扩散到更多区域,火上浇油。 | C: 说得对但不够全面。辣椒素确实通过TRPV1受体触发热痛感,不溶于水。但完整答案见D。 | D: ✅ 完整!辣椒素不溶于水(喝水反而扩散),溶于脂肪(牛奶有效);辣不是味觉而是疼痛感受器被激活。鸟类对辣椒素不敏感,所以鸟吃辣椒没事帮植物传播种子。",
+    "type": "choice"
+  },
+  {
+    "stem": "刷到科普视频说向日葵并不是一直跟着太阳转。你一直以为它们全天追着太阳走。真相是什么?",
+    "options": ["B. 向日葵一直固定朝东不动", "C. 向日葵跟着月亮转", "D. 向日葵白天跟太阳晚上低头睡觉", "A. 只有开花前跟太阳转,开花后固定朝东"],
+    "answer": 3,
+    "explanation": "A: 不完全。开花后确实大多朝东,但开花前是会动的。 | B: 跟月亮没关系。向日性是对太阳光的反应。 | C: 哈哈想象一下向日葵低头睡觉的样子。但实际上花蕾期夜间它是慢慢转回东边等日出。 | D: ✅ 最准确!向日葵只在花蕾阶段跟太阳转(向日性)。一旦花朵开放茎停止生长,花固定朝东。朝东的好处:早上花盘被阳光加热,吸引传粉昆虫来得更早。",
+    "type": "choice"
+  },
+  {
+    "stem": "吃菠萝的时候舌头刺痛,有人开玩笑说你吃菠萝的时候菠萝在吃你。这居然有一定科学道理。为什么?",
+    "options": ["C. 菠萝表皮绒毛扎嘴", "B. 菠萝的果酸腐蚀口腔", "D. 菠萝含微量毒素刺激神经", "A. 菠萝含菠萝蛋白酶,会分解口腔黏膜的蛋白质"],
+    "answer": 3,
+    "explanation": "A: 绒毛在果皮上,你吃的果肉已去皮。舌头疼是化学原因。 | B: 果酸有一点刺激但不是主因。柠檬比菠萝酸多了但不会舌头疼。 | C: 菠萝没毒。蛋白酶在消化道被胃酸分解,正常食用完全安全。 | D: ✅ 对!菠萝蛋白酶能分解蛋白质,你嚼菠萝时它正在分解你舌头表面的蛋白质。泡盐水可让酶部分失活减轻刺痛。做菜时用菠萝腌肉会让肉变嫩也是这个原理。",
+    "type": "choice"
+  },
+  {
+    "stem": "你看到海獭睡觉的视频,它们手拉手飘在海面上。评论区全在刷好可爱。但海獭手拉手睡觉的真正原因是什么?",
+    "options": ["C. 警惕天敌,手拉手能感知危险", "B. 体温传递保暖", "A. 怕被海流冲散,手拉手保持在一起", "D. 纯粹社交行为增进感情"],
+    "answer": 2,
+    "explanation": "A: 海獭天敌主要是虎鲸和鲨鱼,靠视觉听觉感知,手拉手不增强警戒。 | B: 海獭保暖靠极密毛发(每平方厘米约15万根毛)和皮下脂肪,不需要体温传递。 | C: ✅ 对!海獭在海面上睡觉,海流会把它们冲散。手拉手是为了醒来还在彼此身边,特别是妈妈和宝宝。有时还用海带裹住自己当锚。 | D: 虽然是生存本能不是社交,但知道了原因好像更可爱了。",
+    "type": "choice"
+  },
+];
+const L2 = [
+  {
+    "stem": "早上煮豆浆,看到泡沫上涌以为煮开了关火。结果喝完肚子疼了一整天。豆浆冒泡了到底能不能喝?",
+    "options": ["B. 能喝,冒泡就是开了", "D. 再多煮1分钟就行", "A. 不能,80度就冒泡叫假沸,皂素还没被破坏,要继续煮到100度", "C. 泡沫撇掉就能喝"],
+    "answer": 2,
+    "explanation": "A: 这就是很多人中招的原因。冒泡不等于煮沸,水100度才开但豆浆80度就冒泡。 | B: 1分钟可能不够。假沸后需继续煮沸至少5分钟确保毒素完全失活。 | C: ✅ 对!豆浆80度左右会产生大量泡沫像煮开了,这叫假沸。此时皂素和抗胰蛋白酶还没被分解,喝了会恶心呕吐腹泻。必须继续小火煮沸5分钟以上。 | D: 撇泡沫没用。皂素溶解在液体里不在泡沫上,必须持续加热破坏。",
+    "type": "choice"
+  },
+  {
+    "stem": "土豆发芽了,你想把芽挖掉剩下的吃。室友说不行。发芽土豆到底能不能吃?",
+    "options": ["A. 不能,芽和变绿部分含龙葵苷毒素比正常高几十到几百倍", "C. 煮熟就能解毒", "B. 能,挖掉芽就安全", "D. 只有大面积发绿才不能吃"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!发芽变绿处龙葵苷含量极高,是神经毒素。挖掉可见的芽不够,毒素已扩散到周围组织。大面积发芽或变绿直接扔。 | B: 龙葵苷耐高温,普通烹饪温度破坏不了。不是煮熟就没事的毒素。 | C: 挖芽不够。龙葵苷从芽眼向周围扩散,不可见但已有毒。 | D: 小芽风险低一些但毒素扩散范围不可见。最安全:大面积发芽/明显变绿直接扔。",
+    "type": "choice"
+  },
+  {
+    "stem": "饭后你妈给你泡浓茶说助消化。你喝完胃不太舒服。饭后马上喝茶真的健康吗?",
+    "options": ["A. 不建议,茶中鞣酸跟食物铁结合形成不溶物,长期易贫血", "C. 只要不喝浓茶就行", "B. 很健康,茶帮助消化脂肪", "D. 饭后喝茶刮油减肥"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!鞣酸跟食物中铁结合形成不溶性沉淀,身体吸收不了。长期饭后立刻喝浓茶易缺铁性贫血。建议饭后1小时再喝。 | B: 淡茶好一点但鞣酸还在。偶尔喝影响不大,长期缺铁的人要注意。 | C: 茶不能分解脂肪。油腻感减轻只是茶水稀释了胃里的油脂。 | D: 没有科学依据。茶不含脂肪酶不能分解脂肪。零卡但不能帮你消耗红烧肉。",
+    "type": "choice"
+  },
+  {
+    "stem": "你点了杯半糖奶茶觉得挺健康。但一杯普通全糖奶茶大约含多少糖?",
+    "options": ["C. 约5克基本可以忽略", "B. 约15克跟一杯可乐差不多", "D. 奶茶不含糖甜味是奶的味道", "A. 约50-60克,超过WHO推荐每日25克上限的两倍"],
+    "answer": 3,
+    "explanation": "A: 5克是一小包咖啡糖的量。奶茶甜度远超这个。 | B: 一杯可乐约35-40克糖,奶茶通常比可乐还甜。 | C: 牛奶含乳糖但奶茶甜味几乎全来自额外添加的糖浆。奶味和甜味是两回事。 | D: ✅ 对!一杯正常甜度奶茶(500ml)平均含糖50-60克。WHO推荐每日添加糖不超过25克。半糖也有25-30克基本顶满一天上限。无糖奶茶的珍珠本身也泡在糖浆里。",
+    "type": "choice"
+  },
+  {
+    "stem": "你切了生菜准备沙拉,觉得生吃最健康。但生鲜蔬菜和肉类真的越鲜越好吗?",
+    "options": ["D. 用醋泡一下就能杀灭所有寄生虫", "A. 生鲜存在寄生虫和细菌风险,充分加热是最有效的杀菌方式", "C. 进口超市买的就可以生吃", "B. 生吃营养保留最完整所以一定最健康"],
+    "answer": 1,
+    "explanation": "A: 醋的酸度不够杀虫。需要高温或长时间超低温冷冻。醋能调味不能当消毒液。 | B: ✅ 对!生肉生鱼可能携带寄生虫和致病菌。加热到中心温度70度以上最可靠。有些日料店生鱼片经过超低温冷冻处理,但家庭条件下不建议自行生食。 | C: 贵不等于安全。可生食级鸡蛋也只是降低风险不是零风险。 | D: 营养保留多但安全风险也高。豆角含皂素必须煮熟,生鸡蛋有沙门氏菌风险。",
+    "type": "choice"
+  },
+  {
+    "stem": "朋友说维C越多越好,感冒了就泡一片泡腾片。你一天泡了三片。维生素C真的是越多越好吗?",
+    "options": ["D. 维C只在冬天需要补", "B. 越多越好,水溶性多出来的会排出", "A. 不是,每天200毫克够了,过量(超过2000毫克)可能腹泻甚至结石", "C. 维C可以治感冒"],
+    "answer": 2,
+    "explanation": "A: 维C全年都需要。冬季蔬果少可能摄入不足但不是只有冬天才需要。 | B: 维C确实水溶性,多余的会随尿排出,但排出过程增加肾脏负担和结石风险。能排出来不等于多多益善。 | C: ✅ 对!成人每天需约100毫克维C,200毫克够增强免疫力。超过2000毫克可能腹泻、胃酸过多,长期过量增加草酸钙结石风险。 | D: 维C不能治感冒。研究显示可能稍微缩短病程但不能预防或治愈。",
+    "type": "choice"
+  },
+  {
+    "stem": "你以为睡不着是因为不困。其实可能一直在错过黄金睡眠窗口。人的深睡眠主要集中在哪个时段?",
+    "options": ["C. 睡着后最后两小时", "D. 深睡眠均匀分布在整个睡眠中", "B. 凌晨3-6点最深", "A. 大约24:00-3:00,过了这个窗口很难补回来"],
+    "answer": 3,
+    "explanation": "A: 不是。最后两小时主要是浅睡眠和REM。 | B: 不是均匀分布。前半夜深睡眠多,后半夜REM多。时间点不同质量差很多。 | C: 反了。凌晨3-6点更多是REM(做梦阶段)。这就是熬夜后即使睡够时长也觉得累的原因。 | D: ✅ 对!深睡眠(N3阶段)集中在前半夜,入睡后前3-4小时。2点睡到10点和23点睡到7点都是8小时,后者深睡眠质量远超前者。",
+    "type": "choice"
+  },
+];
+const L3 = [
+  {
+    "stem": "中午困得不行趴桌子睡了40分钟,醒来反而更迷糊头疼。午睡到底睡多久最合适?",
+    "options": ["A. 20-30分钟最好,还没进入深睡眠醒来精神", "B. 越久越好睡到自然醒", "D. 不要午睡会影响晚上", "C. 5分钟就够了"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!20-30分钟叫能量觉,还没进入深睡眠所以醒来不迷糊。超过30分钟进入深睡眠被叫醒会产生睡眠惯性,就是那种脑子转不动的感觉。 | B: 超过40分钟进入深睡眠被闹钟叫醒会超痛苦。这就是越睡越困的原因。 | C: 短午睡不影响晚上。只要不超过30分钟,午睡反而提升下午注意力和情绪。但下午3点后别睡。 | D: 5分钟太短身体还没放松。但闭眼休息一下也有一定恢复作用。",
+    "type": "choice"
+  },
+  {
+    "stem": "晚上躺床上刷手机越刷越精神。你以为是不困,其实是手机在赶走你的睡意。手机怎么做到的?",
+    "options": ["D. 手机辐射阻止睡眠激素", "A. 屏幕蓝光抑制褪黑素分泌,让大脑以为还是白天", "C. 手机电磁波干扰大脑", "B. 内容太刺激导致兴奋"],
+    "answer": 1,
+    "explanation": "A: 跟辐射无关。手机辐射是非电离辐射,不会阻止激素分泌。 | B: ✅ 对!褪黑素是该睡觉了的信号,由松果体在黑暗时分泌。蓝光波长跟白天阳光接近,大脑看到蓝光就判断还是白天别睡。研究显示睡前1小时看手机可减少褪黑素约22%。 | C: 手机电磁波强度极低,对大脑没有影响。真正的问题在光不在波。 | D: 内容确实有影响但不是主因。即使看无聊的内容蓝光照样抑制褪黑素。",
+    "type": "choice"
+  },
+  {
+    "stem": "你说要减肥,每天跑步15分钟坚持了一月体重没变。朋友说你跑的时间不够。运动多久后才开始燃烧脂肪?",
+    "options": ["B. 一开始就烧脂肪", "D. 必须出一身汗才算燃脂", "C. 10分钟就开始", "A. 约40分钟后,之前消耗的是糖原"],
+    "answer": 3,
+    "explanation": "A: 不是一开始就烧脂肪。脂肪代谢比糖原慢,身体优先用糖原。 | B: 出汗跟燃脂无关。蒸桑拿也出汗但减的都是水不是脂肪。脂肪代谢产物主要通过呼吸(CO2)排出。 | C: 10分钟太早。脂肪供能比例在30-40分钟后才显著上升。 | D: ✅ 对!前20-40分钟身体主要消耗肌糖原和血糖(快速能源)。糖原不够了才动用脂肪(慢速能源)。所以跑15分钟基本没烧脂肪,刚热完身就停了。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现心情好的时候很少感冒,心情差的时候特别容易中招。心情真的能影响免疫系统吗?",
+    "options": ["B. 纯属巧合,心情跟免疫无关", "D. 开心的人只是更注意卫生", "A. 能,长期压力使皮质醇升高,直接抑制免疫细胞活性", "C. 只有极端悲伤才会影响免疫"],
+    "answer": 2,
+    "explanation": "A: 不是巧合。心理神经免疫学已证实情绪和免疫的生理联系。 | B: 注意卫生有帮助但跟心情对免疫的直接生理影响是两回事。 | C: ✅ 对!压力激素皮质醇长期偏高会抑制淋巴细胞和抗体的产生。研究证实长期焦虑的人感冒概率比心情稳定的人高2-3倍。笑能降低皮质醇增加干扰素,所以笑是最好的药有科学依据。 | D: 不只是极端情况。日常慢性压力(学业、人际焦虑)就会持续影响免疫。",
+    "type": "choice"
+  },
+  {
+    "stem": "有人说饿的时候决策力更强。但研究发现恰恰相反。饥饿时你的决策能力会怎样?",
+    "options": ["C. 没影响", "B. 更理性,空腹使头脑清醒", "A. 更冲动,饥饿让大脑倾向于短期回报", "D. 只影响体力不影响决策"],
+    "answer": 2,
+    "explanation": "A: 有影响。饥饿改变神经递质平衡,影响情绪和判断。 | B: 空腹头脑清醒是错觉。血糖偏低时大脑前额叶(负责理性决策)活动减弱。 | C: ✅ 对!饥饿时胃饥饿素升高刺激大脑奖励中心让你追求即时满足。研究:饥饿状态的法官假释批准率显著降低;饥饿的人更可能冲动消费。结论:别饿着做决定。 | D: 不只影响体力。大脑虽然只占体重2%但消耗20%的葡萄糖,血糖低直接影响脑功能。",
+    "type": "choice"
+  },
+  {
+    "stem": "你心情不好的时候假装笑了一下,结果发现心情好像真的好了一点点。难道假笑真的能让你变开心?",
+    "options": ["A. 有一定道理,面部肌肉反馈会向大脑传递开心信号", "B. 纯属心理暗示", "C. 只对部分人有效", "D. 假笑只会让你更烦"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!这叫面部反馈假说。微笑时颧大肌收缩会刺激迷走神经,向大脑传递积极信号。研究:咬筷子强迫微笑表情的人对搞笑视频的愉悦感评分更高。不是万能药但有生理效果。 | B: 不完全是暗示。有fMRI研究证实微笑表情能激活大脑奖赏回路。 | C: 对大多数人有效。但严重情绪低谷时效果有限。 | D: 通常不会更烦。微笑的生理反馈是正向的。",
+    "type": "choice"
+  },
+  {
+    "stem": "你跟朋友吵架气到爆炸。15分钟后发现自己没那么气了。愤怒的生理半衰期其实很短,大约多长?",
+    "options": ["A. 约15-20分钟,前提是你不再继续刺激自己", "C. 一整天", "D. 因人而异没有规律", "B. 几个小时"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!愤怒时肾上腺素和皮质醇飙升,但身体不能一直维持。约15-20分钟后激素水平自然回落,前提是你不去反复想他凭什么那么说。越想越重新分泌就回不来了。 | B: 一整天是因为反复触发。就像伤口你一直挠它就不愈合。 | C: 虽然个体有差异但生理半衰期的规律是普遍的。关键是停止继续刺激自己。 | D: 如果不断反刍事件确实会延长。但放下不再刺激自己,生理上15分钟就开始消退。",
+    "type": "choice"
+  },
+];
+const L4 = [
+  {
+    "stem": "你连续几天觉得好累,但明明没干什么体力活。就是躺在床上看手机也累。这种累跟跑完800米的累一样吗?",
+    "options": ["A. 不一样,脑力消耗和心理压力造成的假性疲劳跟体力疲劳机制不同", "D. 只要没运动就不可能真的累", "C. 躺着看手机不算累你是矫情", "B. 一样,累就是累没有区别"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!大脑虽然只占体重2%但消耗20%的葡萄糖。高强度思考、焦虑、情绪波动消耗大量能量。这种脑力疲劳跟肌肉疲劳机制完全不同,睡一觉不一定能恢复,需要的是换频道。 | B: 不运动也会累。大脑高能耗意味着想太多本身就是重体力活。 | C: 不是矫情。心理疲劳是真实存在的生理状态。焦虑和信息过载消耗前额叶认知资源。 | D: 不一样。体力疲劳是肌糖原耗尽加代谢废物堆积;脑力疲劳是神经递质消耗加慢性压力。恢复方式也不同。",
+    "type": "choice"
+  },
+  {
+    "stem": "你紧张的时候肩膀不自觉耸起来,牙关咬紧,呼吸变浅。这些身体反应和情绪之间是什么关系?",
+    "options": ["B. 单向的,情绪影响身体但身体不会影响情绪", "D. 只有极度紧张才有身体反应", "C. 只跟习惯有关跟情绪无关", "A. 双向的,情绪让身体紧绷,身体紧绷也会反过来加剧情绪"],
+    "answer": 3,
+    "explanation": "A: 不是单向的。身体姿态同样能影响情绪。挺胸抬头的人比弯腰驼背的人报告更多自信感。 | B: 轻微压力也有身体反应,只是你没注意到。很多人下意识咬紧牙关自己都不知道。 | C: 跟情绪密切相关。慢性肩颈紧张的人往往长期处于压力状态。 | D: ✅ 对!这叫具身认知。紧张导致耸肩咬牙,身体感知到紧张状态告诉大脑我还在紧张,形成正反馈循环。反过来有意识地松开牙关、沉下肩膀、深呼吸,大脑会收到放松信号。",
+    "type": "choice"
+  },
+  {
+    "stem": "有时候你觉得特别疲惫,但躺下来又睡不着,脑子里各种念头转。这种状态叫什么?跟真正的困有什么区别?",
+    "options": ["B. 这就是失眠跟困不困无关", "A. 这叫过度唤醒,身体很累但神经系统处于亢奋状态", "C. 你就是不困再等等就睡了", "D. 这说明你该吃药了"],
+    "answer": 1,
+    "explanation": "A: 失眠是症状不是原因。过度唤醒是背后的机制之一。先做放松再谈睡眠。 | B: ✅ 对!过度唤醒是慢性压力的典型表现。身体疲惫但皮质醇和去甲肾上腺素偏高,神经系统一直踩油门不肯刹车。这时候你需要的是先降亢奋再谈睡眠。 | C: 不是不困,是身体想睡但大脑不让睡。躺在床上硬等通常越等越焦虑。 | D: 不需要吃药。深呼吸、渐进式肌肉放松、离开床做点无聊的事都比等药强。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现听某些特定的歌会让后背发凉、起鸡皮疙瘩。这种反应叫什么?为什么有的人有有的人没有?",
+    "options": ["C. 只有好听的音乐才会这样", "A. 叫音乐寒颤,跟大脑奖赏系统和催产素释放有关", "B. 说明你体质弱容易受凉", "D. 这是过敏反应"],
+    "answer": 1,
+    "explanation": "A: 不只是好听。有时候是惊喜、感动、回忆触发的。跟情绪强度有关。 | B: ✅ 对!音乐寒颤是大脑听到强烈情绪刺激时释放多巴胺和催产素的结果。约50%的人能体验到。研究:能体验音乐寒颤的人共情能力和想象力测试分数更高。 | C: 跟体质无关。这是中枢神经系统的反应不是外周体温调节。 | D: 不是过敏。是大脑奖赏系统的正向反应,本质上是愉悦感。",
+    "type": "choice"
+  },
+  {
+    "stem": "你注意到一个规律:一到下午三四点就特别烦躁看谁都不顺眼。这其实是很多人共有的现象。为什么?",
+    "options": ["B. 因为下午课太无聊", "D. 只是心理作用", "A. 血糖波动和皮质醇低谷共同导致,吃点东西和走动能缓解", "C. 说明你身体有问题"],
+    "answer": 2,
+    "explanation": "A: 课无聊确实加剧,但即使你在玩也会在下午3-4点出现情绪低谷。这是生理节律。 | B: 不是心理作用。是血糖和激素的客观生理变化。 | C: ✅ 对!午餐后血糖先升后降,下午3-4点血糖偏低;同时皮质醇在下午出现自然低谷。两者叠加导致情绪低落和易怒。吃个水果走动5分钟就能缓解。 | D: 不是身体有问题。这是正常的昼夜节律波动,几乎所有人都有。",
+    "type": "choice"
+  },
+  {
+    "stem": "你状态很差想调整,搜了很多自我提升的方法,看到一堆要你早起、运动、冥想、写日记的建议。你觉得做不到就不想开始。关于自我提升哪个说法最有用?",
+    "options": ["D. 自我提升都是鸡汤没用", "C. 找一个完美的计划再开始", "B. 一次到位最好直接全套上", "A. 微习惯比大决心有效,从每天2分钟开始比从每天1小时开始更容易坚持"],
+    "answer": 3,
+    "explanation": "A: 不是所有自我提升都是鸡汤。微习惯有行为心理学研究支撑,关键是把目标缩到极小。 | B: 永远没有完美计划。等你计划好了一个月过去了。先开始再调整。 | C: 一次到位的失败率最高。意志力是有限资源全靠决心撑不过两周。 | D: ✅ 对!研究:小到不可能失败的目标(如每天做1个俯卧撑)反而最容易形成习惯。因为大脑抗拒大改变但不抗拒小改变。坚持2周每天2分钟,比做了3天每天1小时然后放弃有效得多。",
+    "type": "choice"
+  },
+  {
+    "stem": "你心情很丧什么都不想做。朋友建议出去走走你懒得动。但其实有个不需要出门不需要动的方法也能稍微改善情绪。是什么?",
+    "options": ["B. 刷短视频转移注意力", "D. 强迫自己笑", "A. 深呼吸慢吐气2分钟,激活副交感神经让身体进入放松模式", "C. 吃甜食让血糖升起来"],
+    "answer": 2,
+    "explanation": "A: 短视频确实能转移注意力但只是暂时逃避。放下手机情绪还是一样丧。 | B: 强迫微笑有一点点效果但不如深呼吸直接调节神经系统有效。 | C: ✅ 对!深呼吸(特别是4-7-8呼吸法:吸气4秒屏息7秒呼气8秒)直接刺激迷走神经,激活副交感神经系统。心率下降、血压降低、焦虑减轻。不用出门不用花钱躺着就能做。 | D: 甜食短期提升血糖让人暂时开心。但血糖快速上升后又快速回落情绪反而更不稳定。",
+    "type": "choice"
+  },
+];
+const L5 = [
+  {
+    "stem": "研究发现每天5分钟的正念冥想就能增强免疫力降低压力。你一听冥想就觉得是玄学。但科学怎么说?",
+    "options": ["B. 冥想就是睡觉换了个名字", "C. 冥想是伪科学", "A. 正念冥想确实有研究支撑,能降低皮质醇增厚前额叶皮层", "D. 只有信佛的人才能冥想"],
+    "answer": 2,
+    "explanation": "A: 冥想跟睡觉不同。冥想时你是清醒的有觉察的。脑电波显示冥想时大脑活动跟睡眠完全不同。 | B: 不是伪科学。已有超过2000篇同行评议论文研究正念冥想的生理效果。 | C: ✅ 对!哈佛医学院的fMRI研究:8周正念冥想训练后前额叶皮层(负责注意力和情绪调节)变厚,杏仁核(恐惧中心)缩小。皮质醇水平显著下降。不是玄学是神经科学。 | D: 冥想跟宗教无关。现代正念冥想1979年从佛教中提取技巧去掉了宗教色彩。任何人都能做。",
+    "type": "choice"
+  },
+  {
+    "stem": "你试过写日记但坚持不了觉得没什么好写的。但研究发现写日记的方式比写多少重要。以下哪种写日记方式对情绪健康最有效?",
+    "options": ["A. 写让你感恩的3件小事哪怕很小", "B. 记录每天发生了什么", "C. 把所有不满都倒出来越详细越好", "D. 写读书笔记"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!感恩日记被研究最多效果最好。每天写3件让你感恩的小事(哪怕很小:今天的奶茶好喝、阳光很好),坚持21天就能显著提升幸福感和降低抑郁症状。关键在于训练大脑关注积极面。 | B: 流水账帮助有限。大脑天然偏向记住负面事件,只记录发生了什么不会改变这个偏向。 | C: 倒苦水式写法短期发泄有用但长期可能强化负面思维模式。更好的写法是写完后加一句我能从中学到什么。 | D: 读书笔记对智力有帮助但对情绪健康效果不如感恩日记直接。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现一个规律:收拾房间之后心情会莫名变好。这不是错觉。心理学怎么解释这个现象?",
+    "options": ["C. 因为房间干净了所以心情好就这么简单", "A. 外在秩序会给大脑传递控制感信号降低焦虑", "D. 这是强迫症的表现", "B. 只是运动了一下心情好"],
+    "answer": 1,
+    "explanation": "A: 表面看是这样,但背后的心理机制是控制感和认知负荷减少。 | B: ✅ 对!杂乱的环境会消耗认知资源(大脑要不断过滤视觉干扰)。收拾房间创造了外在秩序,大脑将其解读为我能控制我的环境。这种控制感直接降低焦虑水平。 | C: 不是强迫症。想住整洁环境是正常心理需求。 | D: 运动确实有帮助但不是主因。主要来自视觉秩序带来的控制感。",
+    "type": "choice"
+  },
+  {
+    "stem": "你难过的时候想找朋友倾诉但又不想当负能量发射器。研究发现关于倾诉哪种方式最有利于情绪恢复?",
+    "options": ["A. 倾诉加共同寻找新视角比纯发泄效果好得多", "D. 发朋友圈让所有人看到", "C. 不倾诉自己消化最好", "B. 把所有不开心倒出来就行了"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!最有效的倾诉模式:先说出感受然后跟对方一起找到新的看待角度。这叫认知重构。纯发泄只是在重复负面情绪回路越说越气。找到一个新视角大脑才会松开那条回路。 | B: 朋友圈倾诉的风险是你收到的回复不一定是你需要的。一对一深度对话效果最好。 | C: 完全不倾诉也不好。情绪需要流动。憋着不表达的人身体症状更多。 | D: 纯发泄短期舒服但长期效果差。研究发现反复倾诉同一件事的人抑郁症状反而加重。",
+    "type": "choice"
+  },
+  {
+    "stem": "你参加完一次聚会回来瘫在床上一动不想动,觉得自己社交能量用尽了。但朋友说你就是内向。社交能量这个说法有科学依据吗?",
+    "options": ["A. 有,社交确实消耗认知资源外向者恢复快内向者恢复慢", "B. 没有科学依据就是矫情", "C. 只有社恐才会这样", "D. 跟性格无关纯粹是体力问题"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!社交时大脑要持续处理面部表情、语气、社交规则、自我监控,这些消耗大量前额叶认知资源。外向者多巴胺系统更敏感所以社交时获得更多愉悦感;内向者消耗更快恢复更慢。这是生理差异。 | B: 不是矫情。近20年的心理学研究已反复验证社交疲劳的真实性。 | C: 不只是社恐。普通人也会有社交疲劳只是阈值不同。 | D: 不只是体力。主要是认知和情绪资源的消耗。坐着聊天也能累到崩溃。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现自己参加某些聚会是表演型的:化妆、穿得像大人、找话题、维持气氛。回到家累到虚脱。这种社交和跟闺蜜聊天的累法一样吗?",
+    "options": ["B. 一样社交就是社交", "D. 看你当天状态", "A. 不一样,表演型社交消耗远大于真实社交因为需要持续自我监控", "C. 表演型社交其实更轻松因为戴了面具"],
+    "answer": 2,
+    "explanation": "A: 不一样。研究:需要印象管理的社交比自然互动消耗的认知资源多3-5倍。 | B: 社交类型本身造成的差异远大于当天状态。 | C: ✅ 对!表演型社交要同时做三件事:管理自己的形象、解读对方反应、维持氛围。这种自我监控是认知重活。跟闺蜜聊天不需要自我监控所以哪怕聊3小时也不太累。质量比数量重要。 | D: 表面戴面具省事实际上维持面具本身就是巨大的认知负担。",
+    "type": "choice"
+  },
+  {
+    "stem": "你手机里有200多个微信好友但真正难过了不知道能找谁说。研究发现社交幸福感的秘密不是朋友数量而是什么?",
+    "options": ["B. 朋友越多越幸福", "C. 社交圈子越广越好", "A. 亲密关系的深度,3-5个深交比200个泛交更幸福", "D. 跟数量无关看运气"],
+    "answer": 2,
+    "explanation": "A: 朋友数量超过一定阈值后增加反而降低幸福感(维护成本上升深度下降)。 | B: 圈子广的好处是信息多和机会多但跟幸福感关系不大。 | C: ✅ 对!哈佛85年追踪研究结论:幸福感的最强预测因素不是钱不是名不是朋友数量而是亲密关系的质量。有3-5个能说真话的朋友比200个点赞之交幸福得多。 | D: 不是运气。幸福感可以通过主动培养深度关系来提升。",
+    "type": "choice"
+  },
+];
+const L6 = [
+  {
+    "stem": "周末你一个人待着有人问你不孤独吗。你觉得挺舒服的。一个人待着和孤独是一回事吗?",
+    "options": ["B. 一个人就是孤独不管怎么定义", "C. 独处都是借口其实是在逃避", "D. 只有外向的人才觉得独处难受", "A. 不是,独处是主动选择且享受的,孤独是被动的且痛苦的"],
+    "answer": 3,
+    "explanation": "A: 你可以一个人待着很满足也可以在人群中很孤独。 | B: 独处是心理健康的必要条件。不能独处的人往往依赖他人提供情绪价值反而更脆弱。 | C: 内向和外向的人都需要独处时间。只是外向的人需要的更短。 | D: ✅ 对!独处和孤独是两个不同概念。独处是主动选择的享受的能恢复能量的。孤独是被动的不想要的人群中也可能感到的。一个人看书很舒服是独处;在一群人中觉得没人懂你是孤独。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现每次大聚会之后你需要好几天的独处来恢复。但室友聚会回来照样活蹦乱跳。你们的差异在哪里?",
+    "options": ["B. 室友身体比较好", "A. 多巴胺基线水平不同,外向者需要更多外部刺激才能感到愉悦", "C. 你有社交障碍需要看医生", "D. 只是你不够成熟"],
+    "answer": 1,
+    "explanation": "A: 跟身体好坏无关。内向不等于体弱。 | B: ✅ 对!外向者多巴胺基线较低需要更多外部刺激才能达到愉悦水平。内向者基线较高过多刺激反而过载。所以外向者聚完还想续摊内向者只想回家充电。两种都正常是神经生理差异。 | C: 不是社交障碍。社交疲劳是正常生理反应跟社恐完全不同。 | D: 跟成熟度无关。内向和外向在婴儿期就能观察到差异是天生的气质。",
+    "type": "choice"
+  },
+  {
+    "stem": "你不好意思拒绝社交邀约怕朋友觉得不合群。每次硬着头皮去了又很累。研究发现关于拒绝哪种方式对关系和你自己都最好?",
+    "options": ["A. 真诚地说今天想自己待着真正的朋友会理解", "C. 每次都去不然朋友会疏远你", "B. 找借口说有事去不了", "D. 直接不回消息"],
+    "answer": 0,
+    "explanation": "A: ✅ 对!研究发现真诚拒绝比找借口更有利于关系。说今天想自己休息一下的人在对方眼中好感度反而更高。因为真诚暗示信任(我敢跟你说真话)找借口暗示不信任(我不敢跟你说实话)。 | B: 每次都去的结果是越来越累越来越抗拒最后爆发式拒绝反而伤害关系。 | C: 找借口短期避免冲突但长期需要不断编新借口很累。一旦被发现假的信任会受损。 | D: 不回消息是最差选择。对方会胡思乱想对关系伤害最大。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现自己每次下决心改变都很大:从明天开始早起、运动、背单词、健康饮食。坚持三天就崩了。问题出在哪?",
+    "options": ["B. 你的意志力太弱需要加强", "A. 同时改太多习惯会超出意志力上限一次只改一个", "D. 你就是那种改不了的人", "C. 决心还不够大"],
+    "answer": 1,
+    "explanation": "A: 不是意志力弱。是策略错误。最强意志力的人也做不到同时改5个习惯。 | B: ✅ 对!意志力像手机电量是有限资源。同时开5个耗电App电量一下就没了。研究:一次只改一个习惯的人成功率是同时改5个的3倍。 | C: 没有人是改不了的。只是方法不对。把目标缩到一个习惯从小到不可能失败开始。 | D: 决心大小不影响。即便决心爆棚意志力系统也一样会过载。",
+    "type": "choice"
+  },
+  {
+    "stem": "你做一件事总觉得要做到完美。结果经常因为怕做不好而干脆不开始。完美主义最大的代价是什么?",
+    "options": ["D. 完美主义是因为害怕被评判应该学会不在意", "B. 完美主义说明标准高应该保持", "A. 最大代价不是质量而是从不开始,90分的完成品永远胜过100分的半成品", "C. 完美主义是好事追求卓越才能出好作品"],
+    "answer": 2,
+    "explanation": "A: 确实跟害怕被评判有关。但需要的不是学会不在意而是具体策略:先写烂版本然后改好。 | B: 追求卓越和完美主义是两码事。追求卓越对最终质量有高标准但接受过程中的不完美。完美主义对每一步都有不可降低的标准导致连第一步都迈不出去。 | C: ✅ 对!《反脆弱》的试错理论:先做粗糙版本然后不断迭代。Facebook第一版丑得不能看但它存在了。一个存在的东西可以被改进一个不存在的东西只能被想象。 | D: 完美主义让你在第一步就卡住。真正出好作品的人都是先做烂版本再改好的。",
+    "type": "choice"
+  },
+  {
+    "stem": "你回头看你走过的这段路发现自己最大的成长不是来自计划好的努力而是来自一些意外:一次偶然的尝试一个无意间听到的新观点。这说明什么?",
+    "options": ["D. 以后不要做计划了", "B. 说明你的计划能力不行", "A. 生活的不确定性是成长的燃料而不是威胁", "C. 成长全是靠运气"],
+    "answer": 2,
+    "explanation": "A: 不是不做计划而是做有弹性的计划。留白不等于空白。 | B: 不是计划能力不行。最好的计划也留有弹性和空间。计划是方向不是轨道。 | C: ✅ 对!塔勒布说:反脆弱的系统受益于波动。如果你把每一天都排得死死的没有空间遇到意外你就失去了成长的最大来源。保留一些空白让生活给你惊喜。 | D: 不全是运气。意外遇到新东西后你是否愿意尝试才是关键。运气只负责推送愿不意愿接收是你的事。",
+    "type": "choice"
+  },
+  {
+    "stem": "你身边有个朋友总爱抱怨每次聊天都是负能量。你发现自己跟她聊完心情也变差了。情绪真的会传染吗?",
+    "options": ["C. 只有面对面才会传染", "B. 不会,你的心情只跟你自己有关", "A. 会,情绪传染通过镜像神经元和情绪共鸣机制真实存在", "D. 只有很敏感的人才被传染"],
+    "answer": 2,
+    "explanation": "A: 不只是面对面。研究发现即使通过文字消息和电话也能传染情绪。甚至社交媒体上的负面内容也会影响你的情绪状态。 | B: 你的心情不只跟自己有关。人是社会性动物大脑天然倾向于同步周围人的情绪状态。 | C: ✅ 对!镜像神经元让你不自觉地模仿对方的表情语气和情绪状态。研究发现:跟一个焦虑的人待20分钟你自己的皮质醇也会升高。这不是你脆弱是大脑的硬件设计。对策:适当设置边界而不是硬扛。 | D: 虽然敏感的人更容易被传染但所有人都或多或少受影响。只是程度不同。",
+    "type": "choice"
+  },
+];
+const L7 = [
+  {
+    "stem": "你在小红书上刷到很多同龄人过得比你精彩多了:旅行、得奖、好看的穿搭。你越刷越焦虑。关于社交媒体和焦虑的关系以下哪个说法是对的?",
+    "options": ["D. 删掉所有社交App就能解决", "B. 别人确实过得比你好你该焦虑", "C. 社交媒体跟焦虑没关系", "A. 社交媒体上你看到的是所有人精心挑选的最好瞬间不是日常"],
+    "answer": 3,
+    "explanation": "A: 删掉不一定现实但可以:限制使用时间、取关让你焦虑的账号、关注真实内容的创作者。 | B: 你看到的不是真实的全貌。没人发自己凌晨3点哭泣的照片也没人发考砸了的成绩单。你在跟一个精心包装的幻象比。 | C: 大量研究已证实社交媒体使用跟焦虑抑郁有显著相关性。不是你的问题是信息环境的问题。 | D: ✅ 对!这叫幸存者偏差+选择性展示。每个人发的是自己最好的1%的瞬间你拿来跟自己100%的日常比当然焦虑。研究表明每天刷社交媒体超1小时的人焦虑和抑郁分数显著更高。",
+    "type": "choice"
+  },
+  {
+    "stem": "一天结束你躺在床上回想今天觉得什么也没做成。但如果换个角度问自己一个问题可能整个感受都不一样。哪个问题最值得每天问自己?",
+    "options": ["D. 今天离目标还有多远?", "A. 今天有没有一件事让你觉得还不错哪怕很小?", "C. 今天有什么没做好?", "B. 今天完成了多少任务?"],
+    "answer": 1,
+    "explanation": "A: 目标重要但每天盯着距离只会觉得远。更好的问法是:今天比昨天近了一步吗? | B: ✅ 对!大脑有负面偏差:天然倾向记住做错的事忽略做对的事。每天问自己一个问题训练大脑去注意积极面。不是因为做错了不重要而是因为你已经过度关注做错的了对的反而被忽略。 | C: 这是你大脑默认就会做的事。不需要额外问。 | D: 任务清单思维让人永远觉得不够。今天做了10件事你只会想着还有20件没做。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现跟某些人聊天之后心情很好跟某些人聊完更空了。区别通常不在于聊了什么而在于什么?",
+    "options": ["B. 对方是不是很有趣很会说话", "A. 对方有没有在听你说话并且给出真实的回应", "D. 聊的时间够不够长", "C. 聊的话题够不够深"],
+    "answer": 1,
+    "explanation": "A: 有趣的人确实好相处但如果是单口相声你只是观众不是对话者。社交满足感来自双向互动。 | B: ✅ 对!心理学研究:决定社交质量的最关键因素是感知到的回应性(perceived responsiveness)——对方有没有真的在听真的在意。一个不会说话但认真听你讲的朋友比一个口才极好但心不在焉的朋友让你满足得多。 | C: 时间长不代表质量高。30分钟深度对话比3小时浅层闲聊恢复能量效果更好。 | D: 话题深度有影响但不是关键。聊很深的话题但对方心不在焉你一样觉得空。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现自己发完消息后反复看对方有没有回。5分钟没回就开始想是不是说错话了。这种状态在心理学上叫什么?",
+    "options": ["C. 说明对方确实不想理你", "A. 焦虑型依恋倾向,对关系的不安全感导致过度监控", "D. 说明你太闲了", "B. 正常的关心"],
+    "answer": 1,
+    "explanation": "A: 5分钟没回可能在一百种情况:在忙、没看到、在跟人说话。不一定是你的问题。 | B: ✅ 对!焦虑型依恋的人对关系中的信号高度敏感,容易把中性行为(没及时回消息)解读为负面信号(他不在乎我)。这不是病是一个依恋风格。了解自己的风格后可以练习:消息发出去做别的事不要盯着屏幕。 | C: 跟闲不闲无关。焦虑型依恋的人即使很忙也会下意识检查手机。这是神经回路不是时间多少的问题。 | D: 关心是正常的但反复查看和焦虑说明超出了正常范围。正常关心不会让你心跳加速。",
+    "type": "choice"
+  },
+  {
+    "stem": "你做事总是三分钟热度。朋友说你没毅力。但行为设计学有一个完全不同的解释。以下哪个最接近真相?",
+    "options": ["D. 三分钟热度说明你不适合做这件事", "B. 你确实需要更强的毅力", "C. 你只对感兴趣的事能坚持", "A. 不是毅力问题,是目标设计问题——需要把目标缩到极小并绑定已有习惯"],
+    "answer": 3,
+    "explanation": "A: 三分钟热度是普遍现象跟事情本身关系不大。换一件事可能还是一样。关键是方法。 | B: 毅力是有限资源靠它撑不过两周。可持续的行为靠的是设计不是决心。 | C: 兴趣有帮助但不够。很多人对感兴趣的事也是三分钟热度——因为新鲜感过了大脑奖励回路就弱了。 | D: ✅ 对!行为设计师BJ Fogg的研究:持续性不靠毅力靠设计。两个技巧:1.把目标缩到极小(每天背1个词而不是100个);2.绑在已有习惯后面(刷牙后立刻背)。大脑抗拒大任务但不抗拒小任务。",
+    "type": "choice"
+  },
+  {
+    "stem": "你发现一个悖论:越想让自己别焦虑越焦虑。越想让自己快点睡着越睡不着。为什么控制情绪反而适得其反?",
+    "options": ["D. 这说明你有心理问题", "A. 因为压抑情绪会让大脑更关注它——你越说不该想大脑越觉得这事很重要", "C. 情绪可以被直接控制只是你方法不对", "B. 因为你的控制力不够"],
+    "answer": 1,
+    "explanation": "A: 这是所有人类的普遍现象不是心理问题。白熊实验在所有人身上都成立。 | B: ✅ 对!心理学有个经典实验:不要想一头白熊——结果满脑子都是白熊。情绪也一样:你越告诉自己别焦虑大脑就越确认焦虑存在。正确方法不是压制而是接纳:承认我现在有点焦虑然后把注意力放到具体行动上。 | C: 情绪不能被直接控制。你能控制的是呼吸、动作、注意力焦点。这些间接影响情绪。 | D: 不是控制力不够。最自律的人也一样控制不了情绪。能控制的是行为不是感受。",
+    "type": "choice"
+  },
+  {
+    "stem": "你在做一个选择但一直犹豫不决。分析了很多利弊还是拿不定主意。关于做决定以下哪个说法最有道理?",
+    "options": ["D. 应该找人帮你做决定", "A. 如果分析了很久还决定不了说明两条路差别不大随便选一个就行", "B. 说明你还没分析够继续想", "C. 说明两个选择都不好"],
+    "answer": 1,
+    "explanation": "A: 别人可以提供视角但最终承担后果的是你。而且别人帮你做你心理上不会全力投入。 | B: ✅ 对!决策学有个洞见:如果两个选项有明显优劣你早就选了。犹豫不决通常意味着利弊差不多——差别小到大脑判断不了。这时候花更多时间分析收益极低。随便选一个然后全力去做那个选择就是最好的选择。 | C: 边际收益递减。超过一定时间后多想不会产生新信息只是在已有信息上打转。 | D: 不一定。可能两个都不错所以难选。也可能两个都一般但差别不大。",
+    "type": "choice"
+  },
+];
+
+const layers = [
+  { name: "第1关", sub: "风物自然探秘", questions: L1, icon: "\u2638\ufe0f" },
+  { name: "第2关", sub: "饮食误区纠偏", questions: L2, icon: "\u26f0\ufe0f" },
+  { name: "第3关", sub: "人体节律图鉴", questions: L3, icon: "\u23f0" },
+  { name: "第4关", sub: "感官状态解析", questions: L4, icon: "\u269b\ufe0f" },
+  { name: "第5关", sub: "微习惯疗愈", questions: L5, icon: "\u2698\ufe0f" },
+  { name: "第6关", sub: "社交能耗认知", questions: L6, icon: "\u2697\ufe0f" },
+  { name: "第7关", sub: "烟火格局沉淀", questions: L7, icon: "\u2728" },
+];
+/* === DATA BLOCK END === */
+
+const layers = [
+  { name: "第一章", sub: "人生选择——从一把雨伞开始", questions: L1, icon: "\u2602\ufe0f" },
+  { name: "第二章", sub: "金钱思维方式——你的脑子是怎么转的", questions: L2, icon: "\ud83e\udde0" },
+  { name: "第三章", sub: "生活习惯——钱包里有你的人生密码", questions: L3, icon: "\ud83d\udc5b" },
+  { name: "第四章", sub: "工作方式——你的时间卖给谁了", questions: L4, icon: "\u23f0" },
+  { name: "第五章", sub: "投资——用钱生钱的基本功", questions: L5, icon: "\ud83d\udcc8" },
+  { name: "第六章", sub: "人际关系——谁把你带上路的", questions: L6, icon: "\ud83e\udd1d" },
+];
+let currentLayer = 0;
+let currentQ = 0;
+let answers = {};
+let matchSelectedSrc = null;
+
+function init() { buildTabs(); showQuestion(); }
+
+function buildTabs() {
+  var tabsHtml = layers.map(function(l, i) {
+    return '<div class="layer-tab ' + (i === currentLayer ? 'active' : '') + '" onclick="switchLayer(' + i + ')">' +
+    l.icon + ' ' + l.name + '<span class="layer-label">' + l.sub + '</span></div>';
+  }).join('');
+  document.getElementById('layerTabs').innerHTML = tabsHtml;
+}
+
+function switchLayer(i) {
+  currentLayer = i; currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+function refresh() { buildTabs(); showQuestion(); updateScore(); updateNavButtons(); }
+
+function goPrev() {
+  if (currentQ > 0) { currentQ--; matchSelectedSrc = null; showQuestion(); updateNavButtons(); }
+}
+
+function goNext() {
+  const qs = layers[currentLayer].questions;
+  if (currentQ < qs.length - 1) { currentQ++; matchSelectedSrc = null; showQuestion(); updateNavButtons(); }
+}
+
+function updateNavButtons() {
+  const qs = layers[currentLayer].questions;
+  document.getElementById('btnPrev').disabled = (currentQ === 0);
+  document.getElementById('btnNext').disabled = (currentQ >= qs.length - 1);
+  const key = currentLayer + '-' + currentQ;
+  const hint = document.getElementById('navHint');
+  if (answers[key] === undefined) { hint.textContent = '未作答'; return; }
+  const q = qs[currentQ];
+  let isCorrect = false;
+  if (q.type === 'match') {
+    if (typeof answers[key] === 'object') {
+      isCorrect = Object.entries(answers[key]).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; });
+    }
+  } else if (q.type === 'tf') {
+    var a = answers[key];
+    isCorrect = (a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer);
+  } else {
+    isCorrect = (answers[key] === q.answer);
+  }
+  hint.textContent = isCorrect ? '✅ 正确' : '❌ 错误';
+}
+
+function showQuestion() {
+  const qs = layers[currentLayer].questions;
+  const q = qs[currentQ];
+  const total = qs.length;
+  document.getElementById('qProgress').innerHTML = '第 <span class="q-number">' + (currentQ+1) + '</span> / ' + total + ' 题';
+
+  const badge = document.getElementById('qTypeBadge');
+  const typeMap = { choice: ['选择题', 'type-choice'], tf: ['判断题', 'type-tf'], match: ['连线题', 'type-match'] };
+  badge.className = 'q-type-badge ' + typeMap[q.type][1];
+  badge.textContent = typeMap[q.type][0];
+
+  document.getElementById('qStem').innerHTML = q.stem;
+
+  const body = document.getElementById('qBody');
+  const key = currentLayer + '-' + currentQ;
+  const prevAns = answers[key];
+
+  if (q.type === 'choice') {
+    body.innerHTML = '<div class="options">' +
+      q.options.map(function(opt, i) {
+        var cls = 'option';
+        if (prevAns !== undefined) {
+          cls += ' disabled';
+          if (i === q.answer) cls += ' correct';
+          else if (i === prevAns && prevAns !== q.answer) cls += ' wrong';
+        }
+        return '<div class="' + cls + '" onclick="' + (prevAns === undefined ? 'answerChoice(' + i + ')' : '') + '">' + opt + '</div>';
+      }).join('') + '</div>';
+  } else if (q.type === 'tf') {
+    var qAnsNum = (q.answer === true || q.answer === 0) ? 0 : 1;
+    body.innerHTML = '<div class="tf-options">' +
+      '<div class="tf-btn' + (prevAns === 0 ? ' selected' : '') + (prevAns !== undefined ? (0 === qAnsNum ? ' correct' : (prevAns === 0 ? ' wrong' : '')) + ' disabled' : '') + '" onclick="' + (prevAns === undefined ? 'answerTF(true)' : '') + '">✅ 正确</div>' +
+      '<div class="tf-btn' + (prevAns === 1 ? ' selected' : '') + (prevAns !== undefined ? (1 === qAnsNum ? ' correct' : (prevAns === 1 ? ' wrong' : '')) + ' disabled' : '') + '" onclick="' + (prevAns === undefined ? 'answerTF(false)' : '') + '">❌ 错误</div>' +
+      '</div>';
+  } else if (q.type === 'match') {
+    var matched = (prevAns && typeof prevAns === 'object') ? prevAns : {};
+    var allDone = Object.keys(matched).length === q.left.length;
+    var html = '<div class="match-area">';
+    html += '<div class="match-col"><div class="match-label">左列（点击后再点右列连线）</div>';
+    q.left.forEach(function(item, i) {
+      if (matched[i] !== undefined) {
+        html += '<div class="match-item matched">' + item + ' → ' + q.right[matched[i]] + '</div>';
+      } else {
+        html += '<div class="match-item src-selected" onclick="selectMatchSrc(' + i + ')" id="match-src-' + i + '">' + item + '</div>';
+      }
+    });
+    html += '</div><div class="match-col"><div class="match-label">右列</div>';
+    q.right.forEach(function(item, i) {
+      if (Object.values(matched).includes(i)) {
+        html += '<div class="match-item matched">' + item + '</div>';
+      } else {
+        html += '<div class="match-item" onclick="selectMatchTarget(' + i + ')" id="match-tgt-' + i + '">' + item + '</div>';
+      }
+    });
+    html += '</div></div>';
+    if (allDone) {
+      var allCorrect = Object.entries(matched).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; });
+      html += '<div style="margin-top:1rem; text-align:center; color:' + (allCorrect ? '#4ecb71' : '#e05050') + '; font-weight:bold;">' +
+        (allCorrect ? '🎉 全部正确！' : '❌ 有错误，请重做') + '</div>';
+    }
+    body.innerHTML = html;
+  }
+
+  var explDiv = document.getElementById('qExplanation');
+  if (prevAns !== undefined && q.explanation) {
+    explDiv.className = 'explanation show';
+    explDiv.textContent = '💡 ' + q.explanation;
+  } else {
+    explDiv.className = 'explanation';
+    explDiv.textContent = '';
+  }
+}
+
+function answerChoice(idx) {
+  var key = currentLayer + '-' + currentQ;
+  if (answers[key] !== undefined) return;
+  answers[key] = idx;
+  showQuestion(); updateScore(); updateNavButtons(); updateScoreboard();
+}
+
+function answerTF(val) {
+  var key = currentLayer + '-' + currentQ;
+  if (answers[key] !== undefined) return;
+  answers[key] = val ? 0 : 1;
+  showQuestion(); updateScore(); updateNavButtons(); updateScoreboard();
+}
+
+function selectMatchSrc(idx) {
+  matchSelectedSrc = idx;
+  document.querySelectorAll('.match-item').forEach(function(el) { el.classList.remove('src-selected'); });
+  var el = document.getElementById('match-src-' + idx);
+  if (el) el.classList.add('src-selected');
+  var q = layers[currentLayer].questions[currentQ];
+  var matched = answers[currentLayer + '-' + currentQ] || {};
+  document.querySelectorAll('.match-item').forEach(function(el) { el.classList.remove('target-selected'); });
+  q.right.forEach(function(_, i) {
+    if (!Object.values(matched).includes(i)) {
+      var tel = document.getElementById('match-tgt-' + i);
+      if (tel) tel.classList.add('target-selected');
+    }
+  });
+}
+
+function selectMatchTarget(ti) {
+  if (matchSelectedSrc === null) return;
+  var key = currentLayer + '-' + currentQ;
+  var matched = answers[key];
+  if (!matched || typeof matched !== 'object') matched = {};
+  if (matched[matchSelectedSrc] !== undefined) return;
+  matched[matchSelectedSrc] = ti;
+  answers[key] = matched;
+  matchSelectedSrc = null;
+  showQuestion(); updateScore(); updateNavButtons();
+  updateScoreboard();
+}
+
+function updateScore() {
+  var area = document.getElementById('scoreArea');
+  var qs = layers[currentLayer].questions;
+  var correct = 0, total = 0;
+  qs.forEach(function(q, qi) {
+    var key = currentLayer + '-' + qi;
+    var ans = answers[key];
+    if (ans === undefined) return;
+    total++;
+    if (q.type === 'match') {
+      if (typeof ans === 'object') {
+        if (Object.entries(ans).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; })) correct++;
+      }
+    } else {
+      if (q.type === 'tf') {
+        if ((ans === 1 && q.answer === false) || (ans === 0 && q.answer === true) || (ans === q.answer)) correct++;
+      } else {
+        if (ans === q.answer) correct++;
+      }
+    }
+  });
+  if (total > 0) {
+    area.className = 'score-area show';
+    area.innerHTML = '<div class="score-number">' + correct + ' / ' + total + '</div>' +
+      '<div class="score-detail">正确率 ' + Math.round(correct/total*100) + '% （共' + qs.length + '题，已答' + total + '题）</div>';
+  } else {
+    area.className = 'score-area';
+  }
+}
+
+// === Scoreboard update ===
+function updateScoreboard() {
+  var total = 0, correct = 0;
+  for (var l = 0; l < layers.length; l++) {
+    var qs = layers[l].questions;
+    for (var i = 0; i < qs.length; i++) {
+      var key = l + '-' + i;
+      if (answers[key] === undefined) continue;
+      total++;
+      var q = qs[i];
+      if (q.type === 'choice') {
+        if (answers[key] === q.answer) correct++;
+      } else if (q.type === 'tf') {
+        var a = answers[key];
+        if ((a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer)) correct++;
+      } else if (q.type === 'match') {
+        if (typeof answers[key] === 'object') {
+          var allOk = true;
+          for (var j = 0; j < q.corrects.length; j++) {
+            if (q.corrects[j] !== answers[key][j]) { allOk = false; break; }
+          }
+          if (allOk) correct++;
+        }
+      }
+    }
+  }
+  var wrong = total - correct;
+  var pct = total > 0 ? Math.round(correct / total * 100) : 0;
+  document.getElementById('sbProgress').textContent = total + '/49';
+  document.getElementById('sbCorrect').textContent = correct;
+  document.getElementById('sbWrong').textContent = wrong;
+  document.getElementById('sbScore').textContent = pct + '%';
+}
+
+function showSummary() {
+  var panel = document.getElementById('summaryPanel');
+  if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  var allCorrect = [], allWrong = [], unansweredQ = [];
+  var totalCorrect = 0, totalWrong = 0;
+  for (var l = 0; l < layers.length; l++) {
+    var qs = layers[l].questions;
+    for (var i = 0; i < qs.length; i++) {
+      var key = l + '-' + i;
+      var q = qs[i];
+      if (answers[key] === undefined) {
+        unansweredQ.push({ layer: l, qi: i, q: q });
+        continue;
+      }
+      var isCorrect = false;
+      if (q.type === 'choice') {
+        isCorrect = answers[key] === q.answer;
+      } else if (q.type === 'tf') {
+        var a = answers[key];
+        isCorrect = (a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer);
+      }
+      var entry = { layer: l, qi: i, q: q, your: answers[key] };
+      if (isCorrect) { allCorrect.push(entry); totalCorrect++; }
+      else { allWrong.push(entry); totalWrong++; }
+    }
+  }
+  var answered = totalCorrect + totalWrong;
+  var h = '<h2 style="color:#f9e2af;margin:0 0 8px;">📋 测验总结</h2>';
+  h += '<p style="color:#a6adc8;margin:0 0 4px;">已答' + answered + '/49题 · ✅' + totalCorrect + ' · ❌' + totalWrong;
+  if (unansweredQ.length > 0) h += ' · ⚠️未答' + unansweredQ.length;
+  h += '</p>';
+  h += '<div style="background:#313244;height:6px;border-radius:3px;margin:12px 0;overflow:hidden;"><div style="background:#a6e3a1;height:100%;width:' + (answered/49*100) + '%;border-radius:3px;transition:width 0.3s;"></div></div>';
+  
+  if (allWrong.length > 0) {
+    h += '<h3 style="color:#f38ba8;margin:20px 0 12px;">❌ 答错的题（' + allWrong.length + '题）</h3>';
+    for (var wi = 0; wi < allWrong.length; wi++) {
+      var w = allWrong[wi];
+      h += '<div style="background:#302030;padding:12px 16px;margin:8px 0;border-radius:8px;border-left:3px solid #f38ba8;">';
+      h += '<div style="color:#f38ba8;font-size:12px;">' + layers[w.layer].name + ' 第' + (w.qi+1) + '题</div>';
+      h += '<div style="margin:6px 0;">' + w.q.stem + '</div>';
+      h += '<div style="font-size:12px;margin:4px 0;">你的答案：<span style="color:#f38ba8;">' + w.q.options[w.your] + '</span></div>';
+      h += '<div style="font-size:12px;">正确答案：<span style="color:#a6e3a1;">' + w.q.options[w.q.answer] + '</span></div>';
+      h += '</div>';
+    }
+  }
+  
+  if (allCorrect.length > 0) {
+    h += '<h3 style="color:#a6e3a1;margin:20px 0 12px;">✅ 答对的题（' + allCorrect.length + '题）</h3>';
+    for (var ci = 0; ci < allCorrect.length; ci++) {
+      var c = allCorrect[ci];
+      h += '<div style="background:#203020;padding:12px 16px;margin:8px 0;border-radius:8px;border-left:3px solid #a6e3a1;">';
+      h += '<div style="color:#a6e3a1;font-size:12px;">' + layers[c.layer].name + ' 第' + (c.qi+1) + '题</div>';
+      h += '<div style="margin:6px 0;">' + c.q.stem + '</div>';
+      h += '<div style="font-size:12px;">你的答案：<span style="color:#a6e3a1;">' + c.q.options[c.your] + '</span></div>';
+      h += '</div>';
+    }
+  }
+  
+  if (unansweredQ.length > 0) {
+    h += '<h3 style="color:#f9e2af;margin:20px 0 12px;">⚠️ 尚未作答（' + unansweredQ.length + '题）</h3>';
+    for (var ui = 0; ui < unansweredQ.length; ui++) {
+      var u = unansweredQ[ui];
+      h += '<div style="background:#2a2a30;padding:10px 16px;margin:6px 0;border-radius:6px;font-size:13px;color:#a6adc8;">' + layers[u.layer].name + ' 第' + (u.qi+1) + '题：' + u.q.stem.substring(0,50) + '…</div>';
+    }
+  }
+  panel.innerHTML = h;
+  panel.scrollIntoView({behavior: 'smooth'});
+}
+
+
+function showAllAnswers() {
+  var qs = layers[currentLayer].questions;
+  qs.forEach(function(q, qi) {
+    var key = currentLayer + '-' + qi;
+    if (q.type === 'match') {
+      var obj = {};
+      q.corrects.forEach(function(ti, si) { obj[si] = ti; });
+      answers[key] = obj;
+    } else {
+      answers[key] = q.answer;
+    }
+  });
+  refresh();
+  updateScoreboard();
+}
+
+function resetCurrentLayer() {
+  var qs = layers[currentLayer].questions;
+  qs.forEach(function(_, qi) { delete answers[currentLayer + '-' + qi]; });
+  currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+function resetAll() {
+  answers = {}; currentLayer = 0; currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+init();
+</script>
+
+</div>
+</body>
+</html>
