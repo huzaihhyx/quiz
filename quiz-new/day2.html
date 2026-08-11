@@ -580,7 +580,7 @@ function goNext() {
 function updateNavButtons() {
   const qs = layers[currentLayer].questions;
   document.getElementById('btnPrev').disabled = (currentQ === 0);
-  document.getElementById('btnNext').disabled = (currentQ >= qs.length - 1);
+  document.getElementById('btnNext').disabled = (currentQ >= qs.length - 1 && currentLayer >= layers.length - 1);
   const key = currentLayer + '-' + currentQ;
   const hint = document.getElementById('navHint');
   if (answers[key] === undefined) { hint.textContent = '未作答'; return; }
