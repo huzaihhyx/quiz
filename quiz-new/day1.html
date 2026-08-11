@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day1 星途初遇</title>
+<style>* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: "Noto Serif CJK SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+  background: #1a1a2e; color: #e0d5b7; min-height: 100vh;
+  margin: 0; padding: 0;
+}
+.wrapper { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
+.container { width: 100%; }
+h1 {
+  text-align: center; font-size: 1.4rem; color: #f0c060;
+  border-bottom: 2px solid #f0c060; padding-bottom: 0.5rem; margin-bottom: 0.3rem;
+}
+.subtitle { text-align: center; color: #a09070; font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+.layer-tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.layer-tab {
+  flex: 1; min-width: 100px; padding: 0.6rem 0.5rem; text-align: center;
+  background: #262640; border: 1px solid #3a3a5a; color: #a09070;
+  border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+}
+.layer-tab:hover { background: #30305a; color: #d0c090; }
+.layer-tab.active { background: #3a3050; border-color: #f0c060; color: #f0c060; font-weight: bold; }
+.layer-label { display: block; font-size: 0.7rem; color: #706050; margin-top: 2px; }
+
+.question-area { background: #22223a; border: 1px solid #3a3a5a; border-radius: 8px; padding: 1.5rem; }
+.q-progress { font-size: 0.8rem; color: #706050; margin-bottom: 1rem; text-align: right; }
+.q-number { color: #f0c060; font-weight: bold; }
+
+.q-type-badge {
+  display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 3px;
+  margin-bottom: 0.8rem; font-weight: bold;
+}
+.type-choice { background: #2a4a3a; color: #4ecb71; }
+.type-tf { background: #4a3a2a; color: #e0a040; }
+.type-match { background: #3a2a4a; color: #b080e0; }
+
+.q-stem { font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.2rem; color: #d8cfa0; }
+
+.options { display: flex; flex-direction: column; gap: 8px; }
+.option {
+  padding: 0.7rem 1rem; background: #2a2a44; border: 1px solid #3a3a5a;
+  border-radius: 6px; cursor: pointer; transition: all 0.15s; line-height: 1.5;
+}
+.option:hover { background: #30305a; }
+.option.selected { border-color: #f0c060; background: #3a3050; }
+.option.correct { border-color: #4ecb71; background: #1a3a2a; color: #4ecb71; }
+.option.wrong { border-color: #e05050; background: #3a1a2a; color: #e05050; }
+.option.disabled { pointer-events: none; opacity: 0.7; }
+
+.tf-options { display: flex; gap: 12px; }
+.tf-btn {
+  flex: 1; padding: 0.8rem; text-align: center; border-radius: 6px;
+  cursor: pointer; background: #2a2a44; border: 1px solid #3a3a5a;
+  font-size: 1rem; transition: all 0.15s;
+}
+.tf-btn:hover { background: #30305a; }
+.tf-btn.selected { border-color: #f0c060; background: #3a3050; }
+.tf-btn.correct { border-color: #4ecb71; background: #1a3a2a; color: #4ecb71; }
+.tf-btn.wrong { border-color: #e05050; background: #3a1a2a; color: #e05050; }
+.tf-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+.match-area { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; }
+.match-col { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px; }
+.match-item {
+  padding: 0.5rem 0.8rem; background: #2a2a44; border: 1px solid #3a3a5a;
+  border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-align: center;
+  transition: all 0.15s; line-height: 1.4;
+}
+.match-item:hover { background: #30305a; }
+.match-item.src-selected { border-color: #f0c060 !important; background: #3a3050 !important; }
+.match-item.target-selected { border-color: #80c0f0 !important; background: #2a3050 !important; }
+.match-item.matched { border-color: #4ecb71 !important; background: #1a3a2a !important; color: #4ecb71; pointer-events: none; }
+.match-label { font-size: 0.75rem; color: #706050; text-align: center; margin-bottom: 6px; }
+
+.explanation {
+  margin-top: 1rem; padding: 0.8rem 1rem; background: #1a1a30; border-left: 3px solid #f0c060;
+  border-radius: 0 6px 6px 0; font-size: 0.85rem; line-height: 1.6; display: none;
+  color: #c0b090;
+}
+.explanation.show { display: block; }
+
+.score-area {
+  text-align: center; margin-top: 1.5rem; padding: 1rem; background: #1a1a30;
+  border-radius: 8px; display: none;
+}
+.score-area.show { display: block; }
+.score-number { font-size: 2rem; color: #f0c060; font-weight: bold; }
+.score-detail { color: #a09070; font-size: 0.85rem; margin-top: 0.3rem; }
+
+.btn-row { display: flex; gap: 10px; margin-top: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn {
+  padding: 0.5rem 1.2rem; border-radius: 6px; cursor: pointer; border: none;
+  font-size: 0.9rem; font-family: inherit; transition: all 0.15s;
+}
+.btn-correct { background: #2a4a3a; color: #4ecb71; }
+.btn-correct:hover { background: #3a5a4a; }
+.btn-reset { background: #3a3a5a; color: #a09070; }
+.btn-reset:hover { background: #4a4a6a; color: #d0c090; }
+.btn-all { background: #4a3a2a; color: #e0a040; }
+.btn-all:hover { background: #5a4a3a; }
+
+/* 导航按钮 */
+.nav-row { display: flex; gap: 10px; margin-top: 0.8rem; justify-content: center; align-items: center; }
+.nav-hint { color: #706050; font-size: 0.8rem; min-width: 80px; text-align: center; }
+.btn-nav {
+  background: #3a3a50; color: #c0b090; padding: 0.5rem 1.2rem;
+  border-radius: 6px; cursor: pointer; border: 1px solid #4a4a6a;
+  font-size: 0.9rem; font-family: inherit; transition: all 0.15s;
+}
+.btn-nav:hover { background: #4a4a60; color: #e0d5b7; }
+.btn-nav:disabled { background: #2a2a35; color: #5a5a5a; border-color: #3a3a3a; cursor: not-allowed; }
+
+.btn-summary { background: #cba6f7; color: #1e1e2e; }
+.btn-summary:hover { background: #b4befe; }
+
+#scoreboard { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 8px 16px; width: 100%; box-sizing: border-box; }
+#scoreboard > div { white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<div id="scoreboard">
+  <div>📊 总进度：<span id="sbProgress" style="color:#f5c2e7;font-weight:700;">0/49</span></div>
+  <div>✅ 正确：<span id="sbCorrect" style="color:#a6e3a1;font-weight:700;">0</span></div>
+  <div>❌ 错误：<span id="sbWrong" style="color:#f38ba8;font-weight:700;">0</span></div>
+  <div>🏆 得分：<span id="sbScore" style="color:#f9e2af;font-weight:700;font-size:18px;">0%</span></div>
+</div>
+
+<div class="container">
+  <h1>🏛️ 星途初遇</h1>
+  <p class="subtitle">纯爆解压日 · 7关49题 · 零门槛入坑</p>
+
+  <div class="layer-tabs" id="layerTabs"></div>
+
+  <div class="question-area">
+    <div class="q-progress" id="qProgress"></div>
+    <div class="q-type-badge" id="qTypeBadge"></div>
+    <div class="q-stem" id="qStem"></div>
+    <div id="qBody"></div>
+    <div class="explanation" id="qExplanation"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-nav" id="btnPrev" onclick="goPrev()">◀ 上一题</button>
+    <span class="nav-hint" id="navHint"></span>
+    <button class="btn btn-nav" id="btnNext" onclick="goNext()">下一题 ▶</button>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-summary" id="btnSummary" onclick="showSummary()">📋 查看总结</button>
+    <button class="btn btn-correct" onclick="showAllAnswers()">📖 显示全部答案</button>
+    <button class="btn btn-reset" onclick="resetCurrentLayer()">🔄 重做本层</button>
+    <button class="btn btn-all" onclick="resetAll()">🔁 全部重做</button>
+  </div>
+
+  <div id="summaryPanel" style="display:none;max-width:720px;margin:20px auto;padding:24px;background:#1e1e2e;border-radius:16px;color:#cdd6f4;font-size:14px;line-height:1.7;"></div>
+    <div class="score-area" id="scoreArea"></div>
+</div>
+
+<script>
+// ==================== 题库 ====================
+
+// 菩提道次第广论卷十四 · 止观双运
+// 宗喀巴大师 著
+// 2026-08-08 v4 -- 大白话版
+
+/* === DATA BLOCK START === */
+var DAY1_DATA = [
+  {
+    "stem": "你吃了一口超辣的辣椒，眼泪鼻涕一起流。你的味蕾正在感受的是——",
+    "options": [
+      "A.一种特殊的味觉，叫辣味",
+      "B.一种痛觉，辣椒素激活了TRPV1受体",
+      "C.一种触觉，舌头在抽筋",
+      "D.一种幻觉"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "五味是酸甜苦咸鲜，没有辣。",
+      "B": "没错！辣是痛觉。辣椒素绑定TRPV1受体后大脑收到疼痛信号，分泌内啡肽来止痛——这就是为什么吃辣会上瘾。",
+      "C": "舌头没抽筋。灼烧感是化学反应。",
+      "D": "辣椒确实辣，这是它的防御机制。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "超市里的香蕉看起来都一样，但科学家说香蕉可能正在走向灭绝。为什么？",
+    "options": [
+      "A.全球变暖太热了",
+      "D.香蕉树寿命短",
+      "C.吃的人太多供不应求",
+      "B.全世界吃的香蕉几乎都是同一个品种（卡文迪许），基因太单一"
+    ],
+    "answer": 3,
+    "explanations": {
+      "A": "全球变暖有影响但不是核心原因。",
+      "B": "香蕉树可以反复结果。",
+      "C": "供不应求是产量问题不是灭绝问题。",
+      "D": "正确！99%出口香蕉都是卡文迪许品种，克隆体基因完全一样。一种病菌杀死一棵就能杀死所有。上一代品种大麦克就是这样灭绝的。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "冬天早上第一口灌一杯冰奶茶，从身体角度来说——",
+    "options": [
+      "A.超级爽冰镇提神",
+      "B.身体偏爱温暖环境，冰饮让胃部微循环变差",
+      "C.没什么影响",
+      "D.能燃烧卡路里"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "嘴上爽了胃不一定同意。",
+      "B": "对了。身体内部永远喜欢温暖。冰饮让胃部血管收缩、微循环变差。",
+      "C": "偶尔没事天天冰就是给胃上刑。",
+      "D": "升温消耗的热量微乎其微。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "土豆发芽了，奶奶说把芽切掉还能吃。对吗？",
+    "options": [
+      "B.不对，龙葵苷毒素已扩散到整个土豆且耐高温",
+      "A.对",
+      "C.切掉芽就可以了",
+      "D.煮熟就没事"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "正确！龙葵苷扩散到整个土豆，耐高温煮不破坏。",
+      "B": "这条经验不行。",
+      "C": "毒素已渗透扩散了。",
+      "D": "煮熟也没用，这是最常见的误解。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "世界上已知最古老的面条在哪里发现的？",
+    "options": [
+      "A.意大利庞贝",
+      "C.日本京都",
+      "B.中国青海喇家遗址，距今约4000年",
+      "D.埃及金字塔"
+    ],
+    "answer": 2,
+    "explanations": {
+      "A": "意大利面有名但最古老的不在意大利。",
+      "B": "日本拉面好吃但最古老的在中国。",
+      "C": "没错！2002年青海喇家遗址发现4000年前的面条，成分是粟（小米），比意大利面早两千年。",
+      "D": "埃及墓葬好东西多但最古老的面条在中国。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "你整天盯屏幕眼睛干涩。正常人一天大概眨眼多少次？",
+    "options": [
+      "A.几千次",
+      "B.约1.5到2万次",
+      "C.几百次",
+      "D.只有干的时候才眨"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "比这多。",
+      "B": "对了！每分钟15-20次，一天约1.5-2万次。盯屏幕时降到三分之一，这就是为什么看手机久了眼睛干。",
+      "C": "太少了角膜早就干了。",
+      "D": "眨眼是自动的。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "蜂蜜保质期写三年前过期了，还能吃吗？",
+    "options": [
+      "A.绝对不能",
+      "D.加热后可以",
+      "C.看颜色",
+      "B.纯蜂蜜几乎不会坏，考古学家发现过3000年前的蜂蜜还能吃"
+    ],
+    "answer": 3,
+    "explanations": {
+      "A": "纯蜂蜜是例外。",
+      "B": "不需要加热消毒。",
+      "C": "颜色变深或结晶都正常。",
+      "D": "正确！纯蜂蜜含水量极低、糖分极高、呈酸性，细菌活不了。密封保存几乎永远不会坏。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "如果地球突然停止自转一秒会发生什么？",
+    "options": [
+      "B.惯性导致地表没固定的东西以每小时1600公里飞出去",
+      "A.什么都不会发生",
+      "C.天旋地转",
+      "D.重力消失一秒"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "没错！突然刹车的话你、手机、水杯、海水全飞出去。安全带救不了你。",
+      "B": "地球赤道自转速度每秒460米。",
+      "C": "是所有东西变成炮弹的问题。",
+      "D": "重力跟自转无关。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "人类的鼻子能分辨多少种不同气味？",
+    "options": [
+      "A.约1万种",
+      "B.约1万亿种（2014年研究）",
+      "C.约100种",
+      "D.跟狗差不多"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "旧说法已被推翻。",
+      "B": "对了！洛克菲勒大学研究发现人类理论上能分辨约1万亿种气味。你的鼻子比你想的厉害多了。",
+      "C": "太低估了。",
+      "D": "狗嗅觉强数万倍，但人类分辨种类也很惊人。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "为什么游泳后饿得能吃一头牛？",
+    "options": [
+      "A.泳池水有开胃成分",
+      "D.水里有细菌",
+      "C.胃变大了",
+      "B.全身肌肉参与+水温低导致热量大量流失"
+    ],
+    "answer": 3,
+    "explanations": {
+      "A": "泳池水有氯不会开胃。",
+      "B": "没这种细菌。",
+      "C": "胃不会变大。是能量消耗太多。",
+      "D": "正确！全身运动+水温低=双重热量消耗。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "一朵普通的白色积云大概有多重？",
+    "options": [
+      "A.几公斤",
+      "B.约50万公斤，跟100头大象差不多",
+      "C.几千克",
+      "D.无法测量"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "看着像棉花但体积巨大。",
+      "B": "没错！含水量约50万公斤。能飘着是水滴极分散被上升气流托住。100头大象飘在你头顶。",
+      "C": "绝对重量惊人。",
+      "D": "可以测量。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "猫慢悠悠把你的杯子推下桌摔碎了。为什么？",
+    "options": [
+      "B.狩猎本能+获取你的注意力",
+      "A.讨厌你",
+      "C.想喝水",
+      "D.意外"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "对了！推东西是模拟捕猎测试运动物体。你冲过来大叫=它获得了注意力。下次推得更起劲。",
+      "B": "不是因为讨厌你。",
+      "C": "想喝会直接去喝。",
+      "D": "猫推东西时表情非常冷静。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "为什么电影院爆米花比哪都香？",
+    "options": [
+      "A.玉米品种不同",
+      "C.心情好",
+      "B.专用配方+封闭空间+气味营销，香气浓度拉满",
+      "D.秘密香料"
+    ],
+    "answer": 2,
+    "explanations": {
+      "A": "有区别但核心不在玉米。",
+      "B": "心情有影响但核心是环境。",
+      "C": "没错！专用油盐配方+封闭空间空气不流通，香味越积越浓。影院设计时就考虑了气味刺激消费。",
+      "D": "是专用油+空间的组合。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "长颈鹿的舌头什么颜色？为什么？",
+    "options": [
+      "A.粉红色",
+      "B.紫黑色含黑色素防晒，每天伸舌头吃树叶十几小时",
+      "C.绿色",
+      "D.白色"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "大多数哺乳动物是粉红但长颈鹿例外。",
+      "B": "正确！深蓝紫色舌头含大量黑色素。赤道烈日下吃树叶十几个小时，黑色素是天然防晒霜。",
+      "C": "颜色跟食物无关。",
+      "D": "白色会晒伤。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "纯金烧杯被盗，金属探测器没查到。怎么带出去的？",
+    "options": [
+      "A.藏大衣里",
+      "B.溶于王水变液体带出后还原",
+      "C.吞肚子里",
+      "D.窗扔下去"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "探测器会探到金子。",
+      "B": "满分！王水溶解黄金变成氯金酸溶液，探测器测不到。加还原剂黄金重新析出。真实案例。",
+      "C": "太大吞不下。",
+      "D": "可能被监控拍到。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "凶器刀柄爬满蚂蚁。法医说凶手可能有什么病？",
+    "options": [
+      "B.糖尿病，汗液含糖量高吸引蚂蚁",
+      "A.心脏病",
+      "C.皮肤病",
+      "D.肝病"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "对了！糖尿病患者汗液皮脂糖分高，蚂蚁被含糖汗液吸引。蚂蚁帮法医筛选嫌疑人。",
+      "B": "不影响汗液成分。",
+      "C": "不会吸引蚂蚁。",
+      "D": "不会让汗液变甜。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "嫌疑人说：我10点03分到家，10点05分换衣，10点08分看新闻。可疑吗？",
+    "options": [
+      "A.不可疑记性好",
+      "C.该精确到秒",
+      "B.可疑——说谎者过度精确，编造的记忆比真实的更详细",
+      "D.正常都这样"
+    ],
+    "answer": 2,
+    "explanations": {
+      "A": "真实记忆是模糊的。",
+      "B": "更可疑。",
+      "C": "正确！说谎者用过多细节增加可信度。真实回忆是大概的。过度精确本身就是破绽。",
+      "D": "正常人的时间记忆是模糊的。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "车祸现场手表碎裂停在11:47。手表能告诉法医什么？",
+    "options": [
+      "A.只知道死亡时间",
+      "B.死亡时间+撞击残留物（车漆玻璃碎片）",
+      "C.手表品牌",
+      "D.受害者行程"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "时间只是其一。",
+      "B": "没错！碎裂表蒙和表壳缝隙可能嵌有车漆微粒玻璃碎片。一块手表可能同时锁定时间+车型+颜色。",
+      "C": "能看出但不是最关心的。",
+      "D": "手表不记录行程。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "嫌疑人裤脚沾了带刺植物种子。警方怎么利用？",
+    "options": [
+      "A.巧合没价值",
+      "D.判断身高",
+      "C.判断鞋码",
+      "B.特定区域才有的植物种子可以锁定嫌疑人去过哪里"
+    ],
+    "answer": 3,
+    "explanations": {
+      "A": "微量物证价值巨大。",
+      "B": "跟身高无关。核心是锁定位置。",
+      "C": "不能判断鞋码。",
+      "D": "正确！某种植物只在特定区域生长，沾了它的种子说明一定去过那里。植物地理学取证。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "审讯员沉默30秒盯着嫌疑人。嫌疑人坐不住主动补充了很多。沉默为什么比咆哮有效？",
+    "options": [
+      "B.沉默制造信息空白，大脑本能用说话来填补",
+      "A.在积累怒气",
+      "C.需要思考时间",
+      "D.房间太安静"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "满分！大脑面对信息空白极度焦虑。咆哮给了信号防御启动。沉默什么都没有，大脑驱使你说话打破它。",
+      "B": "沉默本身就是技术。",
+      "C": "思考应该越想越少说。实际越说越多。",
+      "D": "是焦虑驱动不是想听人说话。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "密室自杀：死者右太阳穴中弹右手握枪。法医说不可能自杀。为什么？",
+    "options": [
+      "A.没指纹",
+      "C.弹壳位置不对",
+      "B.右太阳穴中弹用右手在物理上做不到，角度不对",
+      "D.血迹方向不对"
+    ],
+    "answer": 2,
+    "explanations": {
+      "A": "核心不在这里。",
+      "B": "有参考价值但核心是弹道角度。",
+      "C": "正确！右手持枪自杀弹孔应在右侧太阳穴但弹道角度不对。左手持枪才能打中右太阳穴——但现场无左手痕迹。",
+      "D": "最直接的矛盾在弹道。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "花一百多给游戏角色买皮肤，属性几乎不变。这类消费叫什么？",
+    "options": [
+      "A.刚需",
+      "B.社交信号消费——买的不是属性是给别人看到的形象",
+      "C.投资",
+      "D.冲动"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "不买照样玩。",
+      "B": "正确！跟名牌包、豪车、雄孔雀大尾巴同一个逻辑。",
+      "C": "皮肤不保值。",
+      "D": "更准确是社交信号消费。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "技术一般但喜欢找高手带飞。从心理学看真正原因是什么？",
+    "options": [
+      "B.短暂逃离自我否定的焦虑——被带飞时至少赢了能喘口气",
+      "A.不想努力",
+      "C.好玩",
+      "D.学技术"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "对了。连输几把心态快崩了，找个高手带飞至少这把能赢。不是不想变强是需要心理缓冲。",
+      "B": "核心驱动力更深层。",
+      "C": "确实更顺但核心在心理。",
+      "D": "被带飞学不到什么。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "排位赛手心出汗手抖，匹配赛随便选。核心原因？",
+    "options": [
+      "A.对手更强",
+      "C.奖励更好",
+      "B.损失厌恶——段位被内化成身份，掉分等于自我价值受损",
+      "D.匹配不算战绩"
+    ],
+    "answer": 2,
+    "explanations": {
+      "A": "差距没那么大。",
+      "B": "核心不在奖励。",
+      "C": "完全正确。段位是身份认同。输掉排位=威胁自我认知。",
+      "D": "匹配也记录但不影响身份数字。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "被嘲讽后上头1v5送了人头。那个瞬间什么脑区接管了？",
+    "options": [
+      "A.前额叶",
+      "B.杏仁核——爬行脑战斗反应，理智脑被压制",
+      "C.视觉皮层",
+      "D.海马体"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "理智脑被抑制了。",
+      "B": "正确！愤怒激活杏仁核触发战斗反应。深呼吸三秒给前额叶重启窗口。",
+      "C": "只管看。",
+      "D": "管记忆。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "修图经常一修两三小时完全不累。这叫什么？",
+    "options": [
+      "A.上瘾",
+      "D.逃避现实",
+      "C.强迫症",
+      "B.心流——即时反馈+自我掌控+挑战匹配"
+    ],
+    "answer": 3,
+    "explanations": {
+      "A": "心流是享受不是痛苦。",
+      "B": "心流本身是积极状态。",
+      "C": "是你想修不是不得不修。",
+      "D": "满分！修图完美满足心流三条件。这其实是你的天赋在告诉你什么。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "连输三把越打越烂心态崩了。这个循环叫什么？",
+    "options": [
+      "B.负向增强回路——输导致心态差导致操作变形导致继续输",
+      "A.沉没成本",
+      "C.边际递减",
+      "D.囚徒困境"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "对了！破局不是再打一把，是打断循环——站起来走两分钟让回路断开。",
+      "B": "不甘心放手≠状态恶化循环。",
+      "C": "方向不同。",
+      "D": "跟自我强化循环无关。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "两种热爱：一种需要别人夸才有动力；另一种没人看你也想做。哪个更持久？",
+    "options": [
+      "A.第一种",
+      "B.第二种——内在动机最稳定",
+      "C.一样",
+      "D.看情况"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "别人不夸了动力就没了。",
+      "B": "满分！没人看你你也愿意做的那件事就是你的内核。",
+      "C": "内在动机远超外在。",
+      "D": "研究明确内在更持久。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "判断题：偶尔摆烂躺平什么都不想干，是正常人常见的情绪修复方式，不是堕落。",
+    "options": [
+      "A.正确",
+      "B.错误"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "当然正确。大脑不可能永远高效运转，偶尔低能量期就像手机充电一样自然。",
+      "B": "摆烂是大脑自我保护机制跟堕落没关系。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "判断题：社交疲惫不喜欢热闹场合，不是性格缺陷，是社交能量偏低的人格特质。",
+    "options": [
+      "A.正确",
+      "B.错误"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "没错。社交电池容量不同，有人待机两天有人两小时，都正常。",
+      "B": "社交能量低不是缺陷。约三分之一的人都是这类型。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "判断题：很多人表面热符合群内心却觉得累——这叫表演式社交，是非常普遍的现象。",
+    "options": [
+      "A.正确",
+      "B.错误"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "正确。大多数成年人都有这种经历。不是虚伪是社交适应策略。",
+      "B": "比你想的普遍得多。也许最自在的那个人内心也在倒计时。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "判断题：参加聚会后需要很久恢复状态甚至一两周，这是正常的个体差异不是社交障碍。",
+    "options": [
+      "A.正确",
+      "B.错误"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "完全正确。恢复周期长=体质不同没有优劣。",
+      "B": "恢复慢不是障碍。是你的系统需要更长时间处理信息。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "判断题：觉得别人的社交方式好装好累，可能是社交审美的清醒判断不一定是性格问题。",
+    "options": [
+      "A.正确",
+      "B.错误"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "没错。审美敏锐时表演感强的场合确实让你不适。是审美差异。",
+      "B": "很多人都有这感觉。不是你挑剔是有些场合确实表演成分偏高。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "判断题：短暂逃避压力不等于放弃，大脑有时需要缓冲期才能重新启动。",
+    "options": [
+      "A.正确",
+      "B.错误"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "正确。逃避是战略性撤退，放弃是永久缴械。大脑有时需要先躲一下。",
+      "B": "短暂逃避是人类共有行为跟意志力无关。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "判断题：自我否定循环往往来自只在单一评价体系里衡量自己。换个环境结论可能完全不同。",
+    "options": [
+      "A.正确",
+      "B.错误"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "完全正确。学术赛道被碾压换到创造力审美共情赛道结果可能翻转。",
+      "B": "评价体系决定你看到怎样的自己。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "排了一小时队买到奶茶喝着特别香。朋友同款没排队你觉得也就那样。为什么你的更好喝？",
+    "options": [
+      "A.排队做的更好",
+      "B.大脑合理化已投入的等待成本",
+      "C.排队让味觉灵敏",
+      "D.食欲好"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "同一家味道一样。",
+      "B": "对了！排了一小时=必须好喝。大脑真的让你觉得更好喝。",
+      "C": "不会变灵敏。",
+      "D": "排队不算运动。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "便利店收银台旁口香糖你顺手拿了。什么心理？",
+    "options": [
+      "B.3秒冲动消费——排队无聊+商品在手边",
+      "A.想吃",
+      "C.便宜",
+      "D.店员推荐"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "满分！排队无聊的几秒大脑寻找刺激，商品在手边决策时间短。",
+      "B": "不是想吃才拿。",
+      "C": "便宜是原因之一但核心是位置时机。",
+      "D": "是位置在帮你做决定。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "待办清单划掉一项的满足感从哪来？",
+    "options": [
+      "A.成就感",
+      "D.能休息了",
+      "C.任务难",
+      "B.多巴胺奖励回路——完成任务释放多巴胺"
+    ],
+    "answer": 3,
+    "explanations": {
+      "A": "背后有神经机制。",
+      "B": "是完成本身的奖励不是休息。",
+      "C": "简单的划掉也爽。",
+      "D": "正确！完成→多巴胺→愉悦→驱动继续完成。列清单本身就能提高效率。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "秋冬季节莫名情绪低落嗜睡不想出门。学名叫什么？",
+    "options": [
+      "A.冬季抑郁症",
+      "B.季节性情感障碍（SAD）——日照减少影响褪黑素血清素",
+      "C.冷天综合征",
+      "D.冬眠本能"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "俗称。",
+      "B": "正确！日照缩短褪黑素增加犯困血清素降低情绪低。治疗方法之一是坐在特别亮的灯前30分钟。",
+      "C": "没这个诊断。",
+      "D": "人类没冬眠本能。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "说就看5分钟短视频，结果一小时后还在刷。为什么短视频比长视频更上瘾？",
+    "options": [
+      "B.变率强化程序——不知道下一条好不好看这种随机性最上瘾",
+      "A.内容更好",
+      "C.不用思考",
+      "D.手机好玩"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "满分！跟老虎机原理一样。每条都好你会腻都差你退出。随机搭配最上瘾。",
+      "B": "内容参差不齐。",
+      "C": "核心是随机奖励。",
+      "D": "是随机性好玩不是手机好玩。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "研究表明说就看5分钟手机实际平均看多久？",
+    "options": [
+      "A.5分钟左右",
+      "C.10分钟内",
+      "B.远超5分钟——平均25到50分钟，注意力被捕获后时间感失真",
+      "D.看意志力"
+    ],
+    "answer": 2,
+    "explanations": {
+      "A": "极少数人能做到。",
+      "B": "极少。",
+      "C": "正确！大脑进入内容消费模式后时间感知失真。你以为5分钟其实30分钟了。5分钟变50是常态。",
+      "D": "意志力在算法面前基本无效。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "把乱了一周的房间收拾完突然心情好了。有科学关联吗？",
+    "options": [
+      "A.巧合",
+      "B.有——环境秩序感降低大脑焦虑水平减少认知负荷",
+      "C.运动了心情好",
+      "D.不脏了心情好"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "有关联。",
+      "B": "对了！杂乱环境增加大脑视觉处理负荷。整理=给大脑后台减负=焦虑降低。最便宜的心理治疗。",
+      "C": "核心是视觉秩序感。",
+      "D": "心情好的原因是大脑负荷降低。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "花钱给游戏角色买装饰，两天后新鲜感没了。这个消费给你带来的是什么？",
+    "options": [
+      "A.属性提升",
+      "B.短期的社交存在感",
+      "C.长期投资",
+      "D.技术提升"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "提升微乎其微。",
+      "B": "正确。你买的是别人看到你的那一秒。新鲜感消退很快因为信号消费一旦别人也有了你的就不值钱了。",
+      "C": "不保值。",
+      "D": "不提升技术。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "靠自己的小手艺赚了几块钱。这几块钱的真正价值是什么？",
+    "options": [
+      "B.是真实的自我价值反馈——有人觉得你的能力值这个价",
+      "A.买杯奶茶",
+      "C.用来投资",
+      "D.攒着买大件"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "满分！金额不重要，重要的是外部世界的真实价值确认，比夸奖有说服力。",
+      "B": "价值远不止半杯奶茶。",
+      "C": "几块投不出什么。",
+      "D": "核心是价值确认。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "朋友口头说下次一定请你吃饭，一个月过去没动静。口头承诺意味着什么？",
+    "options": [
+      "A.他太忙了",
+      "C.考验你",
+      "B.说出口的瞬间获得道德满足感，行动动力反而下降",
+      "D.故意骗你"
+    ],
+    "answer": 2,
+    "explanations": {
+      "A": "有更隐蔽的原因。",
+      "B": "不是考验是大脑机制。",
+      "C": "对了！公开承诺时大脑提前释放满足感好像已经做了。提前满足降低了行动概率。",
+      "D": "说的时候可能真心想做。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "一直想开始做一件事但总觉得要等合适时机。合适时机最可能什么时候来？",
+    "options": [
+      "A.下周",
+      "C.永远等不到——大脑会一直制造新的不完美条件",
+      "B.下月",
+      "D.心情好时"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "下周有新理由推迟。",
+      "B": "正确。大脑天生回避不确定性，不断找理由让现在不够完美。不完美的现在就是最好的时机。",
+      "C": "下月也有新障碍。",
+      "D": "心情好也可能被新借口取代。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "去图书馆学习比在家效率高很多。不是因为更努力，那是因为什么？",
+    "options": [
+      "A.空气好",
+      "D.安静",
+      "C.书多",
+      "B.环境减少选择成本——周围人都在学你只需跟着学"
+    ],
+    "answer": 3,
+    "explanations": {
+      "A": "空气差不多。",
+      "B": "有帮助但核心是环境的默认行为引导。",
+      "C": "不影响效率。",
+      "D": "满分！在家要不断做选择学不学先学哪科要不要吃水果，每个选择消耗意志力。自习室默认选项变成了学。环境约束比意志力可靠。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "十个人夸你一个人批评你。晚上你反复回放的是谁的话？为什么？",
+    "options": [
+      "B.负面偏好——大脑天生放大威胁信号",
+      "A.批评更真实",
+      "C.你太敏感",
+      "D.批评的人说得对"
+    ],
+    "answer": 0,
+    "explanations": {
+      "A": "正确！负面偏好是基因里的生存本能。远古忽视威胁=可能送命。大脑自动放大负面声音即使十条好评更有参考价值。",
+      "B": "不一定更真实。",
+      "C": "全人类大脑都这样。",
+      "D": "核心原因是负面偏好不是逻辑判断。"
+    },
+    "type": "choice"
+  },
+  {
+    "stem": "经历了一段低谷期什么都不想做觉得自己不行。回头看这段时期最可能是？",
+    "options": [
+      "A.浪费时间",
+      "B.蓄力沉淀的窗口期——大脑在后台重组认知",
+      "C.证明你不行",
+      "D.运气不好"
+    ],
+    "answer": 1,
+    "explanations": {
+      "A": "低谷期往往伴随重要认知转变。",
+      "B": "满分！很多突破和转折紧随低谷期。大脑不是偷懒是在后台清理重组。像手机更新系统时黑屏一下不是坏了是在升级。",
+      "C": "低谷不等于不行。",
+      "D": "不是运气。低谷是心理周期的自然阶段。"
+    },
+    "type": "choice"
+  }
+];
+
+const L1 = DAY1_DATA.slice(0, 7);
+const L2 = DAY1_DATA.slice(7, 14);
+const L3 = DAY1_DATA.slice(14, 21);
+const L4 = DAY1_DATA.slice(21, 28);
+const L5 = DAY1_DATA.slice(28, 35);
+const L6 = DAY1_DATA.slice(35, 42);
+const L7 = DAY1_DATA.slice(42, 49);
+
+
+
+
+/* === DATA BLOCK END === */
+
+const layers = [
+  { name: "第一章", sub: "人生选择——从一把雨伞开始", questions: L1, icon: "\u2602\ufe0f" },
+  { name: "第二章", sub: "金钱思维方式——你的脑子是怎么转的", questions: L2, icon: "\ud83e\udde0" },
+  { name: "第三章", sub: "生活习惯——钱包里有你的人生密码", questions: L3, icon: "\ud83d\udc5b" },
+  { name: "第四章", sub: "工作方式——你的时间卖给谁了", questions: L4, icon: "\u23f0" },
+  { name: "第五章", sub: "投资——用钱生钱的基本功", questions: L5, icon: "\ud83d\udcc8" },
+  { name: "第六章", sub: "人际关系——谁把你带上路的", questions: L6, icon: "\ud83e\udd1d" },
+];
+let currentLayer = 0;
+let currentQ = 0;
+let answers = {};
+let matchSelectedSrc = null;
+
+function init() { buildTabs(); showQuestion(); }
+
+function buildTabs() {
+  var tabsHtml = layers.map(function(l, i) {
+    return '<div class="layer-tab ' + (i === currentLayer ? 'active' : '') + '" onclick="switchLayer(' + i + ')">' +
+    l.icon + ' ' + l.name + '<span class="layer-label">' + l.sub + '</span></div>';
+  }).join('');
+  document.getElementById('layerTabs').innerHTML = tabsHtml;
+}
+
+function switchLayer(i) {
+  currentLayer = i; currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+function refresh() { buildTabs(); showQuestion(); updateScore(); updateNavButtons(); }
+
+function goPrev() {
+  if (currentQ > 0) { currentQ--; matchSelectedSrc = null; showQuestion(); updateNavButtons(); }
+}
+
+function goNext() {
+  const qs = layers[currentLayer].questions;
+  if (currentQ < qs.length - 1) { currentQ++; matchSelectedSrc = null; showQuestion(); updateNavButtons(); }
+}
+
+function updateNavButtons() {
+  const qs = layers[currentLayer].questions;
+  document.getElementById('btnPrev').disabled = (currentQ === 0);
+  document.getElementById('btnNext').disabled = (currentQ >= qs.length - 1);
+  const key = currentLayer + '-' + currentQ;
+  const hint = document.getElementById('navHint');
+  if (answers[key] === undefined) { hint.textContent = '未作答'; return; }
+  const q = qs[currentQ];
+  let isCorrect = false;
+  if (q.type === 'match') {
+    if (typeof answers[key] === 'object') {
+      isCorrect = Object.entries(answers[key]).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; });
+    }
+  } else if (q.type === 'tf') {
+    var a = answers[key];
+    isCorrect = (a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer);
+  } else {
+    isCorrect = (answers[key] === q.answer);
+  }
+  hint.textContent = isCorrect ? '✅ 正确' : '❌ 错误';
+}
+
+function showQuestion() {
+  const qs = layers[currentLayer].questions;
+  const q = qs[currentQ];
+  const total = qs.length;
+  document.getElementById('qProgress').innerHTML = '第 <span class="q-number">' + (currentQ+1) + '</span> / ' + total + ' 题';
+
+  const badge = document.getElementById('qTypeBadge');
+  const typeMap = { choice: ['选择题', 'type-choice'], tf: ['判断题', 'type-tf'], match: ['连线题', 'type-match'] };
+  badge.className = 'q-type-badge ' + typeMap[q.type][1];
+  badge.textContent = typeMap[q.type][0];
+
+  document.getElementById('qStem').innerHTML = q.stem;
+
+  const body = document.getElementById('qBody');
+  const key = currentLayer + '-' + currentQ;
+  const prevAns = answers[key];
+
+  if (q.type === 'choice') {
+    body.innerHTML = '<div class="options">' +
+      q.options.map(function(opt, i) {
+        var cls = 'option';
+        if (prevAns !== undefined) {
+          cls += ' disabled';
+          if (i === q.answer) cls += ' correct';
+          else if (i === prevAns && prevAns !== q.answer) cls += ' wrong';
+        }
+        return '<div class="' + cls + '" onclick="' + (prevAns === undefined ? 'answerChoice(' + i + ')' : '') + '">' + opt + '</div>';
+      }).join('') + '</div>';
+  } else if (q.type === 'tf') {
+    var qAnsNum = (q.answer === true || q.answer === 0) ? 0 : 1;
+    body.innerHTML = '<div class="tf-options">' +
+      '<div class="tf-btn' + (prevAns === 0 ? ' selected' : '') + (prevAns !== undefined ? (0 === qAnsNum ? ' correct' : (prevAns === 0 ? ' wrong' : '')) + ' disabled' : '') + '" onclick="' + (prevAns === undefined ? 'answerTF(true)' : '') + '">✅ 正确</div>' +
+      '<div class="tf-btn' + (prevAns === 1 ? ' selected' : '') + (prevAns !== undefined ? (1 === qAnsNum ? ' correct' : (prevAns === 1 ? ' wrong' : '')) + ' disabled' : '') + '" onclick="' + (prevAns === undefined ? 'answerTF(false)' : '') + '">❌ 错误</div>' +
+      '</div>';
+  } else if (q.type === 'match') {
+    var matched = (prevAns && typeof prevAns === 'object') ? prevAns : {};
+    var allDone = Object.keys(matched).length === q.left.length;
+    var html = '<div class="match-area">';
+    html += '<div class="match-col"><div class="match-label">左列（点击后再点右列连线）</div>';
+    q.left.forEach(function(item, i) {
+      if (matched[i] !== undefined) {
+        html += '<div class="match-item matched">' + item + ' → ' + q.right[matched[i]] + '</div>';
+      } else {
+        html += '<div class="match-item src-selected" onclick="selectMatchSrc(' + i + ')" id="match-src-' + i + '">' + item + '</div>';
+      }
+    });
+    html += '</div><div class="match-col"><div class="match-label">右列</div>';
+    q.right.forEach(function(item, i) {
+      if (Object.values(matched).includes(i)) {
+        html += '<div class="match-item matched">' + item + '</div>';
+      } else {
+        html += '<div class="match-item" onclick="selectMatchTarget(' + i + ')" id="match-tgt-' + i + '">' + item + '</div>';
+      }
+    });
+    html += '</div></div>';
+    if (allDone) {
+      var allCorrect = Object.entries(matched).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; });
+      html += '<div style="margin-top:1rem; text-align:center; color:' + (allCorrect ? '#4ecb71' : '#e05050') + '; font-weight:bold;">' +
+        (allCorrect ? '🎉 全部正确！' : '❌ 有错误，请重做') + '</div>';
+    }
+    body.innerHTML = html;
+  }
+
+  var explDiv = document.getElementById('qExplanation');
+  if (prevAns !== undefined && q.explanation) {
+    explDiv.className = 'explanation show';
+    explDiv.textContent = '💡 ' + q.explanation;
+  } else {
+    explDiv.className = 'explanation';
+    explDiv.textContent = '';
+  }
+}
+
+function answerChoice(idx) {
+  var key = currentLayer + '-' + currentQ;
+  if (answers[key] !== undefined) return;
+  answers[key] = idx;
+  showQuestion(); updateScore(); updateNavButtons(); updateScoreboard();
+}
+
+function answerTF(val) {
+  var key = currentLayer + '-' + currentQ;
+  if (answers[key] !== undefined) return;
+  answers[key] = val ? 0 : 1;
+  showQuestion(); updateScore(); updateNavButtons(); updateScoreboard();
+}
+
+function selectMatchSrc(idx) {
+  matchSelectedSrc = idx;
+  document.querySelectorAll('.match-item').forEach(function(el) { el.classList.remove('src-selected'); });
+  var el = document.getElementById('match-src-' + idx);
+  if (el) el.classList.add('src-selected');
+  var q = layers[currentLayer].questions[currentQ];
+  var matched = answers[currentLayer + '-' + currentQ] || {};
+  document.querySelectorAll('.match-item').forEach(function(el) { el.classList.remove('target-selected'); });
+  q.right.forEach(function(_, i) {
+    if (!Object.values(matched).includes(i)) {
+      var tel = document.getElementById('match-tgt-' + i);
+      if (tel) tel.classList.add('target-selected');
+    }
+  });
+}
+
+function selectMatchTarget(ti) {
+  if (matchSelectedSrc === null) return;
+  var key = currentLayer + '-' + currentQ;
+  var matched = answers[key];
+  if (!matched || typeof matched !== 'object') matched = {};
+  if (matched[matchSelectedSrc] !== undefined) return;
+  matched[matchSelectedSrc] = ti;
+  answers[key] = matched;
+  matchSelectedSrc = null;
+  showQuestion(); updateScore(); updateNavButtons();
+  updateScoreboard();
+}
+
+function updateScore() {
+  var area = document.getElementById('scoreArea');
+  var qs = layers[currentLayer].questions;
+  var correct = 0, total = 0;
+  qs.forEach(function(q, qi) {
+    var key = currentLayer + '-' + qi;
+    var ans = answers[key];
+    if (ans === undefined) return;
+    total++;
+    if (q.type === 'match') {
+      if (typeof ans === 'object') {
+        if (Object.entries(ans).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; })) correct++;
+      }
+    } else {
+      if (q.type === 'tf') {
+        if ((ans === 1 && q.answer === false) || (ans === 0 && q.answer === true) || (ans === q.answer)) correct++;
+      } else {
+        if (ans === q.answer) correct++;
+      }
+    }
+  });
+  if (total > 0) {
+    area.className = 'score-area show';
+    area.innerHTML = '<div class="score-number">' + correct + ' / ' + total + '</div>' +
+      '<div class="score-detail">正确率 ' + Math.round(correct/total*100) + '% （共' + qs.length + '题，已答' + total + '题）</div>';
+  } else {
+    area.className = 'score-area';
+  }
+}
+
+// === Scoreboard update ===
+function updateScoreboard() {
+  var total = 0, correct = 0;
+  for (var l = 0; l < layers.length; l++) {
+    var qs = layers[l].questions;
+    for (var i = 0; i < qs.length; i++) {
+      var key = l + '-' + i;
+      if (answers[key] === undefined) continue;
+      total++;
+      var q = qs[i];
+      if (q.type === 'choice') {
+        if (answers[key] === q.answer) correct++;
+      } else if (q.type === 'tf') {
+        var a = answers[key];
+        if ((a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer)) correct++;
+      } else if (q.type === 'match') {
+        if (typeof answers[key] === 'object') {
+          var allOk = true;
+          for (var j = 0; j < q.corrects.length; j++) {
+            if (q.corrects[j] !== answers[key][j]) { allOk = false; break; }
+          }
+          if (allOk) correct++;
+        }
+      }
+    }
+  }
+  var wrong = total - correct;
+  var pct = total > 0 ? Math.round(correct / total * 100) : 0;
+  document.getElementById('sbProgress').textContent = total + '/49';
+  document.getElementById('sbCorrect').textContent = correct;
+  document.getElementById('sbWrong').textContent = wrong;
+  document.getElementById('sbScore').textContent = pct + '%';
+}
+
+function showSummary() {
+  var panel = document.getElementById('summaryPanel');
+  if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  var allCorrect = [], allWrong = [], unansweredQ = [];
+  var totalCorrect = 0, totalWrong = 0;
+  for (var l = 0; l < layers.length; l++) {
+    var qs = layers[l].questions;
+    for (var i = 0; i < qs.length; i++) {
+      var key = l + '-' + i;
+      var q = qs[i];
+      if (answers[key] === undefined) {
+        unansweredQ.push({ layer: l, qi: i, q: q });
+        continue;
+      }
+      var isCorrect = false;
+      if (q.type === 'choice') {
+        isCorrect = answers[key] === q.answer;
+      } else if (q.type === 'tf') {
+        var a = answers[key];
+        isCorrect = (a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer);
+      }
+      var entry = { layer: l, qi: i, q: q, your: answers[key] };
+      if (isCorrect) { allCorrect.push(entry); totalCorrect++; }
+      else { allWrong.push(entry); totalWrong++; }
+    }
+  }
+  var answered = totalCorrect + totalWrong;
+  var h = '<h2 style="color:#f9e2af;margin:0 0 8px;">📋 测验总结</h2>';
+  h += '<p style="color:#a6adc8;margin:0 0 4px;">已答' + answered + '/42题 · ✅' + totalCorrect + ' · ❌' + totalWrong;
+  if (unansweredQ.length > 0) h += ' · ⚠️未答' + unansweredQ.length;
+  h += '</p>';
+  h += '<div style="background:#313244;height:6px;border-radius:3px;margin:12px 0;overflow:hidden;"><div style="background:#a6e3a1;height:100%;width:' + (answered/49*100) + '%;border-radius:3px;transition:width 0.3s;"></div></div>';
+  
+  if (allWrong.length > 0) {
+    h += '<h3 style="color:#f38ba8;margin:20px 0 12px;">❌ 答错的题（' + allWrong.length + '题）</h3>';
+    for (var wi = 0; wi < allWrong.length; wi++) {
+      var w = allWrong[wi];
+      h += '<div style="background:#302030;padding:12px 16px;margin:8px 0;border-radius:8px;border-left:3px solid #f38ba8;">';
+      h += '<div style="color:#f38ba8;font-size:12px;">' + layers[w.layer].name + ' 第' + (w.qi+1) + '题</div>';
+      h += '<div style="margin:6px 0;">' + w.q.stem + '</div>';
+      h += '<div style="font-size:12px;margin:4px 0;">你的答案：<span style="color:#f38ba8;">' + w.q.options[w.your] + '</span></div>';
+      h += '<div style="font-size:12px;">正确答案：<span style="color:#a6e3a1;">' + w.q.options[w.q.answer] + '</span></div>';
+      h += '</div>';
+    }
+  }
+  
+  if (allCorrect.length > 0) {
+    h += '<h3 style="color:#a6e3a1;margin:20px 0 12px;">✅ 答对的题（' + allCorrect.length + '题）</h3>';
+    for (var ci = 0; ci < allCorrect.length; ci++) {
+      var c = allCorrect[ci];
+      h += '<div style="background:#203020;padding:12px 16px;margin:8px 0;border-radius:8px;border-left:3px solid #a6e3a1;">';
+      h += '<div style="color:#a6e3a1;font-size:12px;">' + layers[c.layer].name + ' 第' + (c.qi+1) + '题</div>';
+      h += '<div style="margin:6px 0;">' + c.q.stem + '</div>';
+      h += '<div style="font-size:12px;">你的答案：<span style="color:#a6e3a1;">' + c.q.options[c.your] + '</span></div>';
+      h += '</div>';
+    }
+  }
+  
+  if (unansweredQ.length > 0) {
+    h += '<h3 style="color:#f9e2af;margin:20px 0 12px;">⚠️ 尚未作答（' + unansweredQ.length + '题）</h3>';
+    for (var ui = 0; ui < unansweredQ.length; ui++) {
+      var u = unansweredQ[ui];
+      h += '<div style="background:#2a2a30;padding:10px 16px;margin:6px 0;border-radius:6px;font-size:13px;color:#a6adc8;">' + layers[u.layer].name + ' 第' + (u.qi+1) + '题：' + u.q.stem.substring(0,50) + '…</div>';
+    }
+  }
+  panel.innerHTML = h;
+  panel.scrollIntoView({behavior: 'smooth'});
+}
+
+
+function showAllAnswers() {
+  var qs = layers[currentLayer].questions;
+  qs.forEach(function(q, qi) {
+    var key = currentLayer + '-' + qi;
+    if (q.type === 'match') {
+      var obj = {};
+      q.corrects.forEach(function(ti, si) { obj[si] = ti; });
+      answers[key] = obj;
+    } else {
+      answers[key] = q.answer;
+    }
+  });
+  refresh();
+  updateScoreboard();
+}
+
+function resetCurrentLayer() {
+  var qs = layers[currentLayer].questions;
+  qs.forEach(function(_, qi) { delete answers[currentLayer + '-' + qi]; });
+  currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+function resetAll() {
+  answers = {}; currentLayer = 0; currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+init();
+</script>
+
+</div>
+</body>
+</html>
