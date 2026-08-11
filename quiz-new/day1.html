@@ -1117,9 +1117,21 @@ function showQuestion() {
   }
 
   var explDiv = document.getElementById('qExplanation');
-  if (prevAns !== undefined && q.explanation) {
-    explDiv.className = 'explanation show';
-    explDiv.textContent = '💡 ' + q.explanation;
+  if (prevAns !== undefined) {
+    var expText = '';
+    if (q.explanations) {
+      var expKey = String.fromCharCode(65 + prevAns);
+      expText = q.explanations[expKey] || '';
+    } else if (q.explanation) {
+      expText = q.explanation;
+    }
+    if (expText) {
+      explDiv.className = 'explanation show';
+      explDiv.textContent = '💡 ' + expText;
+    } else {
+      explDiv.className = 'explanation';
+      explDiv.textContent = '';
+    }
   } else {
     explDiv.className = 'explanation';
     explDiv.textContent = '';
