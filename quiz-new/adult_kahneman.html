@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思考，快与慢 · 认知测验</title>
+<style>* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #1a1a2e; color: #e0d5b7; min-height: 100vh;
+  margin: 0; padding: 0;
+}
+.wrapper { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
+.container { width: 100%; }
+h1 {
+  text-align: center; font-size: 1.5rem; color: #f0c060;
+  border-bottom: 2px solid #f0c060; padding-bottom: 0.5rem; margin-bottom: 0.3rem;
+}
+.subtitle { text-align: center; color: #a09070; font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+.layer-tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.layer-tab {
+  flex: 1; min-width: 100px; padding: 0.6rem 0.5rem; text-align: center;
+  background: #262640; border: 1px solid #3a3a5a; color: #a09070;
+  border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+}
+.layer-tab:hover { background: #30305a; color: #d0c090; }
+.layer-tab.active { background: #3a3050; border-color: #f0c060; color: #f0c060; font-weight: bold; }
+.layer-label { display: block; font-size: 0.7rem; color: #706050; margin-top: 2px; }
+
+.question-area { background: #22223a; border: 1px solid #3a3a5a; border-radius: 8px; padding: 1.5rem; }
+.q-progress { font-size: 0.8rem; color: #706050; margin-bottom: 1rem; text-align: right; }
+.q-number { color: #f0c060; font-weight: bold; }
+
+.q-type-badge {
+  display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 3px;
+  margin-bottom: 0.8rem; font-weight: bold;
+}
+.type-choice { background: #2a4a3a; color: #4ecb71; }
+.type-tf { background: #4a3a2a; color: #e0a040; }
+.type-match { background: #3a2a4a; color: #b080e0; }
+
+.q-stem { font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.2rem; color: #d8cfa0; }
+
+.options { display: flex; flex-direction: column; gap: 8px; }
+.option {
+  padding: 0.7rem 1rem; background: #2a2a44; border: 1px solid #3a3a5a;
+  border-radius: 6px; cursor: pointer; transition: all 0.15s; line-height: 1.5;
+}
+.option:hover { background: #30305a; }
+.option.selected { border-color: #f0c060; background: #3a3050; }
+.option.correct { border-color: #4ecb71; background: #1a3a2a; color: #4ecb71; }
+.option.wrong { border-color: #e05050; background: #3a1a2a; color: #e05050; }
+.option.disabled { pointer-events: none; opacity: 0.7; }
+
+.tf-options { display: flex; gap: 12px; }
+.tf-btn {
+  flex: 1; padding: 0.8rem; text-align: center; border-radius: 6px;
+  cursor: pointer; background: #2a2a44; border: 1px solid #3a3a5a;
+  font-size: 1rem; transition: all 0.15s;
+}
+.tf-btn:hover { background: #30305a; }
+.tf-btn.selected { border-color: #f0c060; background: #3a3050; }
+.tf-btn.correct { border-color: #4ecb71; background: #1a3a2a; color: #4ecb71; }
+.tf-btn.wrong { border-color: #e05050; background: #3a1a2a; color: #e05050; }
+.tf-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+.match-area { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; }
+.match-col { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px; }
+.match-item {
+  padding: 0.5rem 0.8rem; background: #2a2a44; border: 1px solid #3a3a5a;
+  border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-align: center;
+  transition: all 0.15s; line-height: 1.4;
+}
+.match-item:hover { background: #30305a; }
+.match-item.src-selected { border-color: #f0c060 !important; background: #3a3050 !important; }
+.match-item.target-selected { border-color: #80c0f0 !important; background: #2a3050 !important; }
+.match-item.matched { border-color: #4ecb71 !important; background: #1a3a2a !important; color: #4ecb71; pointer-events: none; }
+.match-label { font-size: 0.75rem; color: #706050; text-align: center; margin-bottom: 6px; }
+
+.explanation {
+  margin-top: 1rem; padding: 0.8rem 1rem; background: #1a1a30; border-left: 3px solid #f0c060;
+  border-radius: 0 6px 6px 0; font-size: 0.85rem; line-height: 1.6; display: none;
+  color: #c0b090;
+}
+.explanation.show { display: block; }
+
+.score-area {
+  text-align: center; margin-top: 1.5rem; padding: 1rem; background: #1a1a30;
+  border-radius: 8px; display: none;
+}
+.score-area.show { display: block; }
+.score-number { font-size: 2rem; color: #f0c060; font-weight: bold; }
+.score-detail { color: #a09070; font-size: 0.85rem; margin-top: 0.3rem; }
+
+.btn-row { display: flex; gap: 10px; margin-top: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn {
+  padding: 0.5rem 1.2rem; border-radius: 6px; cursor: pointer; border: none;
+  font-size: 0.9rem; font-family: inherit; transition: all 0.15s;
+}
+.btn-correct { background: #2a4a3a; color: #4ecb71; }
+.btn-correct:hover { background: #3a5a4a; }
+.btn-reset { background: #3a3a5a; color: #a09070; }
+.btn-reset:hover { background: #4a4a6a; color: #d0c090; }
+.btn-all { background: #4a3a2a; color: #e0a040; }
+.btn-all:hover { background: #5a4a3a; }
+
+/* 导航按钮 */
+.nav-row { display: flex; gap: 10px; margin-top: 0.8rem; justify-content: center; align-items: center; }
+.nav-hint { color: #706050; font-size: 0.8rem; min-width: 80px; text-align: center; }
+.btn-nav {
+  background: #3a3a50; color: #c0b090; padding: 0.5rem 1.2rem;
+  border-radius: 6px; cursor: pointer; border: 1px solid #4a4a6a;
+  font-size: 0.9rem; font-family: inherit; transition: all 0.15s;
+}
+.btn-nav:hover { background: #4a4a60; color: #e0d5b7; }
+.btn-nav:disabled { background: #2a2a35; color: #5a5a5a; border-color: #3a3a3a; cursor: not-allowed; }
+
+.btn-summary { background: #cba6f7; color: #1e1e2e; }
+.btn-summary:hover { background: #b4befe; }
+
+#scoreboard { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 8px 16px; width: 100%; box-sizing: border-box; }
+#scoreboard > div { white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<div id="scoreboard">
+  <div>📊 总进度：<span id="sbProgress" style="color:#f5c2e7;font-weight:700;">0/42</span></div>
+  <div>✅ 正确：<span id="sbCorrect" style="color:#a6e3a1;font-weight:700;">0</span></div>
+  <div>❌ 错误：<span id="sbWrong" style="color:#f38ba8;font-weight:700;">0</span></div>
+  <div>🏆 得分：<span id="sbScore" style="color:#f9e2af;font-weight:700;font-size:18px;">0%</span></div>
+</div>
+
+<div class="container">
+  <h1>思考，快与慢</h1>
+  <p class="subtitle">丹尼尔·卡尼曼 著 · 2002年诺贝尔经济学奖 · 28题测测你的理性决策水平</p>
+
+  <div class="layer-tabs" id="layerTabs"></div>
+
+  <div class="question-area">
+    <div class="q-progress" id="qProgress"></div>
+    <div class="q-type-badge" id="qTypeBadge"></div>
+    <div class="q-stem" id="qStem"></div>
+    <div id="qBody"></div>
+    <div class="explanation" id="qExplanation"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-nav" id="btnPrev" onclick="goPrev()">◀ 上一题</button>
+    <span class="nav-hint" id="navHint"></span>
+    <button class="btn btn-nav" id="btnNext" onclick="goNext()">下一题 ▶</button>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-summary" id="btnSummary" onclick="showSummary()">📋 查看总结</button>
+    <button class="btn btn-correct" onclick="showAllAnswers()">📖 显示全部答案</button>
+    <button class="btn btn-reset" onclick="resetCurrentLayer()">🔄 重做本层</button>
+    <button class="btn btn-all" onclick="resetAll()">🔁 全部重做</button>
+  </div>
+
+  <div id="summaryPanel" style="display:none;max-width:720px;margin:20px auto;padding:24px;background:#1e1e2e;border-radius:16px;color:#cdd6f4;font-size:14px;line-height:1.7;"></div>
+    <div class="score-area" id="scoreArea"></div>
+</div>
+
+<script>
+// ==================== 题库 ====================
+
+// 菩提道次第广论卷十四 · 止观双运
+// 宗喀巴大师 著
+// 2026-08-08 v4 -- 大白话版
+
+/* === DATA BLOCK START === */
+const L1 = [
+  {stem:'球拍和球一共1.10美元，球拍比球贵1美元。球多少钱？', options:["A. 15美分。球拍1美元球0.10加上税0.05", "B. 5美分。设球=x，球拍=x+1，x+(x+1)=1.10，x=0.05", "C. 10美分。简单加减法，1.10减1.00等于0.10", "D. 无法确定，题目缺少信息"], answer:1, explanation:'正确。这是卡尼曼最经典的实验题。系统2只要稍微启动一下就能算对，但系统1先抢答了。卡尼曼的结论：你以为自己在用理性做决策，其实系统1才是幕后操盘手，系统2只是给它背书。', type:'choice'},
+  {stem:'保释法官在刚吃完饭后批准65%的保释申请，两小时后降到接近0%。同样的案件、同样的法官，唯一变量是肚子里有没有食物。这说明什么？', options:["A. 这个研究有缺陷，法官的判决不可能被午饭影响", "B. 法官吃饱了心情好，所以更宽容", "C. 系统2消耗血糖，葡萄糖耗尽后大脑自动切换到最省力的默认选项：拒绝", "D. 饥饿让法官变得更谨慎，这是理性的风险规避"], answer:2, explanation:'正确。这就是卡尼曼说的自我损耗——执行系统2会消耗血糖。又累又饿的时候人更容易出错、更冲动、更依赖直觉。保释法官的案例是真实研究，发表在美国国家科学院院刊上。', type:'choice'},
+  {stem:'超市限购12罐的促销标语让顾客购买量翻倍。这不是因为顾客真的需要12罐，而是因为什么？', options:["A. 顾客数学不好，以为12是最低购买量", "B. 限购本身就是一种营销策略，让人觉得商品很抢手", "C. 数字12成为了锚点，顾客无意识地以它为参照来决定买多少", "D. 顾客觉得限购说明库存不多，赶紧囤货"], answer:2, explanation:'正确。锚定效应：你对任何数字的判断都会被之前接触的数字锚定，哪怕这个数字完全无关。轮盘停在10的人估计联合国非洲国家占比25%，停在65的人估计45%。一个随机数字就能撬动你的判断。', type:'choice'},
+  {stem:'飞机失事后买航空保险的人激增，六个月后又恢复原样。飞机失事的概率其实一直没变。人们为什么这样？', options:["A. 这是媒体炒作的结果，不反映真实心理", "B. 保险公司故意降价促销", "C. 飞机刚失事时确实更危险，大家的恐惧是理性的", "D. 看到新闻后脑子里全是坠机的画面，大脑用容易想起来的程度代替了实际概率"], answer:3, explanation:'正确。可得性偏差：你判断一件事的概率，不是基于实际数据，而是基于脑子里有多容易想起它。龙卷风致死率人们认为比哮喘高，实际哮喘高20倍。媒体报道的频率不等于实际发生频率。', type:'choice'},
+  {stem:'琳达关心社会正义、参加反核游行。下列哪种更可能？', options:["A. 题目信息不足，无法判断", "B. 琳达是银行出纳员", "C. 两者概率相同", "D. 琳达是银行出纳员兼女权主义者"], answer:1, explanation:'正确。这是卡尼曼最著名的琳达问题。85%的人选B。但B是A的子集——出纳员兼女权主义者的数量不可能多于出纳员。人们用像不像替换了概率多大，这就是代表性启发。', type:'choice'},
+  {stem:'一支股票涨了100%，分析师说我早就看出它要涨。你怎么判断这是真本事还是后见之明？', options:["A. 看他过去的预测记录，有多少次说对了", "B. 查他在涨之前是否真的写过预测，而不是事后说的", "C. 看他说的理由是否逻辑自洽", "D. 看他管理基金的业绩"], answer:1, explanation:'正确。后见之明偏见让人高估世界的可预测性。卡尼曼的防御方法：事前写预测，事后对照。没有事先记录的我早知道一律视为噪音。', type:'choice'},
+  {stem:'你的朋友买了健身年卡，半年没去几次，但他说卡还没到期不能浪费。这是什么心理？', options:["A. 健身房套路深，故意让年卡看起来划算", "B. 沉没成本谬误——已经花掉的钱不应该影响未来决策", "C. 他其实想健身，只是太忙了", "D. 他需要找个健身搭子才能坚持"], answer:1, explanation:'正确。卡尼曼说系统1自动把已经花了3000块算进了决策，但理性经济学告诉你：那3000块已经没了，不管你去不去。冒着暴风雪去看已付费的球赛、守着一个做不下去的项目不肯关——都是同一个谬误。', type:'choice'},
+  {stem:'抛硬币：背面你输100元，正面你赢150元。期望值是正的（+25元），但大多数人拒绝。为什么？', options:["A. 硬币可能被动过手脚，概率不是50%", "B. 一次性赌博不值得，多次才行", "C. 因为赢150元不够多，至少要赢200元才值得", "D. 输100元的心理痛苦强度大约是赢150元的快乐的两倍——损失厌恶"], answer:3, explanation:'正确。这是前景理论的核心发现：失去100元的痛苦强度约等于得到200元的快乐。损失的心理冲击是同等收益的2倍。这个发现颠覆了传统经济学的理性人假设，卡尼曼因此获得2002年诺贝尔经济学奖。', type:'choice'},
+  {stem:'同一家公司业绩好时，CEO被描述为灵活有远见；业绩下滑时，同一人被说成僵化固执。CEO本人没变，变的是什么？', options:["A. 光环效应——业绩的光环让你对他的所有特质评价都跟着变", "B. 业绩下滑时公司真的出了问题，跟CEO能力有关", "C. CEO确实随年龄变了，只是你没注意", "D. 媒体只会跟风报道，没有独立判断"], answer:0, explanation:'正确。光环效应是系统1的杰作：你对一个人某一特质的喜欢会自动溢出到所有方面。觉得他帅就自动假定他聪明善良有能力。公司业绩好CEO所有特质都自动变好。这不是客观评价，是大脑在偷懒。', type:'choice'},
+  {stem:'同一台手术，说第一个月存活率90%时84%的医生选手术；说第一个月死亡率10%时只有50%选手术。为什么？', options:["A. 医生数学不好", "B. 不同的医生群体，水平不同", "C. 研究样本太小，不具代表性", "D. 框架效应——逻辑上完全等价的表述因为用词不同导致截然不同的选择"], answer:3, explanation:'正确。框架效应：逻辑完全相同的两个表述——90%存活 vs 10%死亡——引发完全不同的选择。得让人规避风险，失让人愿意冒险。公司说裁员500人和保留4500人是同一件事，但员工反应截然不同。', type:'choice'}
+];
+const L2 = [
+  {stem:'病人A做结肠镜检查8分钟，结尾很痛（7分）；病人B做了24分钟，但结尾只是轻微不适（1分）。按总痛苦量B远大于A，但病人自己评价时A觉得更痛苦。为什么？', options:["A. 病人B撒了谎", "B. 24分钟的病人已经麻木了", "C. 病人A太娇气", "D. 峰终定律——人们对经历的评价取决于最强烈时刻和结束时刻，不看总时长"], answer:3, explanation:'正确。峰终定律：人们对一段经历的整体评价不取决于持续时长，而取决于最强烈的瞬间（峰）和结束时的感受（终）。冰手实验中，80%的人下次选择更长时间但结尾好转的版本——明明多了30秒痛苦。', type:'choice'},
+  {stem:'你买了一只股票后，每天找它会涨的新闻来看，对利空消息视而不见。这是什么？', options:["A. 正常的信息收集，持有期间关注相关新闻", "B. 锚定效应", "C. 行为金融学里的过度自信", "D. 确认偏差——大脑倾向寻找支持已有观点的证据，忽略矛盾信息"], answer:3, explanation:'正确。确认偏差（也叫眼见即为事实WYSIATI）：系统1只用手头的信息构建最连贯的故事，完全不去想还有什么我不知道的。信息越少故事越连贯——因为没东西捣乱。防御方法：主动去找反方证据。', type:'choice'},
+  {stem:'随机发给一半学生一个杯子。卖方平均要价7.12美元，买方平均出价2.87美元。同一只杯子，为什么估值差了2.5倍？', options:["A. 实验设计有问题", "B. 买方觉得杯子不值钱", "C. 禀赋效应——一旦拥有某物，你对它的估值立即上升，放弃的痛苦大于获得的快乐", "D. 卖方想要赚钱，故意抬高价格"], answer:2, explanation:'正确。禀赋效应：拥有改变估值。杯子的主人不是觉得杯子更好，而是放弃它的痛苦大于得到它的快乐。损失厌恶在这里又出现了——放弃=损失，获得=收益，损失感受是2倍。', type:'choice'},
+  {stem:'公司宣布裁员500人和保留4500人，员工反应截然不同。同一件事，为什么？', options:["A. 不同部门的员工关心的数字不一样", "B. 员工数学不好，不知道是同一件事", "C. 框架效应——裁触发损失厌恶，保留让人感觉安全", "D. HR的表达方式确实改变了公司政策"], answer:2, explanation:'正确。框架效应。裁500触发损失厌恶（失去=痛苦，感受强度2倍），保留4500让人感觉大部分安全。前景理论三原则之一：评价基于参照点，裁的参照点是现在的工作，保留的参照点是全部失业。', type:'choice'},
+  {stem:'你的同事每天看股票账户，涨了高兴跌了痛苦。卡尼曼建议的最佳查看频率是？', options:["A. 每周一次比较合理", "B. 一年一次，查看越频繁痛苦越多，越容易做出非理性决策", "C. 每天一次，及时掌握动态", "D. 看持有标的而定，短线每天看长线不用看"], answer:1, explanation:'正确。泰勒和贝纳茨的研究：查看频率越高感受到的痛苦越多。一年看一次，大部分年份是涨的（股市长期向上），痛苦很少。每天看的话几乎一半日子在痛苦。巴菲特说：最好股市一年只开放一天。', type:'choice'},
+  {stem:'表扬飞行员的好表现后下次往往变差，批评差表现后下次往往变好。教官得出结论：批评有效，表扬有害。这个结论对吗？', options:["A. 错的——这是回归平均值，极端表现之后自然回归正常，跟表扬批评无关", "B. 半对半错，批评对纪律有效但对士气有害", "C. 需要更多数据才能判断", "D. 对的，军事训练证明批评比表扬有效"], answer:0, explanation:'正确。回归平均值：极端表现（极好或极差）之后，下一次自然趋向平均水平。好表现后变差不是因为表扬有害，差表现后变好不是因为批评有效——只是统计规律。卡尼曼说这跟神迹之后信徒总失望是同一个道理。', type:'choice'},
+  {stem:'保释法官、选股专家、医生诊断、葡萄酒定价——卡尼曼发现，在几乎所有领域，简单公式的预测准确率跟人类专家的直觉相比如何？', options:["A. 公式至少跟专家一样准，多数情况下更准", "B. 专家远胜公式，经验无可替代", "C. 公式跟专家持平，各有所长", "D. 看领域，医学专家远胜公式但金融不如"], answer:0, explanation:'正确。公式优于直觉的发现被重复验证了几十年。原因有三：公式一致性高（不会疲劳/饥饿/心情不好）；专家过度自信；简单规则比复杂模型鲁棒。招聘时列出6项指标分别打分简单相加，比面试官的直觉准得多。', type:'choice'},
+  {stem:'抛硬币50%输100元/50%赢200元。拒绝玩一次，但愿意玩100次。这说明什么？', options:["A. 玩一次100元太少，不值得", "B. 一次的风险太大，多次风险被分散了", "C. 人不理性，需要学习概率论", "D. 窄框架让人每次单独感受损失，宽框架让人看到整体期望值为正"], answer:3, explanation:'正确。窄框架：每次单独评估，每次都感受到100元损失的痛苦（损失厌恶）。宽框架：100次加在一起几乎不可能输（期望值+5000元），整体看就愿意了。关键洞察：对单次也该用宽框架思维——你的整个人生就是100次抛硬币。', type:'choice'},
+  {stem:'一家公司全员持股推出后员工积极性暴增，但三年后公司倒闭了。离职员工说早该走但舍不得股票。他们被什么困住了？', options:["A. 对公司有感情", "B. 股票有可能涨回来", "C. 沉没成本谬误——已跌80%的股票是沉没的，不应影响未来去留", "D. 找不到更好的工作"], answer:2, explanation:'正确。沉没成本谬误：已经发生的投入不应影响未来决策。卡尼曼用电影票实验证明了这点——买了烂电影票还坐在电影院看完的人，不是在享受电影，是在为已花的钱服刑。正确做法：只看未来收益，不看已沉没的成本。', type:'choice'},
+  {stem:'器官捐献率在默认不捐的国家只有15%，在默认捐的国家超过90%。为什么一个表格的默认选项能造成6倍差距？', options:["A. 默认捐的国家文化上更注重公益", "B. 默认不捐的国家医疗系统落后", "C. 人们不关心器官捐献这种事", "D. 不作为偏好——因没做某事而后悔的程度远低于因做了某事而后悔"], answer:3, explanation:'正确。不作为偏好：因做了某事后悔的程度远大于因没做而后悔。投资者实验：保罗没换股票少赚1200，乔治换了股票少赚1200。两人损失一样，但92%的人认为换了的乔治更后悔。所以人们倾向不改变默认——改了之后后悔更痛苦。', type:'choice'}
+];
+const L3 = [
+  {stem:'看到老年相关词汇后，年轻人走路速度自动变慢。拿着铅笔做出微笑表情的人觉得漫画更搞笑。这些影响有什么共同点？', options:["A. 只有心理脆弱的人才会受影响", "B. 这些实验后来都被证明不可重复", "C. 启动效应——系统1被无意识地触发，你的行为被改变但你自己完全不知道", "D. 这是实验者的暗示效应，被试者在迎合实验"], answer:2, explanation:'正确。启动效应：系统1自动对外部刺激做出反应，改变你的行为和判断，而你毫无察觉。投票站设在学校里到教育经费议案得票率更高。看钱相关图片后人变得更独立、更自私。这就是广告和环境的底层原理。', type:'choice'},
+  {stem:'投资了同一只基金的人，先亏了1000再赚回800的，比先赚800再亏1000的，幸福感低得多。两人的最终收益完全一样（-200）。为什么？', options:["A. 先亏的人心理阴影更大", "B. 参照点依赖——评价基于变化而非绝对值，最近的亏1000比赚800的感受更强", "C. 先亏说明选基金的眼光有问题", "D. 时间顺序确实影响实际收益"], answer:1, explanation:'正确。前景理论核心：参照点依赖（评价基于变化而非绝对值）；敏感度递减（从900到1000的感受小于100到200）；损失厌恶（亏1000的感受是赚1000的两倍）。同样的最终收益，不同的路径给你完全不同的感受。', type:'choice'},
+  {stem:'你度假回来发现所有照片和记忆都被抹去了。你还愿意花同样的钱去度这个假吗？大多数说不愿意。这说明什么？', options:["A. 说明这些人不够理性，被情绪左右", "B. 说明度假的价值只在拍照", "C. 说明人需要外部证据来确认自己的经历", "D. 我们更多是为记忆自我而活，而非为经验自我而活"], answer:3, explanation:'正确。卡尼曼的核心发现：经验自我（每时每刻的感受）不会说话，不做决策。记忆自我（事后的概括）负责叙事、记录、决策。如果记忆被抹去，这段经历对你来说就等于不存在——这说明我们更多是为记忆而活。', type:'choice'},
+  {stem:'你觉得有20年经验的医生和输入数据的AI诊断系统，哪个诊断更准？卡尼曼怎么说？', options:["A. 医生远胜AI，经验是不可替代的", "B. AI至少跟医生一样准，多数情况下更准——因为人有一致性问题", "C. 看病种，常见病AI准罕见病医生准", "D. 卡尼曼没研究过这个"], answer:1, explanation:'正确。公式优于直觉在医学领域已被反复验证。最经典案例：心脏病诊断中，基于年龄/血压/胆固醇的简单公式，准确率超过资深心脏科医生。原因：医生会疲劳、会受第一印象影响、会因为刚吃了饭心情好而判断不同。公式不会。', type:'choice'},
+  {stem:'你买了1000股某股票，跌了30%没卖。你告诉自己没卖就没亏。这个想法的问题在哪？', options:["A. 如果公司基本面没问题确实不该卖", "B. 没问题，浮亏不是真亏", "C. 处置效应——不卖亏损股是为了避免承认错误的心理痛苦，但已跌的30%是沉没的", "D. 应该等它涨回来再卖"], answer:2, explanation:'正确。处置效应是禀赋效应加损失厌恶在投资中的表现。卖赢利股等于关闭赢了钱的账户，感觉好。卖亏损股等于承认失败，痛苦。但理性做法是：卖哪只看这只股票的未来预期，不看你的买入价。买入价是沉没成本。', type:'choice'},
+  {stem:'卡尼曼说大脑遵循最省力原则——能不动脑就不动脑。以下哪个不是这个原理的体现？', options:["A. 为了搞清楚一个投资标的，连续熬夜研究了三天财报", "B. 又累又饿的时候更容易冲动消费", "C. 看到一个复杂问题，你的第一反应是找最简单的答案", "D. 每天走同一条路回家，即使发现更近的新路也不愿换"], answer:0, explanation:'正确答案。连续熬夜研究财报恰恰是系统2在工作——缓慢、费力、消耗大量注意力。这不是最省力，反而是最费力。卡尼曼说系统2很懒惰但它能被强制启动。问题是大多数人不会主动启动它——所以公式往往比人准。', type:'choice'},
+  {stem:'面试时你一眼看中一个候选人——长得精神、说话有气场。后面所有问题你都在为这个第一印象找证据。卡尼曼给你什么建议？', options:["A. 多面试几个人比较一下", "B. 相信自己的直觉，第一印象往往很准", "C. 列出6项关键能力，逐项评分，前面不看完不进入下一项", "D. 让同事也面试一轮"], answer:2, explanation:'正确。这是卡尼曼给以色列军队设计的结构化面试方案：列出6项关键指标，每个单独评估、逐项打分，互不干扰。面试官的直觉被切割了——无法让一个维度的印象污染另一个。这个方法后来被广泛采用，预测准确率显著提升。', type:'choice'},
+  {stem:'卡尼曼说：感性细节掌控理性大局。这句话在投资中的体现是什么？', options:["A. 投资需要控制情绪，不能有任何感觉", "B. 只有专业交易员才能理性分析", "C. 你以为自己理性分析了公司财报，实际上系统1先有了感觉（喜欢/恐惧），系统2再为这个感觉找理由", "D. 跟着感觉走，直觉投资也很准"], answer:2, explanation:'正确。情绪启发式：我先有感觉（这公司好/这股票要跌），再找理由（财报好/行业前景差）。系统2不是在做独立分析，是在给系统1的情绪反应背书。卡尼曼说：系统2的工作不是纠正系统1，而是为它寻找证据。', type:'choice'}
+];
+/* === DATA BLOCK END === */
+
+const layers = [
+  { name: "第一章", sub: "系统1与系统2——谁在替你决策", questions: L1, icon: "🧠" },
+  { name: "第二章", sub: "前景理论——你为什么总是亏多赚少", questions: L2, icon: "📉" },
+  { name: "第三章", sub: "投资心理——打败你的不是市场", questions: L3, icon: "🎯" },
+];
+let currentLayer = 0;
+let currentQ = 0;
+let answers = {};
+let matchSelectedSrc = null;
+
+function init() { buildTabs(); showQuestion(); }
+
+function buildTabs() {
+  var tabsHtml = layers.map(function(l, i) {
+    return '<div class="layer-tab ' + (i === currentLayer ? 'active' : '') + '" onclick="switchLayer(' + i + ')">' +
+    l.icon + ' ' + l.name + '<span class="layer-label">' + l.sub + '</span></div>';
+  }).join('');
+  document.getElementById('layerTabs').innerHTML = tabsHtml;
+}
+
+function switchLayer(i) {
+  currentLayer = i; currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+function refresh() { buildTabs(); showQuestion(); updateScore(); updateNavButtons(); }
+
+function goPrev() {
+  if (currentQ > 0) { currentQ--; matchSelectedSrc = null; showQuestion(); updateNavButtons(); }
+}
+
+function goNext() {
+  const qs = layers[currentLayer].questions;
+  if (currentQ < qs.length - 1) { currentQ++; matchSelectedSrc = null; showQuestion(); updateNavButtons(); }
+}
+
+function updateNavButtons() {
+  const qs = layers[currentLayer].questions;
+  document.getElementById('btnPrev').disabled = (currentQ === 0);
+  document.getElementById('btnNext').disabled = (currentQ >= qs.length - 1);
+  const key = currentLayer + '-' + currentQ;
+  const hint = document.getElementById('navHint');
+  if (answers[key] === undefined) { hint.textContent = '未作答'; return; }
+  const q = qs[currentQ];
+  let isCorrect = false;
+  if (q.type === 'match') {
+    if (typeof answers[key] === 'object') {
+      isCorrect = Object.entries(answers[key]).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; });
+    }
+  } else if (q.type === 'tf') {
+    var a = answers[key];
+    isCorrect = (a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer);
+  } else {
+    isCorrect = (answers[key] === q.answer);
+  }
+  hint.textContent = isCorrect ? '✅ 正确' : '❌ 错误';
+}
+
+function showQuestion() {
+  const qs = layers[currentLayer].questions;
+  const q = qs[currentQ];
+  const total = qs.length;
+  document.getElementById('qProgress').innerHTML = '第 <span class="q-number">' + (currentQ+1) + '</span> / ' + total + ' 题';
+
+  const badge = document.getElementById('qTypeBadge');
+  const typeMap = { choice: ['选择题', 'type-choice'], tf: ['判断题', 'type-tf'], match: ['连线题', 'type-match'] };
+  badge.className = 'q-type-badge ' + typeMap[q.type][1];
+  badge.textContent = typeMap[q.type][0];
+
+  document.getElementById('qStem').innerHTML = q.stem;
+
+  const body = document.getElementById('qBody');
+  const key = currentLayer + '-' + currentQ;
+  const prevAns = answers[key];
+
+  if (q.type === 'choice') {
+    body.innerHTML = '<div class="options">' +
+      q.options.map(function(opt, i) {
+        var cls = 'option';
+        if (prevAns !== undefined) {
+          cls += ' disabled';
+          if (i === q.answer) cls += ' correct';
+          else if (i === prevAns && prevAns !== q.answer) cls += ' wrong';
+        }
+        return '<div class="' + cls + '" onclick="' + (prevAns === undefined ? 'answerChoice(' + i + ')' : '') + '">' + opt + '</div>';
+      }).join('') + '</div>';
+  } else if (q.type === 'tf') {
+    var qAnsNum = (q.answer === true || q.answer === 0) ? 0 : 1;
+    body.innerHTML = '<div class="tf-options">' +
+      '<div class="tf-btn' + (prevAns === 0 ? ' selected' : '') + (prevAns !== undefined ? (0 === qAnsNum ? ' correct' : (prevAns === 0 ? ' wrong' : '')) + ' disabled' : '') + '" onclick="' + (prevAns === undefined ? 'answerTF(true)' : '') + '">✅ 正确</div>' +
+      '<div class="tf-btn' + (prevAns === 1 ? ' selected' : '') + (prevAns !== undefined ? (1 === qAnsNum ? ' correct' : (prevAns === 1 ? ' wrong' : '')) + ' disabled' : '') + '" onclick="' + (prevAns === undefined ? 'answerTF(false)' : '') + '">❌ 错误</div>' +
+      '</div>';
+  } else if (q.type === 'match') {
+    var matched = (prevAns && typeof prevAns === 'object') ? prevAns : {};
+    var allDone = Object.keys(matched).length === q.left.length;
+    var html = '<div class="match-area">';
+    html += '<div class="match-col"><div class="match-label">左列（点击后再点右列连线）</div>';
+    q.left.forEach(function(item, i) {
+      if (matched[i] !== undefined) {
+        html += '<div class="match-item matched">' + item + ' → ' + q.right[matched[i]] + '</div>';
+      } else {
+        html += '<div class="match-item src-selected" onclick="selectMatchSrc(' + i + ')" id="match-src-' + i + '">' + item + '</div>';
+      }
+    });
+    html += '</div><div class="match-col"><div class="match-label">右列</div>';
+    q.right.forEach(function(item, i) {
+      if (Object.values(matched).includes(i)) {
+        html += '<div class="match-item matched">' + item + '</div>';
+      } else {
+        html += '<div class="match-item" onclick="selectMatchTarget(' + i + ')" id="match-tgt-' + i + '">' + item + '</div>';
+      }
+    });
+    html += '</div></div>';
+    if (allDone) {
+      var allCorrect = Object.entries(matched).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; });
+      html += '<div style="margin-top:1rem; text-align:center; color:' + (allCorrect ? '#4ecb71' : '#e05050') + '; font-weight:bold;">' +
+        (allCorrect ? '🎉 全部正确！' : '❌ 有错误，请重做') + '</div>';
+    }
+    body.innerHTML = html;
+  }
+
+  var explDiv = document.getElementById('qExplanation');
+  if (prevAns !== undefined && q.explanation) {
+    explDiv.className = 'explanation show';
+    explDiv.textContent = '💡 ' + q.explanation;
+  } else {
+    explDiv.className = 'explanation';
+    explDiv.textContent = '';
+  }
+}
+
+function answerChoice(idx) {
+  var key = currentLayer + '-' + currentQ;
+  if (answers[key] !== undefined) return;
+  answers[key] = idx;
+  showQuestion(); updateScore(); updateNavButtons(); updateScoreboard();
+}
+
+function answerTF(val) {
+  var key = currentLayer + '-' + currentQ;
+  if (answers[key] !== undefined) return;
+  answers[key] = val ? 0 : 1;
+  showQuestion(); updateScore(); updateNavButtons(); updateScoreboard();
+}
+
+function selectMatchSrc(idx) {
+  matchSelectedSrc = idx;
+  document.querySelectorAll('.match-item').forEach(function(el) { el.classList.remove('src-selected'); });
+  var el = document.getElementById('match-src-' + idx);
+  if (el) el.classList.add('src-selected');
+  var q = layers[currentLayer].questions[currentQ];
+  var matched = answers[currentLayer + '-' + currentQ] || {};
+  document.querySelectorAll('.match-item').forEach(function(el) { el.classList.remove('target-selected'); });
+  q.right.forEach(function(_, i) {
+    if (!Object.values(matched).includes(i)) {
+      var tel = document.getElementById('match-tgt-' + i);
+      if (tel) tel.classList.add('target-selected');
+    }
+  });
+}
+
+function selectMatchTarget(ti) {
+  if (matchSelectedSrc === null) return;
+  var key = currentLayer + '-' + currentQ;
+  var matched = answers[key];
+  if (!matched || typeof matched !== 'object') matched = {};
+  if (matched[matchSelectedSrc] !== undefined) return;
+  matched[matchSelectedSrc] = ti;
+  answers[key] = matched;
+  matchSelectedSrc = null;
+  showQuestion(); updateScore(); updateNavButtons();
+  updateScoreboard();
+}
+
+function updateScore() {
+  var area = document.getElementById('scoreArea');
+  var qs = layers[currentLayer].questions;
+  var correct = 0, total = 0;
+  qs.forEach(function(q, qi) {
+    var key = currentLayer + '-' + qi;
+    var ans = answers[key];
+    if (ans === undefined) return;
+    total++;
+    if (q.type === 'match') {
+      if (typeof ans === 'object') {
+        if (Object.entries(ans).every(function(e) { return q.corrects[parseInt(e[0])] === e[1]; })) correct++;
+      }
+    } else {
+      if (q.type === 'tf') {
+        if ((ans === 1 && q.answer === false) || (ans === 0 && q.answer === true) || (ans === q.answer)) correct++;
+      } else {
+        if (ans === q.answer) correct++;
+      }
+    }
+  });
+  if (total > 0) {
+    area.className = 'score-area show';
+    area.innerHTML = '<div class="score-number">' + correct + ' / ' + total + '</div>' +
+      '<div class="score-detail">正确率 ' + Math.round(correct/total*100) + '% （共' + qs.length + '题，已答' + total + '题）</div>';
+  } else {
+    area.className = 'score-area';
+  }
+}
+
+// === Scoreboard update ===
+function updateScoreboard() {
+  var total = 0, correct = 0;
+  for (var l = 0; l < layers.length; l++) {
+    var qs = layers[l].questions;
+    for (var i = 0; i < qs.length; i++) {
+      var key = l + '-' + i;
+      if (answers[key] === undefined) continue;
+      total++;
+      var q = qs[i];
+      if (q.type === 'choice') {
+        if (answers[key] === q.answer) correct++;
+      } else if (q.type === 'tf') {
+        var a = answers[key];
+        if ((a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer)) correct++;
+      } else if (q.type === 'match') {
+        if (typeof answers[key] === 'object') {
+          var allOk = true;
+          for (var j = 0; j < q.corrects.length; j++) {
+            if (q.corrects[j] !== answers[key][j]) { allOk = false; break; }
+          }
+          if (allOk) correct++;
+        }
+      }
+    }
+  }
+  var wrong = total - correct;
+  var pct = total > 0 ? Math.round(correct / total * 100) : 0;
+  document.getElementById('sbProgress').textContent = total + '/28';
+  document.getElementById('sbCorrect').textContent = correct;
+  document.getElementById('sbWrong').textContent = wrong;
+  document.getElementById('sbScore').textContent = pct + '%';
+}
+
+function showSummary() {
+  var panel = document.getElementById('summaryPanel');
+  if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  var allCorrect = [], allWrong = [], unansweredQ = [];
+  var totalCorrect = 0, totalWrong = 0;
+  for (var l = 0; l < layers.length; l++) {
+    var qs = layers[l].questions;
+    for (var i = 0; i < qs.length; i++) {
+      var key = l + '-' + i;
+      var q = qs[i];
+      if (answers[key] === undefined) {
+        unansweredQ.push({ layer: l, qi: i, q: q });
+        continue;
+      }
+      var isCorrect = false;
+      if (q.type === 'choice') {
+        isCorrect = answers[key] === q.answer;
+      } else if (q.type === 'tf') {
+        var a = answers[key];
+        isCorrect = (a === 1 && q.answer === false) || (a === 0 && q.answer === true) || (a === q.answer);
+      }
+      var entry = { layer: l, qi: i, q: q, your: answers[key] };
+      if (isCorrect) { allCorrect.push(entry); totalCorrect++; }
+      else { allWrong.push(entry); totalWrong++; }
+    }
+  }
+  var answered = totalCorrect + totalWrong;
+  var h = '<h2 style="color:#f9e2af;margin:0 0 8px;">📋 测验总结</h2>';
+  h += '<p style="color:#a6adc8;margin:0 0 4px;">已答' + answered + '/28题 · ✅' + totalCorrect + ' · ❌' + totalWrong;
+  if (unansweredQ.length > 0) h += ' · ⚠️未答' + unansweredQ.length;
+  h += '</p>';
+  h += '<div style="background:#313244;height:6px;border-radius:3px;margin:12px 0;overflow:hidden;"><div style="background:#a6e3a1;height:100%;width:' + (answered/28*100) + '%;border-radius:3px;transition:width 0.3s;"></div></div>';
+  
+  if (allWrong.length > 0) {
+    h += '<h3 style="color:#f38ba8;margin:20px 0 12px;">❌ 答错的题（' + allWrong.length + '题）</h3>';
+    for (var wi = 0; wi < allWrong.length; wi++) {
+      var w = allWrong[wi];
+      h += '<div style="background:#302030;padding:12px 16px;margin:8px 0;border-radius:8px;border-left:3px solid #f38ba8;">';
+      h += '<div style="color:#f38ba8;font-size:12px;">' + layers[w.layer].name + ' 第' + (w.qi+1) + '题</div>';
+      h += '<div style="margin:6px 0;">' + w.q.stem + '</div>';
+      h += '<div style="font-size:12px;margin:4px 0;">你的答案：<span style="color:#f38ba8;">' + w.q.options[w.your] + '</span></div>';
+      h += '<div style="font-size:12px;">正确答案：<span style="color:#a6e3a1;">' + w.q.options[w.q.answer] + '</span></div>';
+      h += '</div>';
+    }
+  }
+  
+  if (allCorrect.length > 0) {
+    h += '<h3 style="color:#a6e3a1;margin:20px 0 12px;">✅ 答对的题（' + allCorrect.length + '题）</h3>';
+    for (var ci = 0; ci < allCorrect.length; ci++) {
+      var c = allCorrect[ci];
+      h += '<div style="background:#203020;padding:12px 16px;margin:8px 0;border-radius:8px;border-left:3px solid #a6e3a1;">';
+      h += '<div style="color:#a6e3a1;font-size:12px;">' + layers[c.layer].name + ' 第' + (c.qi+1) + '题</div>';
+      h += '<div style="margin:6px 0;">' + c.q.stem + '</div>';
+      h += '<div style="font-size:12px;">你的答案：<span style="color:#a6e3a1;">' + c.q.options[c.your] + '</span></div>';
+      h += '</div>';
+    }
+  }
+  
+  if (unansweredQ.length > 0) {
+    h += '<h3 style="color:#f9e2af;margin:20px 0 12px;">⚠️ 尚未作答（' + unansweredQ.length + '题）</h3>';
+    for (var ui = 0; ui < unansweredQ.length; ui++) {
+      var u = unansweredQ[ui];
+      h += '<div style="background:#2a2a30;padding:10px 16px;margin:6px 0;border-radius:6px;font-size:13px;color:#a6adc8;">' + layers[u.layer].name + ' 第' + (u.qi+1) + '题：' + u.q.stem.substring(0,50) + '…</div>';
+    }
+  }
+  panel.innerHTML = h;
+  panel.scrollIntoView({behavior: 'smooth'});
+}
+
+
+function showAllAnswers() {
+  var qs = layers[currentLayer].questions;
+  qs.forEach(function(q, qi) {
+    var key = currentLayer + '-' + qi;
+    if (q.type === 'match') {
+      var obj = {};
+      q.corrects.forEach(function(ti, si) { obj[si] = ti; });
+      answers[key] = obj;
+    } else {
+      answers[key] = q.answer;
+    }
+  });
+  refresh();
+  updateScoreboard();
+}
+
+function resetCurrentLayer() {
+  var qs = layers[currentLayer].questions;
+  qs.forEach(function(_, qi) { delete answers[currentLayer + '-' + qi]; });
+  currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+function resetAll() {
+  answers = {}; currentLayer = 0; currentQ = 0; matchSelectedSrc = null; refresh();
+  updateScoreboard();
+}
+
+init();
+</script>
+
+</div>
+</body>
+</html>
