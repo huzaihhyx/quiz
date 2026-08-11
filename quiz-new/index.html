@@ -228,7 +228,7 @@ function showHall() {
   grid.innerHTML = SEASONS.map((s,i) => {
     const done = state[s.id];
     const un = (i===0 || state[SEASONS[i-1].id]);
-    return '<div class="season-card '+s.cls+(un?'':' locked')+'"'+(un?' onclick="startSe…+s.id+')"':'')+'>'+
+    return '<div class="season-card '+s.cls+(un?'':' locked')+'"'+(un?' onclick="startSeason(\''+s.id+'\')"':'')+'>'+
       '<div class="icon">'+s.icon+'</div>'+
       '<div class="name">'+s.name+'</div>'+
       '<div class="sub">'+(done?'✅ 已通关':s.sub)+'</div></div>';
