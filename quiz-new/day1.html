@@ -993,12 +993,13 @@ const L7 = DAY1_DATA.slice(42, 49);
 /* === DATA BLOCK END === */
 
 const layers = [
-  { name: "第一章", sub: "人生选择——从一把雨伞开始", questions: L1, icon: "\u2602\ufe0f" },
-  { name: "第二章", sub: "金钱思维方式——你的脑子是怎么转的", questions: L2, icon: "\ud83e\udde0" },
-  { name: "第三章", sub: "生活习惯——钱包里有你的人生密码", questions: L3, icon: "\ud83d\udc5b" },
-  { name: "第四章", sub: "工作方式——你的时间卖给谁了", questions: L4, icon: "\u23f0" },
-  { name: "第五章", sub: "投资——用钱生钱的基本功", questions: L5, icon: "\ud83d\udcc8" },
-  { name: "第六章", sub: "人际关系——谁把你带上路的", questions: L6, icon: "\ud83e\udd1d" },
+  { name: "第1关", sub: "闲趣冷知识", questions: L1, icon: "\ud83c\udf5c" },
+  { name: "第2关", sub: "脑洞问答", questions: L2, icon: "\ud83e\udde0" },
+  { name: "第3关", sub: "悬疑推理", questions: L3, icon: "\ud83d\udd0d" },
+  { name: "第4关", sub: "游戏洞察", questions: L4, icon: "\ud83c\udfae" },
+  { name: "第5关", sub: "心境判断", questions: L5, icon: "\ud83c\udf3f" },
+  { name: "第6关", sub: "市井百态", questions: L6, icon: "\ud83c\udfe1" },
+  { name: "第7关", sub: "场景匹配", questions: L7, icon: "\ud83d\udcda" },
 ];
 let currentLayer = 0;
 let currentQ = 0;
@@ -1029,6 +1030,14 @@ function goPrev() {
 function goNext() {
   const qs = layers[currentLayer].questions;
   if (currentQ < qs.length - 1) { currentQ++; matchSelectedSrc = null; showQuestion(); updateNavButtons(); }
+  else if (currentLayer < layers.length - 1) {
+    currentLayer++;
+    currentQ = 0;
+    matchSelectedSrc = null;
+    seasonTotalQ = layers[currentLayer].questions.length;
+    showQuestion();
+    updateNavButtons();
+  }
 }
 
 function updateNavButtons() {
