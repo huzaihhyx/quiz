@@ -618,7 +618,9 @@ function showQuestion() {
           if (i === q.answer) cls += ' correct';
           else if (i === prevAns && prevAns !== q.answer) cls += ' wrong';
         }
-        return '<div class="' + cls + '" onclick="' + (prevAns === undefined ? 'answerChoice(' + i + ')' : '') + '">' + opt + '</div>';
+        var label = String.fromCharCode(65 + i) + '. ';
+        var cleanOpt = opt.replace(/^[A-D]\.\s*/, '');
+        return '<div class="' + cls + '" onclick="' + (prevAns === undefined ? 'answerChoice(' + i + ')' : '') + '">' + label + cleanOpt + '</div>';
       }).join('') + '</div>';
   } else if (q.type === 'tf') {
     var qAnsNum = (q.answer === true || q.answer === 0) ? 0 : 1;
