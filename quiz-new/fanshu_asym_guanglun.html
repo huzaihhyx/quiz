@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>非对称风险 × 广论印证 · 交叉测验</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Noto Serif CJK SC","Source Han Serif SC","STSong","SimSun",serif; background:#1a1a2e; color:#e0d5b7; min-height:100vh; }
+.wrapper { max-width:850px; margin:0 auto; padding:16px; }
+h1 { text-align:center; font-size:1.4rem; color:#f0c060; border-bottom:2px solid #f0c060; padding-bottom:0.5rem; margin-bottom:0.3rem; }
+.subtitle { text-align:center; color:#a09070; font-size:0.85rem; margin-bottom:1rem; }
+#scoreboard { display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:8px 16px; margin-bottom:1rem; padding:10px; background:#1e1e35; border-radius:8px; }
+#scoreboard > div { white-space:nowrap; font-size:0.9rem; }
+.book-tabs { display:flex; gap:4px; margin-bottom:1.2rem; overflow-x:auto; padding-bottom:6px; }
+.book-tab { flex-shrink:0; padding:0.5rem 0.8rem; background:#262640; border:1px solid #3a3a5a; color:#a09070; border-radius:6px; cursor:pointer; font-size:0.82rem; transition:all 0.2s; white-space:nowrap; }
+.book-tab:hover { background:#30305a; color:#d0c090; }
+.book-tab.active { background:#3a3050; border-color:#f0c060; color:#f0c060; font-weight:bold; }
+.tab-progress { font-size:0.65rem; margin-top:2px; }
+.question-area { background:#22223a; border:1px solid #3a3a5a; border-radius:8px; padding:1.5rem; }
+.q-progress { font-size:0.8rem; color:#706050; margin-bottom:1rem; text-align:right; }
+.q-number { color:#f0c060; font-weight:bold; }
+.q-stem { font-size:1.05rem; line-height:1.7; margin-bottom:1.2rem; color:#d8cfa0; }
+.options { display:flex; flex-direction:column; gap:8px; }
+.option { padding:0.7rem 1rem; background:#2a2a44; border:1px solid #3a3a5a; border-radius:6px; cursor:pointer; transition:all 0.15s; line-height:1.5; font-size:0.95rem; }
+.option:hover { background:#30305a; }
+.option.correct { border-color:#4ecb71; background:#1a3a2a; color:#4ecb71; }
+.option.wrong { border-color:#e05050; background:#3a1a2a; color:#e05050; }
+.option.disabled { pointer-events:none; opacity:0.7; }
+.explanation { margin-top:1rem; padding:0.8rem 1rem; background:#1a1a30; border-left:3px solid #f0c060; border-radius:0 6px 6px 0; font-size:0.85rem; line-height:1.6; display:none; color:#c0b090; }
+.explanation.show { display:block; }
+.nav-row { display:flex; gap:10px; margin-top:0.8rem; justify-content:center; align-items:center; }
+.nav-hint { color:#706050; font-size:0.8rem; min-width:80px; text-align:center; }
+.btn-nav { background:#3a3a50; color:#c0b090; padding:0.5rem 1.2rem; border-radius:6px; cursor:pointer; border:1px solid #4a4a6a; font-size:0.9rem; font-family:inherit; transition:all 0.15s; }
+.btn-nav:hover { background:#4a4a60; color:#e0d5b7; }
+.btn-nav:disabled { background:#2a2a35; color:#5a5a5a; border-color:#3a3a3a; cursor:not-allowed; }
+.btn-row { display:flex; gap:10px; margin-top:1rem; justify-content:center; flex-wrap:wrap; }
+.btn { padding:0.5rem 1.2rem; border-radius:6px; cursor:pointer; border:none; font-size:0.85rem; font-family:inherit; transition:all 0.15s; }
+.btn-correct { background:#2a4a3a; color:#4ecb71; }
+.btn-correct:hover { background:#3a5a4a; }
+.btn-reset { background:#3a3a5a; color:#a09070; }
+.btn-reset:hover { background:#4a4a6a; color:#d0c090; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<div id="scoreboard">
+  <div>📊 总进度：<span id="sbProgress" style="color:#f5c2e7;font-weight:700;">0/25</span></div>
+  <div>✅ 正确：<span id="sbCorrect" style="color:#a6e3a1;font-weight:700;">0</span></div>
+  <div>❌ 错误：<span id="sbWrong" style="color:#f38ba8;font-weight:700;">0</span></div>
+  <div>🏆 得分率：<span id="sbScore" style="color:#f9e2af;font-weight:700;font-size:18px;">0%</span></div>
+</div>
+<h1>非对称风险 × 广论印证 · 交叉测验</h1>
+<p class="subtitle">塔勒布《非对称风险》 × 《菩提道次第广论》 · 25 道题 · 用佛法印证不确定性的智慧</p>
+<div class="book-tabs" id="bookTabs"></div>
+<div class="question-area">
+  <div class="q-progress" id="qProgress"></div>
+  <div class="q-stem" id="qStem"></div>
+  <div id="qBody"></div>
+  <div class="explanation" id="qExplanation"></div>
+</div>
+<div class="nav-row">
+  <button class="btn-nav" id="btnPrev" onclick="goPrev()">◀ 上一题</button>
+  <span class="nav-hint" id="navHint"></span>
+  <button class="btn-nav" id="btnNext" onclick="goNext()">下一题 ▶</button>
+</div>
+<div class="btn-row">
+  <button class="btn btn-correct" onclick="showAllAnswers()">📖 显示全部答案</button>
+  <button class="btn btn-reset" onclick="resetCurrentBook()">🔄 重做本书</button>
+  <button class="btn btn-reset" onclick="resetAll()">🔁 全部重做</button>
+</div>
+</div>
+<script>
+const books = [
+{name:"非对称风险×广论印证",author:"纳西姆·塔勒布 × 宗喀巴大师",questions:[{stem:"塔勒布在《非对称风险》中反复强调一个概念——\"skin in the game\"（风险共担）：发表观点之前，你首先要\"入局\"——让自己成为风险收益对称的参与者。如果你只享受收益而不承担风险，你的观点就毫无意义。他引了汉谟拉比法典：如果建筑师建的房子塌了、压死房主，\"建筑师应被处死\"。广论卷一有一句几乎一样的话——\"如诸病者负药囊，终不能医自体病\"。那么，\"风险共担\"和\"病者负药囊\"最深的共通智慧是什么？",options:["两者都主张放弃一切理论", "两者都强调不承担风险就没有真正的知识", "两者都反对医生这个职业", "两者都认为赚钱最重要"],answer:1,explanation:"✅ 答案是B。\"风险共担\"的核心是：你的判断是否可靠，取决于你有没有为自己的判断承担代价。\"病者负药囊\"在结构上完全一样：不承担后果的\"知识\"不是真知识。塔勒布说\"脱离实践的知识就像被举到空中的安泰俄斯，虚弱不堪一击\"。所以正确答案是B。A、C、D都偏离了核心。"},{stem:"塔勒布引了古希腊神话——巨人安泰俄斯的力量来自大地母亲，只要双脚踩在地上就不可战胜。可赫拉克勒斯把他举到空中脱离大地，他就失去了所有力量，被杀了。塔勒布说：\"知识\"脱离\"实践\"的大地，就像安泰俄斯脱离大地。日常法师在《手抄稿》里反复讲\"能说善道、道理比谁都强\"却从不实修的人——\"把药背在身上不治自己的病\"。那么，安泰俄斯之死和\"能说不能行\"最深的共通结构是什么？",options:["两者都主张大力士精神", "两者都认为神话比科学可靠", "两者都揭示脱离实践的力量是虚假的", "两者都反对学习理论"],answer:2,explanation:"✅ 答案是C。安泰俄斯的\"不可战胜\"不是自己的力量，而是\"与大地连接\"的力量。一旦切断连接，所有力量瞬间归零。手抄稿里\"能说不能行\"的人就是世俗版的安泰俄斯：他们的\"力量\"来自经论辞藻，可这些经论不经过\"实修\"的大地，一遇真实烦恼境界就瞬间消失。所以正确答案是C。A、C、D都偏离了核心。"},{stem:"塔勒布提出\"罗伯特·鲁宾的勾当\"——鲁宾在花旗赚了超一亿美元，可2008年金融危机后花旗的巨额损失由股东和纳税人买单。\"收益归我、风险归别人\"是所有非对称风险里最危险的一种。广论卷四教诫——\"此复作已非不触，余所作者亦无受\"：你造的业果不会消失，别人造的业也不算到你头上。那么，\"鲁宾的勾当\"和\"作已非不触\"最深刻的对照在哪里？",options:["两者都揭示代价不可转嫁这一对称性原则", "两者都讨论金融监管", "两者都认为富人应多纳税", "两者都主张取消代理制"],answer:0,explanation:"✅ 答案是A。鲁宾的勾当核心在于打破了因果对称性——他做决策，后果由别人承担。广论的\"作已非不触\"从根本上否定这种转嫁的可能性：你造的业果必然回到你身上——业果的对称性是法界的根本法则，不是人间契约能打破的。所以正确答案是A。A、C、D都停留在表层。"},{stem:"塔勒布追溯3800年前《汉谟拉比法典》称其\"比今天法律更先进\"。核心原则是\"对称性\"——建筑师建的房子塌了压死房主，建筑师偿命。塔勒布说这种看似\"野蛮\"的法则蕴含深刻智慧：只有让决策者直接承担后果，才能消除隐藏的尾部风险。日常法师讲业果时反复强调——\"业决定\"：善业必感乐果、恶业必感苦果，因果对称、决定、不错乱。那么，汉谟拉比的\"对称性\"和\"业决定\"最深层共通结构是什么？",options:["两者都是古代残酷法律", "两者都认为惩罚是最好的教育", "两者都建立决策与后果不可分离的对称性", "两者都主张以眼还眼"],answer:2,explanation:"✅ 答案是C。两者都建立了一条不可打破的对称性——你做了什么，就承担什么。只有当决策者知道\"后果不可转嫁\"，他才会真正谨慎。塔勒布说2008年金融危机的根本原因就是\"对称性被打破了\"——高管不承担后果。所以正确答案是C。A、C、D都误读了核心。"},{stem:"塔勒布说大部分我们以为是\"大学教授发明\"的知识，其实是\"能工巧匠在实践中摸索出来的\"，教授们仅限于\"记载和署名\"。通过\"试错、亲历\"得到的知识比通过\"推理、记忆\"得到的更可靠。日常法师在《手抄稿》里说过同样的话——很多人\"文字上会懂，内容上不懂\"，因为\"内容\"不是从经论\"读\"出来的，而是从实修\"证\"出来的。广论引《摄德宝》：\"智者定应摧我慢，如诸病人亲医治。\"那么，\"实践出真知\"和\"实修出真证\"最深的共通点是什么？",options:["两者都认为教授无用", "两者都主张凭感觉行事", "两者都强调亲历实践才能获得真知", "两者都反对读书学习"],answer:2,explanation:"✅ 答案是C。可靠的知识必须经过\"自己的实践\"检验。塔勒布说\"风险共担\"是获得真知的前提——没有切身利害的人的\"知识\"只是\"记载和署名\"。日常法师说\"摧我慢\"是求法的前提——带着\"我比谁都懂\"的我慢，就不可能\"像病人亲医治\"那样去实修。所以正确答案是C。A、C、D都偏离了核心。"},{stem:"塔勒布说\"真正的理性在于避免系统性毁灭\"——不是普通亏损，而是\"一击致命、再无翻身\"的彻底出局。一旦触碰这个\"吸收壁\"，你就从游戏里永久消失了。广论讲\"暇满人身\"极为难得，可如果这一生浪费了、堕落恶趣，下一世可能\"经劫住恶趣\"。那么，\"系统性毁灭\"和\"暇满难得\"最深的共通警示是什么？",options:["两者都主张及时行乐", "两者都揭示存在不可逆的毁灭性后果", "两者都主张不要冒险", "两者都认为人注定失败"],answer:1,explanation:"✅ 答案是B。\"系统性毁灭\"的核心特征是\"不可逆\"——一旦触发，游戏永久结束。广论讲暇满人身难得用的是同构逻辑：堕入恶趣\"经劫\"才能再得人身，这就是修行版的\"系统性毁灭\"。两者共同的警示：存在一种后果极端到不可逆，你必须不惜一切代价避免它。所以正确答案是B。A、C、D都与本意相悖。"},{stem:"塔勒布提出\"代理问题\"：当一个人的收益和风险不对称时，他不可避免地会冒更大风险。2008年金融危机根源就在这里。解药只有一个——\"让决策者承担后果\"，即对称性。广论卷四——\"此复作已非不触，余所作者亦无受\"。那么，\"代理问题\"和\"余所作者亦无受\"最精确的对应关系是什么？",options:["两者都认为应取消雇佣", "两者完全无关", "收益转嫁对应业果不可转嫁", "两者都讨论合同法"],answer:2,explanation:"✅ 答案是C。代理问题是\"试图打破对称性\"——收益归我、风险转嫁别人。而\"余所作者亦无受\"是\"对称性不可打破\"的法界法则。两者的精确对应在于：代理问题是人间层面的\"尝试打破\"，业果法则是法界层面的\"不可打破\"。所以正确答案是C。"},{stem:"塔勒布讽刺那些\"从不拿自己的钱冒险\"的经济学家——他们制定的政策出错时，代价由普通人承担，而他们自己继续拿高薪出书。日常法师在《手抄稿》里反复说——佛法不是\"讲\"的，是\"修\"的；\"如诸病人负药囊，终不能医自体病\"——你背着药不治自己的病，你就是个\"背药的\"。那么，\"专家不担后果\"和\"讲者不实修\"最深的共通病根是什么？",options:["两者都只发生在学术界", "两者都可以靠考试解决", "两者都脱离了判断与代价的闭环", "两者都缺乏足够学历"],answer:2,explanation:"✅ 答案是C。两者的病根完全一样：他们的\"知识/判断\"不经过\"自身代价\"的检验，永远停留在\"不受检验\"的安全区。在这个安全区里不管说多好听，都没有\"皮肤擦在粗糙地面上\"的痛感，就没有真正学到东西。所以正确答案是C。A、C、D都偏离了核心。"},{stem:"塔勒布说在一个充满不确定性的世界里，\"活着\"本身就是最重要的策略——不管你的策略多么精妙，如果它有\"清零\"的可能，长期来看就一定会清零。广论讲\"持戒\"的根本意义也是\"不堕恶趣\"——确保你不会从\"人天善趣\"这个修行平台上永久掉线。那么，\"避免吸收壁\"和\"持戒不堕恶趣\"最精确的共通智慧是什么？",options:["两者都主张极端保守", "两者都反对追求进步", "两者都把不出局作为一切长远策略前提", "两者都认为戒律越多越好"],answer:2,explanation:"✅ 答案是C。\"吸收壁\"一旦触碰就永久停留。不管策略期望收益多高，只要存在触碰吸收壁的概率，长期来看必定触碰。持戒的逻辑完全一样：确保你持续拥有修行的平台——一旦堕恶趣，\"经劫\"才能再得人身，你的\"修行长期计划\"就不存在了。两者共同把\"不出局\"放在一切之前。所以正确答案是C。A、C、D都偏离了。"},{stem:"塔勒布提出了\"少数派规则\"：如果一个群体里有一小部分人有某种\"不可妥协的偏好\"，而其余大部分人\"无所谓\"，那么最终整个群体会服从那一小部分人的规则。比如，一个小区只要有几个对花生过敏的人，所有餐厅都会标注\"无花生\"。日常法师在《手抄稿》里讲过一个令人深思的现象——佛教修行圈里，真正严格持戒、真正实修的人总是少数，可正是因为这少数人的存在，正法才得以延续。法师说\"有几个人真的修，法就还在\"。那么，\"少数派规则\"和\"少数人维持正法\"最深的共通结构是什么？",options:["两者都认为多数人是无知的", "两者都认为少数人应该统治多数人", "两者都反对民主制度", "两者都揭示少数不可妥协者决定系统走向"],answer:3,explanation:"✅ 答案是D。塔勒布的\"少数派规则\"核心是：一个系统中，决定走向的不是\"多数人的偏好\"，而是\"少数人的不可妥协\"。广论和手抄稿里\"少数真正修行者维持正法\"在结构上完全一样：大多数修行人可能只是\"结个缘、种个善根\"，可只要有极少数人真正不可妥协地实修、持戒、证悟，正法就不会断。两者的共同结构是：系统的长期走向由\"不可妥协的少数\"决定，不由\"无所谓的多数\"决定。所以正确答案是D。A、C、D都误读了核心。"},{stem:"塔勒布在书中有一个让人印象深刻的观点：真正的\"信任\"不来自合同、法律、制度——这些只是\"事后追责\"的工具。真正的信任来自\"你知道对方和我承担同样的风险\"。如果对方\"赢了拿钱、输了我扛\"，你不可能信任他，不管合同多么完善。日常法师在《手抄稿》里讲\"依师\"时说过类似的话——你对善知识的信任，不是来自他的头衔或名气，而是来自\"他自己也在这样修\"。那么，\"风险共担产生信任\"和\"善知识自己也在修\"最深的共通逻辑是什么？",options:["两者都认为信任无法建立", "两者都强调信任来自双方承担同样的代价", "两者都认为信任是天生的", "两者都反对合同制度"],answer:1,explanation:"✅ 答案是B。信任的本质不是\"对方承诺什么\"，而是\"对方和我承担同样的风险\"。如果对方有\"风险共担\"——他的皮肤也擦在粗糙地面上——你就信任他，因为你知道他的判断经过了\"自身代价\"的检验。善知识之所以值得信任，不是因为他的头衔，而是因为他\"自己也在这样修\"——他有\"skin in the game\"。所以正确答案是B。A、C、D都偏离了核心。"},{stem:"塔勒布在书中严厉批评了一种人——\"不承担后果的评论员\"。他们写书、开课、做预测，可他们的预测出错时，没有任何后果——继续写下一本书、开下一门课。塔勒布说，这种人的\"预测\"在结构上毫无意义，因为不经过\"代价\"的检验。日常法师在《手抄稿》里也讲过类似的人——\"说起来头头是道，做起来一事无成\"，\"道理比谁都多，烦恼比谁都重\"。那么，\"不担后果的评论员\"和\"道理多烦恼重\"最深的共同病根是什么？",options:["两者都缺乏足够的知识", "两者都可以靠学习解决", "两者都只在媒体界出现", "两者都是\"判断\"脱离了\"代价\"的闭环"],answer:3,explanation:"✅ 答案是D。两者的病根完全一样：他们的\"判断/道理\"不经过\"自身实修/代价\"的检验，所以永远停留在\"不受检验\"的空谈区。在这个空谈区里，不管道理说多好听，都不能转化为实际的力量——因为\"安泰俄斯脱离了大地\"。所以正确答案是D。A、C、D都偏离了核心。"},{stem:"塔勒布在书中引了一句希腊谚语——\"Pathemata mathemata\"，直译\"在痛苦中学习\"。他说，真正的学习一定是痛苦的，因为你只有在\"付了代价\"的实践中才能学到东西。那些\"无痛的学习\"——看书、听课、记笔记——获得的知识远不如\"付出了代价\"的知识可靠。日常法师在《手抄稿》里反复讲——修行是\"大苦事\"，不是舒舒服服的事；真正的修行一定经历\"磨炼\"\"对治烦恼\"\"跟自己的习气搏斗\"。那么，\"在痛苦中学习\"和\"修行是大苦事\"最深的共通智慧是什么？",options:["两者都认为学习应该痛苦", "两者都反对快乐教育", "两者都认为痛苦本身就是目的", "两者都揭示可靠证量必须通过代价获得"],answer:3,explanation:"✅ 答案是D。塔勒布和日常法师说的不是\"学习应该痛苦\"——痛苦本身不是目的。他们说的是：可靠的知识/证量在结构上必须经过\"代价\"的检验，而\"付代价\"这个过程的体验是痛苦的。你要学游泳就得下水——下水可能会呛水、会害怕——这个\"呛水\"就是代价，可正是通过它你才真学会了游泳。修行也是一样——你要断烦恼就得跟自己的习气搏斗——这个搏斗是痛苦的，可正是通过它你才真正\"证\"到了佛法。所以正确答案是D。A、C、D都误读了核心。"},{stem:"塔勒布有一个看似奇怪但极为重要的概念——\"林迪效应\"（Lindy effect）：一个不会自然消亡的东西（比如一本书、一个思想、一种技术），它已经存在的时间越长，它预期还能存在的时间也越长。一本书已经活了100年，它大概率还能再活100年；而一本刚出版的新书，大概率几年内就会被遗忘。广论和手抄稿里有一个完全同构的思想——佛陀说的法，经过了2500年的检验，至今还在利益众生；而各种\"新发明\"的修行方法，热闹一阵就消失了。那么，\"林迪效应\"对修行人最深层的启示是什么？",options:["经过时间检验的东西更可靠", "应该拒绝一切新事物", "古老的东西一定都对", "越新的法越好"],answer:0,explanation:"✅ 答案是A。林迪效应的核心是\"时间是最严格的检验器\"——一个东西能存活很久本身就是一个强有力的信号，说明它有某种\"结构性的韧性\"。佛法的2500年检验期远比任何\"新方法\"的几个月或几年更有说服力。但这不意味着\"古老一定对\"，而是说\"经过时间考验的东西在概率上更可靠\"。所以正确答案是A。A、C、D都误读了林迪效应的含义。"},{stem:"塔勒布在书中有一个极为犀利的观察：那些\"自上而下\"设计制度的人——坐在办公室里用理论模型来\"规划\"社会的人——几乎总是犯错，因为他们的\"模型\"不经过\"实践\"的检验。他对比了两种知识：\"自上而下\"的理论知识和\"自下而上\"的实践知识，说后者远比前者可靠。日常法师在《手抄稿》里讲过一个类似的对比——\"黑板上的佛法\"和\"实修中的佛法\"：前者是\"在教室里推演\"，后者是\"在境界里搏斗\"。法师说，真正的善知识不是\"懂理论的人\"，而是\"自己走过这条路的人\"。那么，\"自上而下的失败\"和\"黑板上的佛法不可靠\"最深的共通原因是什么？",options:["两者都主张经验主义", "两者都认为大学无用", "两者都揭示不经实践检验的理论是脆弱", "两者都反对理论研究"],answer:2,explanation:"✅ 答案是C。两者的共通原因在于：理论和模型在\"纸面上\"可以自洽完美，可一旦接触真实世界，那些被模型忽略的\"变量\"\"尾部风险\"\"非线性效应\"就会立刻击穿纸面的完美。塔勒布说这就是安泰俄斯——脱离了大地母亲的知识，看起来不可战胜，实际上虚弱不堪。手抄稿的\"黑板上的佛法\"完全一样——在教室里推演可以头头是道，可一旦遇到真实的烦恼境界，那些被\"黑板\"忽略的东西就会立刻击穿你的\"完美理解\"。所以正确答案是C。A、C、D都偏离了核心。"},{stem:"塔勒布在书中讲了一个关于自己的故事：他年轻时在华尔街做交易员，每天面对不确定性，靠的不是\"理论模型\"，而是\"在损失和盈利中积累的直觉\"。他说，那些从象牙塔来到华尔街的数学家，模型比他精密得多，可他们\"泡灭\"的频率远高于他——因为他们的模型没有经过\"真实亏损\"的检验。日常法师在《手抄稿》里讲过一个同样的道理——很多人\"学了很多经论\"，可面对烦恼时一点用不上，因为他们的\"经论\"没有经过\"实修\"的检验。广论引《摄德宝》：\"如诸病人亲医治\"——你要像病人找医生治病那样去求法、修法。那么，\"模型不如直觉\"和\"经论不如实修\"最深的共通原因是什么？",options:["两者都认为直觉永远是对的", "两者都认为直觉永远对", "两者都揭示实践检验比纸面理论更可靠", "两者都反对智力活动"],answer:2,explanation:"✅ 答案是C。塔勒布的\"直觉\"不是天生的——它是无数次真实亏损和盈利\"刻\"进身体里的东西。那些数学家的\"模型\"是纸面上推导出来的，没有经过\"真实亏损\"的淬炼。手抄稿的\"实修\"也一样——实修中获得的\"证量\"不是理论推演，而是无数次跟烦恼搏斗\"刻\"进心相续里的东西。两者共同揭示：经过实践检验的东西比纸面理论更可靠。所以正确答案是C。A、C、D都偏离了核心。"},{stem:"塔勒布在书中提出了一个让人意外的概念——\"美感与伦理的关系\"。他说，一个对\"美感\"（秩序、对称、和谐）有深度感知的人，往往比一个只讲\"道德理论\"的人更值得信任。因为\"对称\"是一种直觉——你不需要推导就知道\"收益归我、风险归你\"是\"丑陋的\"\"不对的\"。日常法师在《手抄稿》里讲过一个类似的观点——修行到一定程度的人，\" naturally\"就会远离恶行，不是因为\"害怕果报\"，而是因为恶行在他看来\"不好\"\"不美\"\"不相应\"。那么，\"对称的美感\"和\"修行到自然远离恶行\"最深的共通点是什么？",options:["两者都认为美比善更重要", "两者都反对道德教育", "两者都主张审美决定一切", "两者都揭示真伦理来自内在而非外在"],answer:3,explanation:"✅ 答案是D。塔勒布和日常法师在这里指向同一个深刻的东西：真正的伦理/修行不是\"遵守外在规则\"，而是\"培养出一种内在的直觉\"——当你修行到一定程度，善行就像呼吸一样自然，恶行就像呼吸污浊空气一样不愉快。这不是\"选择了善\"，而是\"自然而然地趋向善\"。所以正确答案是D。A、C、D都偏离了核心。"},{stem:"塔勒布在书中有一个让人深思的概念——\"灵魂在游戏中\"（soul in the game）。比\"skin in the game\"更深一层——你不只是\"承担财务风险\"，你把自己的\"灵魂\"\"名誉\"\"一生的尊严\"都押了进去。他举了某些手工匠人的例子——他们做一件器物，不只是\"卖给你\"，他们把自己的\"灵魂\"刻进了器物里。日常法师在《手抄稿》里讲修行时有一个类似的表述——修行不是\"做交易\"，不是\"我花多少时间就得多少回报\"。修行是\"把整个生命都押上去\"——\"一身拼却\"——把你的命押在这条路上。那么，\"灵魂在游戏中\"和\"一身拼却\"最深的共通点是什么？",options:["两者都反对工作生活平衡", "两者都认为修行是赌博", "两者都主张拼命工作", "两者都揭示最深的承诺需要押上全部自己"],answer:3,explanation:"✅ 答案是D。\"灵魂在游戏中\"和\"一身拼却\"指向同一个东西：最深刻的承诺——不管是一件器物还是一条修行路——需要你把全部的自己投进去，而不是\"投入一部分、保留一部分\"。塔勒布说，这就是为什么手工匠人的器物比工业流水线的产品更有\"灵魂\"——因为匠人把自己的生命刻了进去。日常法师说，这就是为什么真正的修行人跟\"结缘型\"的修行人力量完全不同——前者把命押上了，后者只投了一部分。所以正确答案是D。A、C、D都偏离了核心。"},{stem:"塔勒布在书中有一个让人心惊的观察：2008年金融危机之前，整个金融系统的\"风险管理\"都是靠\"模型\"来做的——这些模型计算了各种\"可量化\"的风险，可偏偏漏掉了那种\"无法量化\"的极端风险（黑天鹅）。结果，\"可量化\"的风险都被管住了，而那个\"不可量化\"的黑天鹅直接把整个系统击穿了。日常法师在《手抄稿》里讲过一个类似的现象——有些人把佛法变成了一套\"可操作的流程\"——念多少遍经、磕多少个头、打坐多少小时——可偏偏忘了那个\"无法被流程化的核心\"：菩提心、真实的慈悲、对苦谛的切身感悟。那么，\"模型漏掉黑天鹅\"和\"流程漏掉核心\"最深的共通病根是什么？",options:["两者都主张凭直觉修行", "两者都反对模型和流程", "两者都把可量化部分当全部而漏掉核心", "两者都认为风险管理无用"],answer:2,explanation:"✅ 答案是C。两者的病根完全一样：人们倾向于把注意力集中在\"可以量化、可以操作、可以打分\"的那部分上——因为这些部分让人有\"掌控感\"。可问题是，真正决定成败的往往不是这些\"可量化的部分\"，而是那个\"不可量化的核心\"。金融模型可以计算日常波动，却算不了黑天鹅；修行流程可以计数磕头念经，却计不了菩提心。两者的共同教训是：别把\"可量化的部分\"错当成\"全部\"。所以正确答案是C。A、C、D都偏离了核心。"},{stem:"塔勒布在书中有一个关于\"低调\"的观点：真正有实力的人不需要\"展示\"——因为他们的实力经过了\"实践\"的反复检验，不需要外在的认证。而那些\"过度展示\"的人——不断秀证书、秀头衔、秀关系——往往是因为他们缺乏\"实践检验\"的真本事，所以需要用外在标签来\"替代\"。日常法师在《手抄稿》里讲过同样的道理——真正有修行的人\"不发露\"，而那些到处炫耀\"我开了什么悟、得了什么境界\"的人，恰恰暴露了他们没有真正的证量。广论引《摄德宝》：\"智者定应摧我慢\"。那么，\"过度展示\"和\"炫耀修行境界\"最深的共通病根是什么？",options:["两者都用外在标签替代内在实力匮乏", "两者都可以通过社交训练解决", "两者都是性格问题", "两者都只发生在特定人群"],answer:0,explanation:"✅ 答案是A。两者的病根完全一样：当一个人缺乏\"经过实践检验的真实力量\"时，他会本能地用\"外在标签\"来填补——证书、头衔、\"修行境界\"的描述。可这些标签和\"真实力量\"之间的关系是虚假的：有标签不代表有力量，有力量的人不需要标签。两者的共同病根在于：用\"看得见的外在\"来掩盖\"看不见的内在空虚\"。所以正确答案是A。A、C、D都偏离了核心。"},{stem:"塔勒布在书中提出了一个让人深思的概念——\"复原力比效率更重要\"。他说，一个系统如果过度追求\"效率\"（消除一切冗余），它就变得脆弱——因为\"冗余\"本身就是\"抗打击\"的资本。人体有两个肾、两片肺，看似\"冗余\"，可正是这种冗余让你在受伤时还有备用。广论讲\"精进度\"时有一个类似的深意——精进不是\"一刻不停地工作\"（那是过度效率化），而是\"持久、稳定、不疲厌地修行\"——这恰恰需要\"冗余\"：你不能把所有精力一把烧光，你得留有余地，才能\"跑完全程\"。那么，\"冗余即复原力\"和\"精进需要留余地\"最深的共通智慧是什么？",options:["两者都认为效率是敌人", "两者都反对努力精进", "两者都主张偷懒休息", "两者都揭示冗余是长期存活的关键"],answer:3,explanation:"✅ 答案是D。冗余的本质是\"保险\"——你多一个肾，就是给自己\"留了一手\"。塔勒布说，过度追求效率的系统（零库存、零冗余、零容错）在\"正常时期\"表现完美，可一旦遭遇极端事件就立刻崩溃。广论讲精进也是一样：如果你把所有精力在短期内一把烧光（\"暴发式修行\"），你在\"正常时期\"看起来很精进，可一旦遇到逆缘或长期考验就立刻\"退转\"。真正的精进是\"持久\"——持久就需要留余地、留冗余。所以正确答案是D。A、C、D都偏离了核心。"},{stem:"塔勒布在书中有一个关于\"信任重启\"的观点：一个允许\"犯错+纠正\"的系统比一个\"不允许犯错\"的系统更可靠。因为前者承认了\"人一定会犯错\"这个前提，并设计了纠错机制；后者假装\"可以不犯错\"，结果一旦犯错就没有回旋余地。日常法师在《手抄稿》里讲过一个类似的观点——修行不是\"不犯错\"，而是\"犯了就忏悔、忏悔了继续修\"。广论讲\"四力忏悔\"正是这个逻辑——不管你造了什么恶业，只要忏悔的力量足够清净，业就可以转变。那么，\"允许犯错+纠正\"和\"忏悔+继续修\"最深的共通智慧是什么？",options:["两者都认为犯错是无所谓的", "两者都反对建立任何标准", "两者都建立动态纠错机制而非静态完美", "两者都认为道德是多余的"],answer:2,explanation:"✅ 答案是C。两者的核心智慧在于：它们不追求\"永不犯错\"这个不可能的目标，而是建立了一个\"犯了能改\"的动态机制。塔勒布说，自然界就是通过\"突变+选择\"（犯错+纠正）来进化的——没有\"犯错\"就没有进化。广论讲忏悔也是一样——不是因为\"犯错无所谓\"，而是因为\"犯了能改、改了能继续\"这条动态路径比\"假装永不犯错\"这条静态完美路径可靠得多。所以正确答案是C。A、C、D都误读了核心。"},{stem:"塔勒布在书中有一个让人叹服的总结：他认为\"风险共担\"不仅仅是一个金融或经济概念——它是文明存续的基础。没有风险共担的社会，不管制度多么完善，最终都会走向衰败——因为\"收益归少数人、风险归所有人\"的结构会积累系统性不满，直到整个系统被撕裂。广论讲僧团和合时有一个类似的深意——僧团的存续不靠制度本身，而靠每个成员都\"如法行持\"——每个人都承担自己的修行责任、都为僧团付出。如果只有少数人付出、多数人只享受，僧团就会败坏。那么，\"风险共担是文明存续基础\"和\"僧团需要人人如法行持\"最深的共通逻辑是什么？",options:["两者都反对个人自由", "两者都揭示成员担责是集体存续前提", "两者都主张平均分配财富", "两者都认为制度无用"],answer:1,explanation:"✅ 答案是B。两者的核心逻辑在于：一个集体——不管是文明、社会还是僧团——它的存续不取决于\"制度多么完善\"，而取决于\"每个成员是否真正承担自己的那份责任\"。如果\"风险共担\"被打破——少数人承担、多数人只享受——集体的根基就被侵蚀了。塔勒布说这是文明衰败的根本原因；广论和手抄稿说这是僧团败坏、正法衰灭的根本原因。所以正确答案是B。A、C、D都偏离了核心。"},{stem:"塔勒布在书中提出了一个关于\"选择权\"（optionality）的精彩论点：你不需要\"预测未来\"，你只需要让自己处于一个\"有好选择权\"的位置——即\"下行有限、上行无限\"的位置。你不知道哪个机会会来，但只要你的\"最大损失\"是可控的，你就可以反复尝试，直到\"那个上行无限的机会\"降临。广论讲修行中的\"发心\"和\"回向\"也有类似的结构——你不知道这一座修行的具体果报是什么，但只要你发心清净、回向菩提，你的\"下行\"就是可控的（最多是这一世没什么明显效果），而你的\"上行\"是无限的（种下的菩提种子可以感得究竟佛果）。那么，\"选择权\"和\"发心回向\"最精确的共通结构是什么？",options:["两者都主张不要规划未来", "两者都认为修行和投资一样", "两者都建立下行有限上行无限的结构", "两者都反对目标导向"],answer:2,explanation:"✅ 答案是C。两者的核心结构完全同构：你不知道\"上行\"的具体形式和时机（哪个机会来、果报何时成熟），但你知道\"下行\"是可控的（最大损失有限/最多种个善根），而\"上行\"在理论上是不封顶的（改变命运的机会/究竟成佛）。塔勒布说这就是面对不确定性最聪明的姿态——不预测但保持选择权。广论的发心回向也是一样——不执着具体果报但保持菩提的方向。所以正确答案是C。A、C、D都偏离了核心。"},{stem:"塔勒布在全书最后的附录里用数学方法论证了一个深刻的结论：在\"权利和责任不匹配\"的委托代理机制下，代理人只会考虑如何\"延长游戏时间\"以获得更多业绩提成，而不会考虑委托人的总体回报——代理人会用委托人的钱去承担小概率的高风险，以此换取大概率的低风险收益。这种做法的代价是\"整个受托资产隐含着巨大的毁灭性风险\"。日常法师在《手抄稿》里反复讲过一个类似的警示——修行人如果把佛法当成\"获取世间利益\"的工具（用佛法来求名、求利、求安全感），就像\"用金碗装毒药\"——容器是佛法，内容却是烦恼。那么，\"代理人的高风险套利\"和\"用佛法谋世间利益\"最深的共通结构是什么？",options:["两者都因为不够聪明", "两者都只发生在金融界", "两者都借用可信框架来追求隐藏私利", "两者都是经济犯罪"],answer:2,explanation:"✅ 答案是C。两者的共通结构在于\"借用\"——代理人\"借用\"了委托人的信任和资金来追求自己的利益；\"借用佛法\"的人\"借用\"了佛法的可信框架来追求自己的世间利益。在两种情况下，\"被借用的东西\"（委托人的钱/佛法的框架）本身是好的、善的，可一旦被\"借用\"来服务于隐藏的私利，它就变成了危险的掩护——因为\"好的外壳\"让隐藏的风险更难被察觉。塔勒布说这就是\"代理人问题\"最危险的地方：它不是\"明抢\"，而是\"在合法框架下的隐蔽套利\"。手抄稿说的\"用金碗装毒药\"完全一样：不是碗有毒，是碗掩盖了毒。所以正确答案是C。A、C、D都偏离了核心。"}]}
+];
+let currentBook=0, currentQ=0, answers={};
+function init(){buildTabs();showQuestion();updateNavButtons();}
+function buildTabs(){
+  var html=books.map(function(b,i){
+    var answered=0;
+    for(var j=0;j<b.questions.length;j++){if(answers[i+'-'+j]!==undefined)answered++;}
+    return '<div class="book-tab'+(i===currentBook?' active':'')+'" onclick="switchBook('+i+')">'+b.name+'<div class="tab-progress">'+answered+'/'+b.questions.length+'</div></div>';
+  }).join('');
+  document.getElementById('bookTabs').innerHTML=html;
+}
+function switchBook(i){currentBook=i;currentQ=0;refresh();}
+function refresh(){buildTabs();showQuestion();updateNavButtons();}
+function goPrev(){if(currentQ>0){currentQ--;showQuestion();updateNavButtons();}}
+function goNext(){var qs=books[currentBook].questions;if(currentQ<qs.length-1){currentQ++;showQuestion();updateNavButtons();}}
+function updateNavButtons(){
+  var qs=books[currentBook].questions;
+  document.getElementById('btnPrev').disabled=(currentQ===0);
+  document.getElementById('btnNext').disabled=(currentQ>=qs.length-1);
+  var key=currentBook+'-'+currentQ, hint=document.getElementById('navHint');
+  if(answers[key]===undefined){hint.textContent='未作答';return;}
+  hint.textContent=(answers[key]===qs[currentQ].answer)?'✅ 正确':'❌ 错误';
+}
+function showQuestion(){
+  var qs=books[currentBook].questions, q=qs[currentQ], b=books[currentBook];
+  document.getElementById('qProgress').innerHTML='<span style="color:#f0c060;">'+b.name+'</span> · 第 <span class="q-number">'+(currentQ+1)+'</span> / '+qs.length+' 题';
+  document.getElementById('qStem').innerHTML=q.stem;
+  var body=document.getElementById('qBody'), key=currentBook+'-'+currentQ, prevAns=answers[key];
+  body.innerHTML='<div class="options">'+q.options.map(function(opt,i){
+    var cls='option';
+    if(prevAns!==undefined){cls+=' disabled';if(i===q.answer)cls+=' correct';else if(i===prevAns&&prevAns!==q.answer)cls+=' wrong';}
+    var label=String.fromCharCode(65+i);
+    return '<div class="'+cls+'" onclick="'+(prevAns===undefined?'answerChoice('+i+')':'')+'">'+label+'. '+opt+'</div>';
+  }).join('')+'</div>';
+  var explDiv=document.getElementById('qExplanation');
+  if(prevAns!==undefined&&q.explanation){explDiv.className='explanation show';explDiv.innerHTML='💡 '+q.explanation;}
+  else{explDiv.className='explanation';explDiv.textContent='';}
+  updateScoreboard();
+}
+function answerChoice(idx){
+  var key=currentBook+'-'+currentQ;
+  if(answers[key]!==undefined)return;
+  answers[key]=idx;showQuestion();updateNavButtons();
+}
+function updateScoreboard(){
+  var total=0,correct=0;
+  for(var b=0;b<books.length;b++)for(var j=0;j<books[b].questions.length;j++){
+    var key=b+'-'+j;if(answers[key]===undefined)continue;
+    total++;if(answers[key]===books[b].questions[j].answer)correct++;
+  }
+  var wrong=total-correct, pct=total>0?Math.round(correct/total*100):0;
+  var totalQ=0;for(var b=0;b<books.length;b++)totalQ+=books[b].questions.length;
+  document.getElementById('sbProgress').textContent=total+'/'+totalQ;
+  document.getElementById('sbCorrect').textContent=correct;
+  document.getElementById('sbWrong').textContent=wrong;
+  document.getElementById('sbScore').textContent=pct+'%';
+}
+function showAllAnswers(){books[currentBook].questions.forEach(function(q,qi){answers[currentBook+'-'+qi]=q.answer;});refresh();}
+function resetCurrentBook(){books[currentBook].questions.forEach(function(_,qi){delete answers[currentBook+'-'+qi];});currentQ=0;refresh();}
+function resetAll(){answers={};currentBook=0;currentQ=0;refresh();}
+init();
+</script>
+</body>
+</html>
