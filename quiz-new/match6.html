@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配对连线 · 六关挑战</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 30%, #e0f2fe 100%);
+  min-height: 100vh; color: #1f2937; padding: 16px;
+}
+.app { max-width: 860px; margin: 0 auto; }
+.scoreboard {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,.85); backdrop-filter: blur(8px);
+  border-radius: 16px; padding: 12px 20px; margin-bottom: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.06);
+  flex-wrap: wrap; gap: 8px;
+}
+.scoreboard .title { font-weight: 700; font-size: 17px; color: #be185d; }
+.scoreboard .stats { display: flex; gap: 18px; font-size: 14px; color: #475569; }
+.scoreboard .stats b { color: #0f766e; }
+.progressbar { height: 6px; background: #f1f5f9; border-radius: 3px; overflow: hidden; margin: 0 4px 14px; }
+.progressbar .fill { height: 100%; background: linear-gradient(90deg,#f472b6,#818cf8); border-radius: 3px; transition: width .4s; }
+.card {
+  background: rgba(255,255,255,.92); border-radius: 20px; padding: 22px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.08);
+}
+.stage-title { font-size: 15px; color: #9d174d; font-weight: 600; margin-bottom: 6px; }
+.intro {
+  font-size: 15px; line-height: 1.8; color: #334155; margin-bottom: 18px;
+  background: #fff7fb; border-left: 3px solid #f9a8d4; padding: 10px 14px; border-radius: 8px;
+}
+.hint { font-size: 13px; color: #94a3b8; margin-bottom: 14px; }
+.matchzone { position: relative; display: flex; gap: 0; justify-content: space-between; }
+.col { width: 42%; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 2; }
+.col.mid-gap { width: 16%; }
+.item {
+  padding: 12px 14px; border-radius: 12px; font-size: 14px; line-height: 1.55;
+  background: #ffffff; border: 2px solid #e2e8f0; cursor: pointer;
+  transition: all .18s; user-select: none; min-height: 62px; display: flex; align-items: center;
+}
+.item:hover { border-color: #c4b5fd; transform: translateY(-1px); }
+.item .num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 50%; font-size: 12px; font-weight: 700;
+  margin-right: 10px; flex-shrink: 0;
+}
+.left-item .num { background: #fdf2f8; color: #be185d; }
+.right-item .num { background: #eff6ff; color: #1d4ed8; }
+.item.item-active { border-color: #8b5cf6; background: #f5f3ff; box-shadow: 0 0 0 3px rgba(139,92,246,.18); }
+.item.linked { border-color: #a78bfa; background: #faf5ff; }
+.item.linked .num { background: #ede9fe; color: #6d28d9; }
+.item.dimmed { opacity: .5; }
+.item.correct { border-color: #34d399; background: #ecfdf5; }
+.item.correct .num { background: #d1fae5; color: #047857; }
+.item.wrong { border-color: #f87171; background: #fef2f2; }
+.item.wrong .num { background: #fee2e2; color: #b91c1c; }
+.item.locked { cursor: default; }
+#svgLayer { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.btns { display: flex; gap: 12px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+button {
+  border: none; border-radius: 12px; padding: 12px 30px; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all .18s; font-family: inherit;
+}
+.btn-primary { background: linear-gradient(135deg,#ec4899,#8b5cf6); color: #fff; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(236,72,153,.35); }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+.btn-ghost { background: #f1f5f9; color: #475569; }
+.btn-ghost:hover { background: #e2e8f0; }
+.explain {
+  display: none; margin-top: 20px; background: #f8fafc; border-radius: 14px; padding: 16px 18px;
+  border: 1px solid #e2e8f0;
+}
+.explain.show { display: block; animation: fadeUp .35s; }
+.explain .verdict { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.explain .pair-line {
+  display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; line-height: 1.65;
+  padding: 7px 10px; border-radius: 8px; margin-bottom: 6px;
+}
+.pair-line.ok { background: #ecfdf5; }
+.pair-line.no { background: #fef2f2; }
+.pair-line .icon { flex-shrink: 0; }
+.finalcard { text-align: center; padding: 40px 20px; }
+.finalcard .big { font-size: 44px; margin-bottom: 10px; }
+.finalcard h2 { font-size: 22px; color: #be185d; margin-bottom: 12px; }
+.finalcard p { color: #475569; font-size: 15px; line-height: 1.9; }
+.finalcard .again { margin-top: 20px; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+.shaking { animation: shake .3s; }
+@media (max-width: 640px) {
+  .col { width: 44%; } .col.mid-gap { width: 12%; }
+  .item { font-size: 12.5px; padding: 10px; min-height: 74px; }
+  .scoreboard .stats { gap: 10px; font-size: 12.5px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="scoreboard">
+    <div class="title" id="sbTitle">🔗 配对连线 · 六关挑战</div>
+    <div class="stats">
+      <span>进度 <b id="sbProgress">1/6</b></span>
+      <span>连对 <b id="sbCorrect">0</b>/<span id="sbTotalPairs">24</span></span>
+      <span>得分率 <b id="sbRate">--%</b></span>
+    </div>
+  </div>
+  <div class="progressbar"><div class="fill" id="sbFill" style="width:16.7%"></div></div>
+
+  <div class="card" id="stageCard">
+    <div class="stage-title" id="stTitle"></div>
+    <div class="intro" id="stIntro"></div>
+    <div class="hint">👆 先点左边一条，再点右边一条配对；点已连线的条目可以断开重来</div>
+    <div class="matchzone" id="matchzone">
+      <div class="col" id="colL"></div>
+      <div class="col mid-gap"></div>
+      <div class="col" id="colR"></div>
+      <svg id="svgLayer"></svg>
+    </div>
+    <div class="btns">
+      <button class="btn-ghost" id="btnReset">↺ 全部重连</button>
+      <button class="btn-primary" id="btnCheck">✔ 检查连线</button>
+    </div>
+    <div class="explain" id="explainBox"></div>
+  </div>
+
+  <div class="card finalcard" id="finalCard" style="display:none">
+    <div class="big" id="finalEmoji">🎉</div>
+    <h2 id="finalTitle"></h2>
+    <p id="finalText"></p>
+    <button class="btn-primary again" id="btnAgain">🔄 再玩一次</button>
+  </div>
+</div>
+
+<script>
+/* === DATA BLOCK START === */
+var MATCH_DATA = [
+  {
+    title: '第 1 关 · 四种思维方式',
+    intro: '复习笔记上写着四种思维方式，每个后面要配一段对应的说明。这四组名字很像、内核不同，配错一个，整张表的意思就散架了。',
+    left: ['黑天鹅思维', '锚定效应', '认知失调', '损失厌恶'],
+    right: ['接受不可预测是世界的默认状态', '你对价格的判断依赖于第一个看到的数字', '大脑会修改感知来消除行为和信念之间的冲突', '失去100块的痛苦约等于得到200块的快乐'],
+    perPair: [
+      '黑天鹅思维：世界会被无法预测的极端事件塑造，塔勒布说与其预测，不如先接受不可预测是常态。',
+      '锚定效应：卡尼曼提出，第一个看到的数字像船锚一样，把后面的判断全部钉死在它附近。',
+      '认知失调：费斯汀格提出，当行为和信念打架，大脑会偷偷修改感知来维持自己没错的感觉。',
+      '损失厌恶：也来自卡尼曼，失去的痛苦大约是得到快感的两倍，所以丢100块比捡200块更刺激。'
+    ]
+  },
+  {
+    title: '第 2 关 · 我们买的到底是什么',
+    intro: '和闺蜜窝在沙发上盘点：游戏皮肤、网红餐厅、新手机、舍不得穿的球鞋。这些东西背后藏着的从来不是东西本身——左边四件消费品，右边四种心里想要的，你来连线。',
+    left: ['买游戏皮肤', '吃昂贵的网红餐', '换最新款手机', '收藏球鞋但不穿'],
+    right: ['别人觉得我厉害的幻觉', '我的生活很精致的社交信号', '我跟得上时代的安全感', '我属于某个圈子的归属感'],
+    perPair: [
+      '游戏皮肤：买的不是那层像素，是别人一看到就知道我多厉害的幻觉。',
+      '网红餐厅那顿饭：拍照发出去，发出去的是我的生活很精致这个信号——本体其实是那条动态。',
+      '最新款手机：图的是我没掉队、跟得上时代的那点安全感。',
+      '收藏却不穿的球鞋：图的是我属于懂鞋的那个圈子的归属感。'
+    ]
+  },
+  {
+    title: '第 3 关 · 钱去哪儿了 · 风险盲区',
+    intro: '奶茶店拼单时聊起钱为什么总在不知不觉中变少。四种风险认知错误，各对应一个真实案例——左边是错误想法，右边是它踩中的坑，连连看。',
+    left: ['把不掉本金当成安全', '把大家都在做当成正确', '把以前没出事当成以后不会出事', '把我不懂当成这件事不存在'],
+    right: ['通胀让购买力缓慢蒸发', '从众免于被指责但不会让错误变正确', '火鸡错觉：前999天都被喂，第1000天被宰', '不知道不等于不存在，地图不是领土'],
+    perPair: [
+      '不掉本金不等于安全：钱的数额没少，但通胀每年都在偷偷蒸发它能买的东西，像奶茶悄悄涨了两块。',
+      '大家都在做不等于对：从众只是让你免于一个人背锅，多数人一起跳的坑还是坑。',
+      '以前没事不等于以后没事：罗素的火鸡——前999天主人天天喂它，它越来越安心，第1000天感恩节到了。',
+      '我不懂不等于不存在：地图上没画的悬崖，不代表悬崖不在那里。'
+    ]
+  },
+  {
+    title: '第 4 关 · 成长障碍体检',
+    intro: '书桌乱成一团，卷子堆成小山，始终没勇气翻开第一页。四种成长障碍，各配一把能撬动它的思维工具——你来把它们一一对号入座。',
+    left: ['拖延不敢开始', '害怕失败不敢尝试', '被别人的评价困住', '追求完美迟迟不动'],
+    right: ['2分钟法则：只做2分钟，做完就有动力继续', '心理预演：先想象最坏结果，发现没那么恐怖', '斯多葛二分法：区分我能控制的和不能控制的', 'MVP思维：先出60分版本，再迭代到90分'],
+    perPair: [
+      '拖延的痛点在启动：2分钟法则来自GTD，别想做完，只做两分钟，起了头惯性会接手。',
+      '害怕失败怕的是模糊的恐怖想象：心理预演是认知行为疗法的招，把最坏情况摊开成具体画面，一看原来不过如此。',
+      '被评价困住，烦的是别人怎么想我这件控制不了的事：斯多葛二分法把能控制和不能控制的切开，别人的评价落在圈外，不必内耗。',
+      '追求完美的人想一步到位100分：MVP思维说先交60分，用反馈迭代到90分，比憋在原地强十倍。'
+    ]
+  },
+  {
+    title: '第 5 关 · 不花钱的财富',
+    intro: '深夜刷到一条笔记：有哪些财富是不花钱就能拥有的？四种免费财富，各有来源——左边是财富，右边是来源，配错了意思就全拧了。',
+    left: ['每天能入睡的能力', '有一个可以说话的人', '学会一个能沉浸的技能', '不被别人期待绑住的能力'],
+    right: ['来自身体的健康基础', '来自长期维护的信任关系', '来自持续投入练习后的心流入口', '来自对自己足够好的确认'],
+    perPair: [
+      '能安稳入睡，根子里是身体好——钱能买到床，买不到一夜安稳的睡眠。',
+      '有一个随时能说话的人，是长期相处一点点攒出来的信任，不是运气。',
+      '一门能沉浸进去的技能，是练到深处才打开的那扇心流之门。',
+      '不被期待绑死，靠的是打心底承认我这样已经足够好——这是自我确认，不是别人给的。'
+    ]
+  },
+  {
+    title: '第 6 关 · 金句的下半句',
+    intro: '从小听到大的四句金句，每句后面都藏着半句没说完的话。把金句和它省略的漏洞配起来——这半句才是真相所在。',
+    left: ['吃得苦中苦，方为人上人', '是金子总会发光的', '失败是成功之母', '坚持就是胜利'],
+    right: ['前提是吃的苦是有价值的苦', '但金子也需要被人看到', '前提是你从失败中提取了教训', '前提是坚持的方向是对的'],
+    perPair: [
+      '吃苦要挑着吃：白挨的苦不会自动变成本事，有价值的苦才行。',
+      '金子会发光，但得先找到能让人看见你的地方——埋在没人路过的土里，再亮也没用。',
+      '失败是成功之母有个大前提：真的把教训提取出来，否则同样的坑再摔一次。',
+      '坚持是胜利的前提是方向对——方向错了，坚持只是原地把坑挖得更深。'
+    ]
+  }
+];
+/* === DATA BLOCK END === */
+
+/* === 洗牌（固定seed，每次打开顺序一致） === */
+function seededShuffle(arr, seed) {
+  var a = arr.slice();
+  var s = seed;
+  for (var i = a.length - 1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    var r = s / 233280;
+    var j = Math.floor(r * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+/* === 状态 === */
+var stage = 0;
+var links = [];        /* links[i] = 右列显示索引, -1=未连 */
+var checked = false;
+var totalCorrect = 0;  /* 累计连对数 */
+var rightOrder = [];   /* 右列洗牌后的 原始索引→显示顺序 */
+var activeLeft = -1;
+
+function initStage() {
+  checked = false;
+  activeLeft = -1;
+  var q = MATCH_DATA[stage];
+  /* 右列洗牌：确保不是原序也不是完全反序 */
+  var order = [];
+  for (var i = 0; i < q.right.length; i++) order.push(i);
+  var cand;
+  var tries = 0;
+  do {
+    cand = seededShuffle(order, 42 + stage * 7 + tries * 131);
+    tries++;
+  } while ((isIdentity(cand) || isReverse(cand)) && tries < 50);
+  rightOrder = cand;
+  links = [];
+  for (var i = 0; i < q.left.length; i++) links.push(-1);
+
+  document.getElementById('stTitle').textContent = q.title;
+  document.getElementById('stIntro').textContent = q.intro;
+  var colL = document.getElementById('colL');
+  var colR = document.getElementById('colR');
+  colL.innerHTML = '';
+  colR.innerHTML = '';
+  var glyphs = ['A', 'B', 'C', 'D'];
+  for (var i = 0; i < q.left.length; i++) {
+    var d = document.createElement('div');
+    d.className = 'item left-item';
+    d.id = 'L' + i;
+    d.innerHTML = '<span class="num">' + (i + 1) + '</span><span>' + q.left[i] + '</span>';
+    d.onclick = (function(idx) { return function() { onLeft(idx); }; })(i);
+    colL.appendChild(d);
+  }
+  for (var j = 0; j < cand.length; j++) {
+    var origIdx = cand[j];
+    var d2 = document.createElement('div');
+    d2.className = 'item right-item';
+    d2.id = 'R' + j;
+    d2.innerHTML = '<span class="num">' + glyphs[j] + '</span><span>' + q.right[origIdx] + '</span>';
+    d2.onclick = (function(idx) { return function() { onRight(idx); }; })(j);
+    colR.appendChild(d2);
+  }
+  document.getElementById('explainBox').className = 'explain';
+  document.getElementById('btnCheck').disabled = true;
+  updateScoreboard();
+  redrawLines();
+}
+
+function isIdentity(a) {
+  for (var i = 0; i < a.length; i++) if (a[i] !== i) return false;
+  return true;
+}
+function isReverse(a) {
+  for (var i = 0; i < a.length; i++) if (a[i] !== a.length - 1 - i) return false;
+  return true;
+}
+
+/* === 交互 === */
+function onLeft(i) {
+  if (checked) return;
+  if (links[i] === -1) {
+    activeLeft = (activeLeft === i) ? -1 : i;
+  } else {
+    /* 断开该左项已有连线 */
+    var oldR = links[i];
+    links[i] = -1;
+    document.getElementById('R' + oldR).className = 'item right-item';
+    activeLeft = i;
+  }
+  refreshStates();
+}
+function onRight(j) {
+  if (checked) return;
+  if (activeLeft === -1) return;
+  /* 右项若已被别的左项占用，断开那个 */
+  for (var i = 0; i < links.length; i++) {
+    if (links[i] === j) {
+      links[i] = -1;
+      break;
+    }
+  }
+  links[activeLeft] = j;
+  activeLeft = -1;
+  refreshStates();
+}
+function refreshStates() {
+  var q = MATCH_DATA[stage];
+  for (var i = 0; i < q.left.length; i++) {
+    var el = document.getElementById('L' + i);
+    var cls = 'item left-item';
+    if (links[i] >= 0) cls += ' linked';
+    if (activeLeft === i) cls += ' item-active';
+    el.className = cls;
+  }
+  for (var j = 0; j < rightOrder.length; j++) {
+    var el2 = document.getElementById('R' + j);
+    var used = links.indexOf(j) >= 0;
+    el2.className = 'item right-item' + (used ? ' linked' : '');
+  }
+  document.getElementById('btnCheck').disabled = links.indexOf(-1) >= 0;
+  redrawLines();
+}
+
+/* === SVG连线 === */
+function anchorPos(el, side) {
+  var zone = document.getElementById('matchzone').getBoundingClientRect();
+  var r = el.getBoundingClientRect();
+  return {
+    x: (side === 'right' ? r.right : r.left) - zone.left,
+    y: r.top + r.height / 2 - zone.top
+  };
+}
+function redrawLines() {
+  var svg = document.getElementById('svgLayer');
+  svg.innerHTML = '';
+  for (var i = 0; i < links.length; i++) {
+    if (links[i] < 0) continue;
+    var a = anchorPos(document.getElementById('L' + i), 'right');
+    var b = anchorPos(document.getElementById('R' + links[i]), 'left');
+    var mx = (a.x + b.x) / 2;
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var stroke = checked ? (checkColor(i)) : '#a78bfa';
+    var dash = checked && !isPairCorrect(i) ? ' stroke-dasharray="7,5"' : '';
+    path.setAttribute('d', 'M' + a.x + ',' + a.y + ' C' + mx + ',' + a.y + ' ' + mx + ',' + b.y + ' ' + b.x + ',' + b.y);
+    path.setAttribute('stroke', stroke);
+    path.setAttribute('stroke-width', '3.5');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-linecap', 'round');
+    if (dash) path.setAttribute('stroke-dasharray', '7,5');
+    svg.appendChild(path);
+    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', a.x); dot.setAttribute('cy', a.y); dot.setAttribute('r', '4');
+    dot.setAttribute('fill', stroke);
+    svg.appendChild(dot);
+  }
+}
+function isPairCorrect(i) {
+  /* 左i 的正确右项 = 原始索引 i；右列显示位置 j 对应原始 rightOrder[j] */
+  return rightOrder[links[i]] === i;
+}
+function checkColor(i) {
+  return isPairCorrect(i) ? '#10b981' : '#ef4444';
+}
+
+/* === 检查 === */
+function onCheck() {
+  if (links.indexOf(-1) >= 0) return;
+  checked = true;
+  var q = MATCH_DATA[stage];
+  var nOk = 0;
+  var box = document.getElementById('explainBox');
+  var html = '';
+  var verdictText, verdictColor;
+  for (var i = 0; i < links.length; i++) {
+    var ok = isPairCorrect(i);
+    if (ok) nOk++;
+    var dispJ = links[i];
+    html += '<div class="pair-line ' + (ok ? 'ok' : 'no') + '">'
+      + '<span class="icon">' + (ok ? '✅' : '❌') + '</span>'
+      + '<span><b>' + q.left[i] + '</b> ' + (ok ? '→' : '✗(你连到了别处)') + ' <b>' + q.right[rightOrder[dispJ]] + '</b>'
+      + '<br>' + q.perPair[i] + '</span></div>';
+  }
+  totalCorrect += nOk;
+  if (nOk === 4) { verdictText = '🎉 全对！四条线全部咬合'; verdictColor = '#047857'; }
+  else if (nOk >= 2) { verdictText = '💪 连对 ' + nOk + '/4，再看看错的那几条'; verdictColor = '#b45309'; }
+  else { verdictText = '💭 连对 ' + nOk + '/4，读完下面的解析就赚回来了'; verdictColor = '#b91c1c'; }
+  html = '<div class="verdict" style="color:' + verdictColor + '">' + verdictText + '</div>' + html;
+  if (stage < MATCH_DATA.length - 1) {
+    html += '<div class="btns"><button class="btn-primary" id="btnNext">下一关 →</button></div>';
+  } else {
+    html += '<div class="btns"><button class="btn-primary" id="btnNext">看总结 🏁</button></div>';
+  }
+  box.innerHTML = html;
+  box.className = 'explain show';
+  document.getElementById('btnCheck').disabled = true;
+  for (var i2 = 0; i2 < links.length; i2++) {
+    var le = document.getElementById('L' + i2);
+    var ok2 = isPairCorrect(i2);
+    le.className = 'item left-item locked ' + (ok2 ? 'correct' : 'wrong');
+    if (!ok2) { le.classList.add('shaking'); (function(e){setTimeout(function(){e.classList.remove('shaking');},400);})(le); }
+    var re = document.getElementById('R' + links[i2]);
+    re.className = 'item right-item locked ' + (ok2 ? 'correct' : 'wrong');
+  }
+  document.getElementById('btnNext').onclick = function() {
+    if (stage < MATCH_DATA.length - 1) { stage++; initStage(); window.scrollTo(0, 0); }
+    else showFinal();
+  };
+  updateScoreboard();
+  redrawLines();
+}
+
+function onReset() {
+  if (checked) return;
+  initStage();
+}
+
+/* === 记分板 === */
+function updateScoreboard() {
+  var done = checked ? stage + 1 : stage;
+  document.getElementById('sbProgress').textContent = Math.min(done + 1, 6) + '/6';
+  var graded = checked ? done * 4 : done * 4;
+  document.getElementById('sbCorrect').textContent = totalCorrect;
+  if (graded > 0) {
+    document.getElementById('sbRate').textContent = Math.round(totalCorrect / graded * 100) + '%';
+  } else {
+    document.getElementById('sbRate').textContent = '--%';
+  }
+  document.getElementById('sbFill').style.width = ((stage + (checked ? 1 : 0)) / 6 * 100) + '%';
+}
+
+/* === 总结页 === */
+function showFinal() {
+  document.getElementById('stageCard').style.display = 'none';
+  document.getElementById('finalCard').style.display = 'block';
+  var rate = Math.round(totalCorrect / 24 * 100);
+  var em, ti, tx;
+  if (rate >= 90) { em = '🏆'; ti = '配对大师！'; tx = '24 条连线你对住了 ' + totalCorrect + ' 条。黑天鹅、锚定、火鸡错觉……这些概念你已经能一眼拆开，这个敏感度刷推看报告的时候特别值钱。'; }
+  else if (rate >= 70) { em = '🎯'; ti = '手感不错！'; tx = '24 条连对 ' + totalCorrect + ' 条。容易混的那几对（比如锚定和认知失调、从众和火鸡错觉）再看一眼解析，下次全对不难。'; }
+  else { em = '🌱'; ti = '概念地图已点亮'; tx = '连对 ' + totalCorrect + '/24。别慌——错的那些正是最容易混的对子，把每关下面的解析扫一遍，这套思维工具就都归你了。'; }
+  document.getElementById('finalEmoji').textContent = em;
+  document.getElementById('finalTitle').textContent = ti;
+  document.getElementById('finalText').textContent = tx;
+  document.getElementById('sbFill').style.width = '100%';
+}
+
+document.getElementById('btnCheck').onclick = onCheck;
+document.getElementById('btnReset').onclick = onReset;
+document.getElementById('btnAgain').onclick = function() {
+  stage = 0; totalCorrect = 0;
+  document.getElementById('finalCard').style.display = 'none';
+  document.getElementById('stageCard').style.display = 'block';
+  initStage();
+};
+
+initStage();
+window.addEventListener('resize', redrawLines);
+</script>
+</body>
+</html>
