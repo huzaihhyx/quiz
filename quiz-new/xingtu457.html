@@ -126,7 +126,7 @@ h1 {
 <body>
 <div class="wrapper">
 <div id="scoreboard">
-  <div>📊 总进度：<span id="sbProgress" style="color:#f5c2e7;font-weight:700;">0/49</span></div>
+  <div>📊 总进度：<span id="sbProgress" style="color:#f5c2e7;font-weight:700;">0/451</span></div>
   <div>✅ 正确：<span id="sbCorrect" style="color:#a6e3a1;font-weight:700;">0</span></div>
   <div>❌ 错误：<span id="sbWrong" style="color:#f38ba8;font-weight:700;">0</span></div>
   <div>🏆 得分：<span id="sbScore" style="color:#f9e2af;font-weight:700;font-size:18px;">0%</span></div>
@@ -686,6 +686,8 @@ const layers = [
   { name: "认知觉醒", sub: "大脑的七个球", questions: L18, icon: "☀️" },
   { name: "枕边书夜读", sub: "睡前十五分钟", questions: L19, icon: "🌙" }
 ];
+
+const TOTAL_QS = layers.reduce(function(s, l) { return s + l.questions.length; }, 0);
 let currentLayer = 0;
 let currentQ = 0;
 let answers = {};
@@ -926,7 +928,7 @@ function updateScoreboard() {
   }
   var wrong = total - correct;
   var pct = total > 0 ? Math.round(correct / total * 100) : 0;
-  document.getElementById('sbProgress').textContent = total + '/49';
+  document.getElementById('sbProgress').textContent = total + '/' + TOTAL_QS;
   document.getElementById('sbCorrect').textContent = correct;
   document.getElementById('sbWrong').textContent = wrong;
   document.getElementById('sbScore').textContent = pct + '%';
@@ -961,10 +963,10 @@ function showSummary() {
   }
   var answered = totalCorrect + totalWrong;
   var h = '<h2 style="color:#f9e2af;margin:0 0 8px;">📋 测验总结</h2>';
-  h += '<p style="color:#a6adc8;margin:0 0 4px;">已答' + answered + '/49题 · ✅' + totalCorrect + ' · ❌' + totalWrong;
+  h += '<p style="color:#a6adc8;margin:0 0 4px;">已答' + answered + '/' + TOTAL_QS + '题 · ✅' + totalCorrect + ' · ❌' + totalWrong;
   if (unansweredQ.length > 0) h += ' · ⚠️未答' + unansweredQ.length;
   h += '</p>';
-  h += '<div style="background:#313244;height:6px;border-radius:3px;margin:12px 0;overflow:hidden;"><div style="background:#a6e3a1;height:100%;width:' + (answered/49*100) + '%;border-radius:3px;transition:width 0.3s;"></div></div>';
+  h += '<div style="background:#313244;height:6px;border-radius:3px;margin:12px 0;overflow:hidden;"><div style="background:#a6e3a1;height:100%;width:' + (answered/TOTAL_QS*100) + '%;border-radius:3px;transition:width 0.3s;"></div></div>';
   
   if (allWrong.length > 0) {
     h += '<h3 style="color:#f38ba8;margin:20px 0 12px;">❌ 答错的题（' + allWrong.length + '题）</h3>';
