@@ -320,12 +320,16 @@ function redrawMLines(){
 
 
 var cFilled=[];   /* cFilled[k] = options 索引, -1 未填 */
+var cKey=null;     /* 当前已初始化 cFilled 的题 key */
 var cActive=null; /* 当前活动空 (自动=第一个未填) */
 
 function renderCloze(){
   var qs=books[currentBook].questions,q=qs[currentQ],key=currentBook+'-'+currentQ,prev=answers[key];
-  if(prev!==undefined){cFilled=prev.slice();}
-  else{cFilled=[];for(var i=0;i<q.blanks;i++)cFilled.push(-1);}
+  if(key!==cKey){
+    cKey=key;
+    if(prev!==undefined){cFilled=prev.slice();}
+    else{cFilled=[];for(var i=0;i<q.blanks;i++)cFilled.push(-1);}
+  }
   cActive=null;
   var body=document.getElementById('qBody');
   var stemText=q.stem;
