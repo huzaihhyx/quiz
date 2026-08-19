@@ -204,6 +204,7 @@ var mRightOrder=[];
 var mLinks=[];
 var mActiveLeft=-1;
 var mChecked=false;
+var mQKey=null;
 
 function seededShuffle(arr,seed){var a=arr.slice(),s=seed;for(var i=a.length-1;i>0;i--){s=(s*9301+49297)%233280;var r=s/233280;var j=Math.floor(r*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 function mIdentity(a){for(var i=0;i<a.length;i++)if(a[i]!==i)return false;return true;}
@@ -222,7 +223,7 @@ function initMatch(q){
 
 function renderMatch(){
   var qs=books[currentBook].questions,q=qs[currentQ],key=currentBook+'-'+currentQ,prev=answers[key];
-  if(mRightOrder.length!==q.left.length){initMatch(q);}
+  if(mQKey!==key){initMatch(q);mQKey=key;}
   if(prev!==undefined){mLinks=prev.slice();mChecked=true;}
   else{mChecked=false;}
   var body=document.getElementById('qBody');
@@ -444,8 +445,8 @@ function showAllAnswers(){
   });
   refresh();
 }
-function resetCurrentBook(){books[currentBook].questions.forEach(function(_,qi){delete answers[currentBook+'-'+qi];});currentQ=0;refresh();}
-function resetAll(){answers={};currentBook=0;currentQ=0;refresh();}
+function resetCurrentBook(){books[currentBook].questions.forEach(function(_,qi){delete answers[currentBook+'-'+qi];});currentQ=0;mRightOrder=[];mLinks=[];mActiveLeft=-1;mChecked=false;mQKey=null;cFilled=[];cKey=null;cActive=null;selection={};refresh();}
+function resetAll(){answers={};currentBook=0;currentQ=0;mRightOrder=[];mLinks=[];mActiveLeft=-1;mChecked=false;mQKey=null;cFilled=[];cKey=null;cActive=null;selection={};refresh();}
 init();
 </script>
 </body>
