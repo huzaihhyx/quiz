@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>青少年家长支持知识图谱 v1</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#fff;color:#16335c;line-height:1.6}
+header{background:linear-gradient(135deg,#0f2a52,#1d4b8f);color:#fff;padding:26px 16px 20px;text-align:center}
+header h1{font-size:1.5rem;letter-spacing:1px}
+header p{margin-top:6px;font-size:.85rem;opacity:.85}
+.searchwrap{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #d8e0ec;padding:10px 12px;display:flex;gap:8px;align-items:center;box-shadow:0 1px 6px rgba(22,51,92,.08)}
+#q{flex:1;min-width:0;padding:9px 14px;border:1.5px solid #1d4b8f;border-radius:20px;font-size:1rem;outline:none;color:#16335c}
+#cnt{font-size:.78rem;color:#5a6f8f;white-space:nowrap}
+nav{display:flex;flex-wrap:wrap;gap:8px;padding:12px 10px;justify-content:center}
+nav a{color:#1d4b8f;text-decoration:none;border:1px solid #b9c8de;border-radius:16px;padding:4px 12px;font-size:.85rem;background:#f4f7fc}
+nav a:hover{background:#e7eef9}
+main{max-width:980px;margin:0 auto;padding:0 14px 30px}
+section{margin:24px 0}
+h2{color:#0f2a52;font-size:1.25rem;border-left:5px solid #1d4b8f;padding-left:10px;margin-bottom:12px}
+h3{color:#1d4b8f;font-size:1.02rem;margin:14px 0 8px}
+.note{font-size:.85rem;color:#5a6f8f;margin:6px 0 10px}
+.hidden{display:none!important}
+.diagram{display:flex;flex-direction:column;align-items:center;padding:16px 8px;border:1px solid #d8e0ec;border-radius:10px;background:#fafcff}
+.core{background:#1d4b8f;color:#fff;border-radius:10px;padding:12px 28px;text-align:center;box-shadow:0 2px 8px rgba(15,42,82,.25)}
+.core b{font-size:1.05rem}
+.core span{display:block;font-size:.82rem;opacity:.9;margin-top:2px}
+.vline{width:2px;height:22px;background:#1d4b8f}
+.wingrow{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:100%;margin-top:0}
+.wing{flex:1;min-width:270px;max-width:430px;border:2px solid #1d4b8f;border-radius:10px;overflow:hidden;background:#fff}
+.wing .hd{background:#e7eef9;color:#0f2a52;padding:8px 10px;text-align:center;font-weight:bold;font-size:.95rem}
+.wing .hd small{display:block;font-weight:normal;font-size:.78rem;color:#41567a;margin-top:2px}
+.wing .bd{display:flex;flex-direction:column;gap:8px;padding:10px}
+.sub{border:1px solid #b9c8de;border-radius:8px;padding:7px 9px;text-align:center;background:#f4f7fc}
+.sub b{display:block;font-size:.9rem}
+.sub span{font-size:.75rem;color:#41567a}
+.layerbox{border:1.5px solid #1d4b8f;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.layerbox .hd{background:#1d4b8f;color:#fff;padding:6px 12px;font-weight:bold;font-size:.95rem}
+.layerbox .bd{padding:10px 12px;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border:1px solid #d8e0ec;padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#e7eef9;color:#0f2a52}
+.chain{border:1px solid #d8e0ec;border-radius:10px;padding:12px;margin-bottom:12px;background:#fdfefe}
+.chain h3{margin:0 0 4px}
+.chain .desc{font-size:.85rem;color:#41567a;margin-bottom:8px}
+.flow{display:flex;align-items:stretch;gap:6px;overflow-x:auto;padding-bottom:6px}
+.flow .card{min-width:118px;max-width:170px;flex:0 0 auto;text-align:center}
+.flow .card b{font-size:.86rem}
+.arrow{align-self:center;color:#1d4b8f;font-weight:bold;flex:0 0 auto}
+.card{border:1px solid #b9c8de;border-radius:8px;background:#f4f7fc;padding:8px 10px}
+.card b{display:block;color:#0f2a52}
+.card span{font-size:.78rem;color:#41567a;display:block}
+.warn{color:#b03a2e;font-weight:bold;font-size:.8rem}
+.idx{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px;margin-bottom:10px}
+.idx .card{min-width:0;text-align:left;padding:6px 10px}
+footer{text-align:center;color:#7b8aa5;font-size:.8rem;padding:18px 12px;border-top:1px solid #d8e0ec;margin-top:12px}
+@media(max-width:600px){header h1{font-size:1.2rem}.idx{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.flow .card{min-width:104px}}
+</style>
+</head>
+<body>
+<header>
+<h1>青少年家长支持知识图谱</h1>
+<p>一心两翼 · 三层五库 · 13条主干链 | v1（261009）</p>
+</header>
+<div class="searchwrap">
+<input type="search" id="q" placeholder="搜索：卡号 / 卡名 / 场景词（如：拖延、手机、卡72）">
+<span id="cnt"></span>
+</div>
+<nav>
+<a href="#sec-map">一心两翼总图</a>
+<a href="#sec-layers">三层</a>
+<a href="#sec-libs">五库·卡片索引</a>
+<a href="#sec-chains">13条主干链</a>
+<a href="#sec-use">用法</a>
+</nav>
+<main>
+<section id="sec-map">
+<h2>一、总架构：一心两翼</h2>
+<p class="note">底盘：75张卡 + v6总纲 + 花径融汇 + 武志红融汇。左翼管家长自己，右翼管孩子发展；左翼先行。</p>
+<div class="diagram searchable" id="map">
+<div class="core"><b>【一心】俩女儿</b><span>高三17 · 高二16</span></div>
+<div class="vline"></div>
+<div class="wingrow">
+<div class="wing">
+<div class="hd">【左翼】家长自身<small>先大人后孩子（铁律）</small></div>
+<div class="bd">
+<div class="sub"><b>能量管理</b><span>卡29/41</span></div>
+<div class="sub"><b>触发拆解</b><span>卡41/45</span></div>
+<div class="sub"><b>夫妻位</b><span>卡69/63</span></div>
+</div>
+</div>
+<div class="wing">
+<div class="hd">【右翼】孩子发展<small>先关系后结构</small></div>
+<div class="bd">
+<div class="sub"><b>自主发展</b><span>卡46/61</span></div>
+<div class="sub"><b>安全防护</b><span>卡02/08</span></div>
+<div class="sub"><b>学业支持</b><span>卡27/36/39</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-layers">
+<h2>二、三层：内功 → 机制 → 实战</h2>
+<div class="layerbox searchable">
+<div class="hd">内功层（底盘 · 向内看）</div>
+<div class="bd">花径融汇（看见 / 分别的爱 / 回归功课）+ ACT + 觉醒。主卡：卡67 · 卡68 · 卡29 · 卡41</div>
+</div>
+<div class="layerbox searchable">
+<div class="hd">机制层（引擎 · 懂原理）</div>
+<div class="bd">武志红全线（内在模式→家庭传导→恋爱重演→情绪解码→孤独出口）+ Maté培养皿 + 安多尔菲三代图。主卡：卡44 · 卡69 · 卡70 · 卡72 · 卡73 · 卡30 · 卡56</div>
+</div>
+<div class="layerbox searchable">
+<div class="hd">实战层（武器 · 周一能做）</div>
+<div class="bd">CPS方案B + 话术总表 + 零花钱体系 + 手机停战 + 睡眠红线 + C卷评估。主卡：卡09 · 卡58 · 卡43 · 卡37 · 卡50 · 自评（C卷）</div>
+</div>
+</section>
+<section id="sec-libs">
+<h2>三、五库：弹药存放处</h2>
+<table>
+<tr><th>库</th><th>内容</th><th>规模</th></tr>
+<tr><td>卡片库</td><td>卡01-77（26空 · 71进行中）</td><td>76张 + 视频卡</td></tr>
+<tr><td>精读笔记库</td><td>读书笔记/青少年家长支持线/</td><td>28本 + 课 + 文章群</td></tr>
+<tr><td>交叉验证库</td><td>v1→v5 + 经典二十本总纲v6</td><td>六代融汇</td></tr>
+<tr><td>转写库</td><td>李玫瑾38集 + NFPP全 + V30</td><td>全量</td></tr>
+<tr><td>留观区</td><td>解读绝望文本版等</td><td>等窗口</td></tr>
+</table>
+<h3>卡片库总索引（卡号 · 卡名）</h3>
+<div class="idx searchable">
+<div class="card"><b>卡01</b><span>Collins2009综述</span></div>
+<div class="card"><b>卡02</b><span>约会暴力特征</span></div>
+<div class="card"><b>卡03</b><span>留学远距线</span></div>
+<div class="card"><b>卡04</b><span>ACT游戏早干预</span></div>
+<div class="card"><b>卡05</b><span>恋爱沟通质量</span></div>
+<div class="card"><b>卡06</b><span>游戏干预三路线</span></div>
+<div class="card"><b>卡07</b><span>父疏离与手机成瘾</span></div>
+<div class="card"><b>卡08</b><span>生殖胁迫底线知识</span></div>
+<div class="card"><b>卡09</b><span>炸毛孩子解法CPS</span></div>
+<div class="card"><b>卡10</b><span>女孩压力与焦虑</span></div>
+<div class="card"><b>卡11</b><span>青少年心理总览（李玫瑾）</span></div>
+<div class="card"><b>卡12</b><span>成长中的心理问题（李玫瑾）</span></div>
+<div class="card"><b>卡13</b><span>青春期红色信号（李玫瑾）</span></div>
+<div class="card"><b>卡14</b><span>家庭教育基本理念（李玫瑾）</span></div>
+<div class="card"><b>卡15</b><span>12岁前培养定一生（李玫瑾）</span></div>
+<div class="card"><b>卡16</b><span>爸爸不在家怎么弥补（李玫瑾）</span></div>
+<div class="card"><b>卡17</b><span>防止孩子自私（李玫瑾）</span></div>
+<div class="card"><b>卡18</b><span>性格比能力重要（李玫瑾）</span></div>
+<div class="card"><b>卡19</b><span>拖延实操解法（李玫瑾）</span></div>
+<div class="card"><b>卡20</b><span>性教育五通道（李玫瑾）</span></div>
+<div class="card"><b>卡21</b><span>心理抚养四台阶（李玫瑾）</span></div>
+<div class="card"><b>卡22</b><span>未成年犯罪心理（李玫瑾）</span></div>
+<div class="card"><b>卡23</b><span>七集短篇合集（李玫瑾）</span></div>
+<div class="card"><b>卡24</b><span>育儿之道三集合并（李玫瑾）</span></div>
+<div class="card"><b>卡25</b><span>心理抚养上下（李玫瑾）</span></div>
+<div class="card"><b>卡26</b><span>（空号）</span></div>
+<div class="card"><b>卡27</b><span>拖延方程Steel</span></div>
+<div class="card"><b>卡28</b><span>女孩与性Orenstein</span></div>
+<div class="card"><b>卡29</b><span>幸福陷阱ACT·Harris</span></div>
+<div class="card"><b>卡30</b><span>常态的神话Maté</span></div>
+<div class="card"><b>卡31</b><span>别叫我公主Orenstein</span></div>
+<div class="card"><b>卡32</b><span>防性侵实操（李玫瑾）</span></div>
+<div class="card"><b>卡33</b><span>情感广度与善良（李玫瑾）</span></div>
+<div class="card"><b>卡34</b><span>真实反馈与抗挫（李玫瑾）</span></div>
+<div class="card"><b>卡35</b><span>六岁前训练手册（李玫瑾）</span></div>
+<div class="card"><b>卡36</b><span>执行功能课郭凤宜</span></div>
+<div class="card"><b>卡37</b><span>零花钱规则与交友安全</span></div>
+<div class="card"><b>卡38</b><span>成长型思维Dweck</span></div>
+<div class="card"><b>卡39</b><span>学习方法·认知天性</span></div>
+<div class="card"><b>卡40</b><span>碎片分享节奏</span></div>
+</div>
+<div class="idx searchable">
+<div class="card"><b>卡41</b><span>家庭觉醒Sabari</span></div>
+<div class="card"><b>卡42</b><span>心流与意义感Csikszentmihalyi</span></div>
+<div class="card"><b>卡43</b><span>正面管教Nelsen</span></div>
+<div class="card"><b>卡44</b><span>原生家庭武志红</span></div>
+<div class="card"><b>卡45</b><span>蛤蟆先生TA·deBoard</span></div>
+<div class="card"><b>卡46</b><span>Untangled七过渡Damour</span></div>
+<div class="card"><b>卡47</b><span>焦虑的一代Haidt</span></div>
+<div class="card"><b>卡48</b><span>色情大脑Wilson</span></div>
+<div class="card"><b>卡49</b><span>多巴胺国度Lembke</span></div>
+<div class="card"><b>卡50</b><span>我们为什么要睡觉Walker</span></div>
+<div class="card"><b>卡51</b><span>青少年与家庭Castellino</span></div>
+<div class="card"><b>卡52</b><span>预防科学Carr</span></div>
+<div class="card"><b>卡53</b><span>网络成瘾Vercillo</span></div>
+<div class="card"><b>卡54</b><span>ADHD生活指南V30</span></div>
+<div class="card"><b>卡55</b><span>家庭治疗流派Nichols</span></div>
+<div class="card"><b>卡56</b><span>三代家庭治疗Andolfi</span></div>
+<div class="card"><b>卡57</b><span>幽微的人性（李玫瑾）</span></div>
+<div class="card"><b>卡58</b><span>如何说青少年Faber</span></div>
+<div class="card"><b>卡59</b><span>性教育三件套</span></div>
+<div class="card"><b>卡60</b><span>掌控习惯Clear</span></div>
+<div class="card"><b>卡61</b><span>课题分离Adler·Kishimi</span></div>
+<div class="card"><b>卡62</b><span>批判性思维Paul</span></div>
+<div class="card"><b>卡63</b><span>七个习惯Covey</span></div>
+<div class="card"><b>卡64</b><span>幸福方法BenShahar</span></div>
+<div class="card"><b>卡65</b><span>被拒绝的勇气Kishimi</span></div>
+<div class="card"><b>卡66</b><span>非主流式成长</span></div>
+<div class="card"><b>卡67</b><span>分别的爱·花径无分别</span></div>
+<div class="card"><b>卡68</b><span>看见与回归功课·花径</span></div>
+<div class="card"><b>卡69</b><span>为何家会伤人</span></div>
+<div class="card"><b>卡70</b><span>为何爱会伤人</span></div>
+<div class="card"><b>卡71</b><span>解读绝望（进行中）</span></div>
+<div class="card"><b>卡72</b><span>七种兵器</span></div>
+<div class="card"><b>卡73</b><span>孤独与陪伴</span></div>
+<div class="card"><b>卡74</b><span>童话原型</span></div>
+<div class="card"><b>卡75</b><span>梦与文章合集</span></div>
+<div class="card"><b>卡76</b><span>SFT例外问句</span></div>
+<div class="card"><b>卡77</b><span>男孩端性教育</span></div>
+<div class="card"><b>视频卡01-02</b><span>拖延与成瘾躺平</span></div>
+</div>
+</section>
+<section id="sec-chains">
+<h2>四、13条主干链速查</h2>
+<p class="note">遇到场景 → 找到对应链 → 按链序读卡（2-3张够用）。卡内箭头方向即使用顺序。</p>
+<div class="chain searchable">
+<h3>1. 家长自身线</h3>
+<p class="desc">家长先修内功，再处理孩子的事。</p>
+<div class="flow">
+<div class="card"><b>卡29</b><span>幸福陷阱ACT<br>（ACT）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡41</b><span>家庭觉醒<br>（拆弹）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡45</b><span>蛤蟆先生TA<br>（定位）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡44</b><span>原生家庭<br>（考古）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡68</b><span>看见回归功课<br>（看见功课）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>2. 妈妈抱怨线</h3>
+<p class="desc">妻子抱怨时：先定位孤独，再拆解，给出道歉话术与出口。</p>
+<div class="flow">
+<div class="card"><b>卡69</b><span>为何家会伤人<br>（定位妻子孤独）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡44</b><span>原生家庭<br>（ABC拆）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡75</b><span>梦与文章<br>（道歉话术）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡72/73</b><span>兵器/孤独陪伴<br>（出口）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>3. 老大耳机线</h3>
+<p class="desc">老大（高三）戴耳机：正向独处视角 → 解码 → 道歉救命 → 择偶程序。</p>
+<div class="flow">
+<div class="card"><b>卡73</b><span>孤独与陪伴<br>（正向独处）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡72</b><span>七种兵器<br>（情绪解码）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡69/75</b><span>家伤/梦文<br>（道歉救命）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡70</b><span>为何爱会伤人<br>（择偶程序）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>4. 老二网恋线</h3>
+<p class="desc">老二（高二）网恋：逃离孤寂 → 等救脚本 → 投射 → 泄压。<span class="warn">红线：涉暴力立即切安全线。</span></p>
+<div class="flow">
+<div class="card"><b>卡73</b><span>孤独与陪伴<br>（逃离孤寂）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡74</b><span>童话原型<br>（等救脚本）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡44</b><span>原生家庭<br>（投射）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡72</b><span>七种兵器<br>（泄压）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>5. 老二拖延线</h3>
+<p class="desc">拖延：先定位方程 → 执行功能施工 → 学法 → 习惯 → 思维。</p>
+<div class="flow">
+<div class="card"><b>卡27</b><span>拖延方程Steel<br>（方程定位）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡36</b><span>执行功能课<br>（EF施工）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡39</b><span>认知天性<br>（学法）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡60</b><span>掌控习惯<br>（习惯）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡62</b><span>批判性思维<br>（思维）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>6. 老二手机线</h3>
+<p class="desc">手机之争：先看大环境 → 判级 → 设计方案 → 零花钱正门。</p>
+<div class="flow">
+<div class="card"><b>卡47</b><span>焦虑的一代<br>（大环境）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡53</b><span>网络成瘾<br>（判级）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡49</b><span>多巴胺国度<br>（设计）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡37</b><span>零花钱规则<br>（零花钱正门）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>7. 性教育线（女孩版全）</h3>
+<p class="desc">识别 → 开口 → 观念 → 知识与万一脚本。男孩端见卡77（半页）。</p>
+<div class="flow">
+<div class="card"><b>卡08</b><span>生殖胁迫底线<br>（识别）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡20</b><span>性教育五通道<br>（开口）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡28</b><span>女孩与性<br>（观念）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡59</b><span>性教育三件套<br>（知识+万一脚本）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>8. 恋爱观察线</h3>
+<p class="desc">观察孩子恋爱：模板 → 质量指标 → 识人三问。</p>
+<div class="flow">
+<div class="card"><b>卡70</b><span>为何爱会伤人<br>（模板）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡05</b><span>恋爱沟通质量<br>（质量指标）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡62</b><span>批判性思维<br>（识人三问）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>9. 家庭结构线</h3>
+<p class="desc">看清家庭结构：家谱图 → 流派地图 → Castellino → C卷实测。</p>
+<div class="flow">
+<div class="card"><b>卡56</b><span>三代家庭治疗<br>（家谱图）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡55</b><span>家庭治疗流派<br>（流派地图）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡51</b><span>青少年与家庭<br>（Castellino）</span></div><div class="arrow">→</div>
+<div class="card"><b>C卷</b><span>家庭功能自评<br>（Olson实测）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>10. 预防线</h3>
+<p class="desc">预防分级：Carr九级 → 觉醒 → 身体 → 信号。</p>
+<div class="flow">
+<div class="card"><b>卡52</b><span>预防科学Carr<br>（Carr九级）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡41</b><span>家庭觉醒<br>（觉醒）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡30</b><span>常态的神话<br>（身体）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡72</b><span>七种兵器<br>（信号）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>11. 学习线</h3>
+<p class="desc">学业支持：检索练习 → 心流条件 → 成长型 → 习惯回路。</p>
+<div class="flow">
+<div class="card"><b>卡39</b><span>认知天性<br>（检索练习）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡42</b><span>心流与意义感<br>（心流条件）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡38</b><span>成长型思维<br>（成长型）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡60</b><span>掌控习惯<br>（习惯回路）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>12. 幸福感线</h3>
+<p class="desc">打底幸福：四模式 → 被拒绝复原 → 课题分离 → 影响圈。</p>
+<div class="flow">
+<div class="card"><b>卡64</b><span>幸福方法<br>（四模式）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡65</b><span>被拒绝的勇气<br>（被拒绝复原）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡61</b><span>课题分离<br>（课题分离）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡63</b><span>七个习惯<br>（影响圈）</span></div>
+</div>
+</div>
+<div class="chain searchable">
+<h3>13. 话术总表</h3>
+<p class="desc">冲突现场的话术弹药库：火控 → 10秒句式 → 30分钟共解 → 上桌。</p>
+<div class="flow">
+<div class="card"><b>卡41</b><span>家庭觉醒<br>（火控）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡58</b><span>如何说青少年<br>（10秒句式）</span></div><div class="arrow">→</div>
+<div class="card"><b>CPS</b><span>卡09方案B<br>（30分钟共解）</span></div><div class="arrow">→</div>
+<div class="card"><b>卡43</b><span>正面管教<br>（上桌）</span></div>
+</div>
+</div>
+</section>
+<section id="sec-use">
+<h2>五、使用说明</h2>
+<table>
+<tr><th>场景</th><th>做法</th></tr>
+<tr class="searchable"><td>周一到周五</td><td>翻「13条主干链」找场景 → 按链序读卡（2-3张够用）</td></tr>
+<tr class="searchable"><td>遇到冲突</td><td>翻交叉验证v5「判定表」→ 找对应条目看结论</td></tr>
+<tr class="searchable"><td>深度学习</td><td>笔记库按书名翻精读笔记 · 总纲在v6</td></tr>
+<tr class="searchable"><td>新资料进来</td><td>过准入三标准 → 精读 → 出卡 → 知识图谱更新</td></tr>
+</table>
+</section>
+</main>
+<footer>
+青少年家长支持知识图谱 v1 · 单文件HTML · 生成日期 2026-10-09<br>
+底盘：75张卡 + v6总纲 + 花径融汇 + 武志红融汇 | 体系自描，非AI生成图
+</footer>
+<script>
+(function(){
+var q=document.getElementById('q'),cnt=document.getElementById('cnt');
+var secs=document.querySelectorAll('main section');
+function run(){
+var v=q.value.trim().toLowerCase(),n=0,t=0;
+document.querySelectorAll('.searchable').forEach(function(el){
+var hit=!v||el.textContent.toLowerCase().indexOf(v)>-1;
+el.classList.toggle('hidden',!hit);t++;if(hit)n++;
+});
+secs.forEach(function(sec){
+var items=sec.querySelectorAll('.searchable');
+if(!items.length)return;
+var any=false;
+items.forEach(function(el){if(!el.classList.contains('hidden'))any=true;});
+sec.classList.toggle('hidden',!any);
+});
+cnt.textContent=v?('命中 '+n+'/'+t):('可搜索单元 '+t);
+}
+q.addEventListener('input',run);
+run();
+})();
+</script>
+</body>
+</html>
