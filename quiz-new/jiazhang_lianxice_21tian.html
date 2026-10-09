@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+<!-- v2 261009: 每日四节详解手风琴＋"凭什么这21天"编排逻辑节；打卡/记录/localStorage与v1完全兼容 -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>家长练习册·21天版</title>
+<title>家长练习册·21天版 v2</title>
 <style>
 body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f7f5ef;color:#2c2620;margin:0;padding-bottom:60px;}
 .wrap{max-width:720px;margin:0 auto;padding:14px;}
@@ -17,12 +18,28 @@ h1{font-size:1.3rem;text-align:center;margin:14px 0 4px;}
 .day .dt b{color:#9a6b2f;margin-right:6px;}
 .day .anchor{color:#8a7f6c;font-size:.75rem;margin-top:4px;}
 .day .rec{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.dh{display:flex;align-items:flex-start;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.dh b{color:#9a6b2f;flex:none;}
+.dh .tt{flex:1;font-size:.95rem;line-height:1.5;}
+.dh .sum{color:#8a7f6c;font-size:.75rem;display:block;margin-top:2px;font-weight:normal;}
+.dh .chev{flex:none;color:#b3a689;font-size:.75rem;transition:transform .2s;padding-top:4px;}
+.db{display:none;padding-top:6px;}
+.open .db{display:block;}
+.open .chev{transform:rotate(180deg);}
+.sec{background:#faf7ef;border:1px solid #efe8d6;border-radius:8px;padding:7px 10px;margin:6px 0;font-size:.85rem;line-height:1.65;}
+.sec h4{margin:0 0 3px;font-size:.78rem;color:#9a6b2f;}
+.lg{background:#fff;border:1px solid #d8b97a;border-radius:12px;margin:14px 0;overflow:hidden;}
+.lg .lgh{display:flex;justify-content:space-between;align-items:center;background:#f4e9d2;padding:10px 14px;cursor:pointer;font-weight:bold;color:#7d5a1e;font-size:.95rem;}
+.lg .lgb{padding:10px 14px;font-size:.85rem;line-height:1.7;display:none;}
+.lg.open .lgb{display:block;}
 .day input[type=checkbox]{width:18px;height:18px;}
 .day .note{flex:1;min-width:160px;border:1px solid #ddd2b8;border-radius:6px;padding:6px 8px;font-size:.8rem;background:#fcfaf4;}
-.done .dt{color:#9a917f;}
+.done .tt,.done .sum{color:#9a917f;}
 .theory{background:#fff;border:1px solid #e5ddca;border-radius:12px;padding:14px 16px;margin:14px 0;font-size:.85rem;line-height:1.7;}
 .theory h2{font-size:1rem;color:#9a6b2f;margin:0 0 8px;}
 .theory h3{font-size:.9rem;color:#5a4a2f;margin:12px 0 4px;}
+.sec.why{background:#fffdf6;border-color:#d8b97a;}
+.sec.why h4{color:#7d5a1e;}
 .bar{position:fixed;bottom:0;left:0;right:0;background:#2c2620;color:#fff;padding:10px;text-align:center;font-size:.85rem;z-index:9;}
 a{color:#9a6b2f;}
 </style>
@@ -30,49 +47,271 @@ a{color:#9a6b2f;}
 <body>
 <div class="wrap">
 <h1>家长练习册 · 21天版</h1>
-<div class="sub">主线：先大人后孩子 ｜ 三周递进：稳住自己 → 关系修复 → 结构施工 ｜ v1.1</div>
+<div class="sub">主线：先大人后孩子 ｜ 三周递进：稳住自己 → 关系修复 → 结构施工 ｜ v2 · 每天点开看详解</div>
 
 <div class="theory">
 <h2>怎么用（五条）</h2>
 1. 每天只做一个动作，5-10分钟<br>2. 做了就在□打勾，写一句她的反应<br>3. 卡号是想深挖时的锚，不要求翻卡<br>4. 忘了一天不做废，第二天接着走<br>5. 周末复盘：保留／调整／放弃
 </div>
 
+<div class="theory">
+<h2>凭什么这21天（编排逻辑）</h2>
+<h3>最根本的主线</h3>
+家庭系统论＋"先大人后孩子"——孩子的症状是家庭的信号。五个独立传统（Greene随机对照试验／ACT／Maté／萨巴瑞／武志红）在六代交叉验证里同判：<b>改变的杠杆在家长端</b>。这本册子就是把这根铁律变成日程表。
+<h3>三周余额逻辑（为什么这个顺序）</h3>
+第1周<b>攒余额</b>：练自己——被点着时火柴在自己身上，先在自己身上把工具跑通（看见→拆弹→脱钩→影响圈→存在句→夸奖→例外）；余额＝情绪不外溢＋给法安全。第2周<b>加余额</b>：练关系——开口权是存出来的（存款→开机句→倾听→道歉→解码→分离→分别的爱）；余额＝她愿意听你说话。第3周<b>花余额办正事</b>：上结构（方案B→拖延施工→习惯叠加→停战→睡眠→家谱图→复测）。<b>没有关系余额就上结构＝方案A战争</b>（咱家四轮实锤：全败在"没写下来＋没余额"）——顺序不可倒。
+<h3>第1周邻居逻辑</h3>
+D1看见→D2拆弹→D3脱钩＝内功三连：先看见自己（往里看）→再停战（闭嘴）→再解钩（想法不是事实），一层比一层往外；D4影响圈→D5存在句→D6夸奖安全层：从管自己的精力投向，到练第一笔给法（先给存在、再给安全夸法）；D7例外问句收口：把镜头从问题转向解法，当晚复盘①。
+<h3>第2周邻居逻辑</h3>
+D8存款→D9开机句式→D10倾听＝给法三连：钱（存款）、话（句式）、耳（真听见）三件套，先存钱再改话术再听到底；D11道歉修过去→D12解码接当下→D13课题分离放手→D14分别的爱收口（事照管人格不打折），当晚复盘②。
+<h3>第3周邻居逻辑</h3>
+D15方案B先对齐（对齐了才施工）→D16拖延施工（环境＋启动）→D17习惯叠加（把结论固化成自动）→D18手机停战（最大战场单独停火日，防止余额清零）→D19睡眠（身体底盘，唯一不用谈就能施工的结构）→D20家谱图（全册唯一的"往回看"：找到按钮的出厂地）→D21复测（数字说话）＋复盘③。
+</div>
+
 <div class="week"><h2>第1周 · 家长自身（攒余额）</h2>
-<div class="day" id="d1"><div class="dt"><b>D1</b>看见功课：今天找一个心里"咯噔"一下的时刻，只记下来，不说、不动</div><div class="anchor">卡68</div><div class="rec"><input type="checkbox" data-k="d1"><input class="note" data-n="d1" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d2"><div class="dt"><b>D2</b>触发拆弹：被点着时，闭嘴5分钟再开口（或先离开现场）</div><div class="anchor">卡41</div><div class="rec"><input type="checkbox" data-k="d2"><input class="note" data-n="d2" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d3"><div class="dt"><b>D3</b>ACT脱钩：把一句"她就是××"改说成"我有个想法：她在××"</div><div class="anchor">卡29</div><div class="rec"><input type="checkbox" data-k="d3"><input class="note" data-n="d3" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d4"><div class="dt"><b>D4</b>影响圈：把一句"如果她就好了"改成"我可以……"</div><div class="anchor">卡63</div><div class="rec"><input type="checkbox" data-k="d4"><input class="note" data-n="d4" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d5"><div class="dt"><b>D5</b>存在句：对老大或老二说一次"能看到你，真好啊"——别的不说</div><div class="anchor">卡65</div><div class="rec"><input type="checkbox" data-k="d5"><input class="note" data-n="d5" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d6"><div class="dt"><b>D6</b>夸奖安全层：今天用一次感谢型（"帮了大忙"）或过程型（"这个方法想得好"）——禁"真棒/真聪明"</div><div class="anchor">卡65/61/38</div><div class="rec"><input type="checkbox" data-k="d6"><input class="note" data-n="d6" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d7"><div class="dt"><b>D7</b>例外问句：找一个她"本来会炸但没炸"的时刻，好奇问一句"那次有什么不一样？"</div><div class="anchor">卡76 ｜ <b>今晚复盘①</b>：这周哪个动作她有反应？保留／调整／放弃</div><div class="rec"><input type="checkbox" data-k="d7"><input class="note" data-n="d7" placeholder="日期｜她反应一句话"></div></div>
+<div class="day" id="d1">
+<div class="dh" onclick="tg(this)"><b>D1</b><span class="tt">看见功课<span class="sum">找一个心里"咯噔"一下的时刻，只记下来，不说、不动</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自三方汇流：花径（林巨）"看见并表达"功课＋精神分析（武志红"看见即松动"）＋ACT"观察性自我"。三方同判一件事：<b>潜意识里看不见的东西，会通过反复发作来索求关注；被看见＝被意识化＝开始松动</b>。机制用人话分三层：①"咯噔"一下＝身体的看见信号，说明踩中了心里某个旧信念（"我是个教不好孩子的人"这类自我低评价）；②把它念出来、不改正、不下结论——花径叫"看见并表达，下面没有了"：情绪是表层，信念是根，只看见不加工，那股劲自己泄；③ACT提醒：你不是那个念头，你是看着念头的那个看的人——<b>你是天空，情绪是天气，天气再坏天空坏不了</b>。证据级：T3经验型（花径营课）＋临床经验（武志红）＋ACT实证传统支撑。咱家接口：卡44武志红同判"看见即疗愈，只能从自己开始斩断家族传递链"——爸被点着的瞬间，就是功课的入口。</div>
+<div class="sec"><h4>怎么做</h4>①今天留意一个被点着/咯噔的时刻（没有就回想最近一次）；②往里看一眼：此刻冒出的"我是个___的人"是哪句；③念出来（心里说也行），不改正、不下结论，写进记录栏。示例句："我是个怕她考不上的爸爸。"——就到这，停。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>爸在策略线/催作业线上的火气，多数不是她点的，是旧信念被踩响。先在自己身上跑通"看见"，第2周的句式才不会带火药味。</div>
+<div class="sec"><h4>做完怎么回味</h4>①咯噔最强的一次，那句"我是个___的人"是什么？②这句像不像你小时候听过的谁的话？③只念不改之后，那股劲是变大还是变小了？</div>
+<div class="anchor">锚：卡68/67/44 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d1"><input class="note" data-n="d1" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d2">
+<div class="dh" onclick="tg(this)"><b>D2</b><span class="tt">触发拆弹<span class="sum">被点着时，闭嘴5分钟再开口（或先离开现场）</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自萨巴瑞《家庭的觉醒》（觉醒式育儿）＋TA沟通分析（戴博德《蛤蟆先生》）双源。核心主张：<b>孩子点着你的那一刻，火柴在你自己身上——她的行为只是风，煽的是你童年没处理的余烬</b>。机制：每个人脑子里有一幅童年画下的自画像（ego，小时候造的保护壳），壳里封着没处理的伤；在同事朋友面前藏得住，在孩子面前藏不住——因为只有面对孩子，大人才拥有"无所不知"的控制力。于是愤怒、唠叨、催促都是面具，底下全是怕（怕失控、怕她不幸福、怕自己没用）——反应＝恐惧的面具。TA补一刀：情绪上头时你多半不在"成人态"——要么儿童态在重播童年，要么父母态在挑剔说教；而进成人态的第一道门，是停掉自我审判（"没有一个法官比我们自己更严苛"）。所以第一动作不是"忍"，是给智慧腾出浮现的时间：闭嘴5分钟。证据级：T2-T3临床/经验型。咱家口径：不是不管，是不带情绪地管。</div>
+<div class="sec"><h4>怎么做</h4>①被点着的现场（牙膏/成绩单/顶嘴），先闭嘴5分钟，或离场喝口水；②5分钟后只说事实句："作业还剩三样。"；③如果还是发作了，事后写两行："我怕的是___""我爱她，因为她是___"，在脑中用爱的话术把场景重放一遍。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>C卷情绪反馈2/5——垫底的格子多半就是在被点着的现场丢的分。这5分钟是对"情绪反馈"格最直接的一笔存款。</div>
+<div class="sec"><h4>做完怎么回味</h4>①这5分钟里最先冒出的冲动是什么（解释/反驳/翻旧账）？②写"我怕的是___"时，那个怕是她的还是你自己的？③5分钟后再开口，说出的话和平时差在哪？</div>
+<div class="anchor">锚：卡41/45/69 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d2"><input class="note" data-n="d2" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d3">
+<div class="dh" onclick="tg(this)"><b>D3</b><span class="tt">ACT脱钩<span class="sum">把"她就是××"改说成"我有个想法：她在××"</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自ACT接纳承诺疗法（哈里斯《幸福陷阱》，第三代行为疗法，RCT实证传统）。核心主张：<b>追求好感觉、消灭坏感觉的努力本身就是痛苦之源</b>——解法即问题。机制用人话：脑子是台24小时广播的电台，80%的节目偏消极，这是人类硬件设定，不是你的错也不是她的错；"她就是懒"不是事实，是电台正在播的一个故事——<b>真假不重要，有没有用才重要</b>。脱钩句式"我有个想法：她在躺平"做了什么？把想法从"我"身上摘下来，放到面前变成可以端详的对象——你不是棋子，你是棋盘；你是天空，念头是天气。卡28从旁边作证：文化也在给女儿们灌电台节目（好看取代感觉、取悦取代愉悦的物化叙事）——家长先在自己身上练会"听到≠当真"，才认得出她脑内循环播放的是哪些别人的故事。证据级：R1-R2实证传统＋自助书版。咱家接口：先给高频故事点名——"考不上故事""躺平定局故事"，点名了才抓得住。</div>
+<div class="sec"><h4>怎么做</h4>①抓一次上头（对孩子对工作都行），心里说："我注意到我有个想法：___"；②接一句"谢谢心智"，开口前彻底呼一口气再慢吸；③给自己的高频故事起个名（"考砸故事""不够好故事"），今天点名认领一次。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>爸的下结论快（分析师职业病）＋妈的灾难化想象，都是电台重度听众。脱钩不影响判断力，只是把判决书改成草稿——第2周的开机句式全部以此为基础。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今天点名的那个故事，最早是什么时候开始播的？②它播的时候你身体哪里先紧？③如果这台电台说的是真的，它会帮你还是害你？</div>
+<div class="anchor">锚：卡29/28 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d3"><input class="note" data-n="d3" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d4">
+<div class="dh" onclick="tg(this)"><b>D4</b><span class="tt">影响圈<span class="sum">把"如果她就好了"改成"我可以……"</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自柯维《高效能人士的七个习惯》（人本主义效能传统）。全书地基一句：<b>"刺激与回应之间存在一段距离，成长和幸福的关键就在于我们如何利用这段距离"</b>——她的行为是刺激，你的反应是选择。机制：人的精力投在两个圈里。盯影响圈（力所能及的事）→能量积极→影响圈越做越大；盯关注圈（她的自觉、政策、别家孩子）→怨天尤人→影响圈越缩越小。语言是仪表盘："如果她肯听话"是关注圈语言，"我可以先做X"是影响圈语言——"他把我气疯了"＝把遥控器交给孩子。柯维再把问题分三类配三把钥匙：自己能直接控制的→改习惯；他人行为（她玩多久手机）→只能改"施加影响的方式"——以身作则而不是口头游说；过去的错误→微笑接受。抢手机＝在关注圈里打仗，赢一局缩一圈。证据级：B2-B3实践工具（非RCT，与压力应对研究同向）。咱家接口：高考焦虑的分流器——家长影响圈只有三件：<b>睡眠环境、饭桌质量、她求助时的响应速度</b>。</div>
+<div class="sec"><h4>怎么做</h4>①焦虑上来时写下一条"如果她……"；②原句旁边改写成"我可以……"（例：我可以把夜宵提前备好/把她要的东西先备齐）；③对照影响圈三件事清单检查：这句"我可以"在圈内吗？不在，就换。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>C卷适应性2/5：家里很多内耗是在关注圈打转打出来的。这课练一周，爸的焦虑有去处，妈的抱怨有出口——精力从盯她转回自己能动手的格子上。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今天写下的"如果她"，背后你真正怕的是什么？②那句"我可以"做完之后，她有反应吗？③哪些"如果"你其实根本动不了，可以正式放手？</div>
+<div class="anchor">锚：卡63 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d4"><input class="note" data-n="d4" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d5">
+<div class="dh" onclick="tg(this)"><b>D5</b><span class="tt">存在句<span class="sum">对老大或老二说一次"能看到你，真好啊"——别的不说</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自阿德勒心理学经岸见一郎《被拒绝的勇气》（存在层价值）＋本-沙哈尔积极心理学（幸福=意义+愉悦）双源。核心主张：<b>人的价值底线不在行为层——"人的价值不能用生产效率来衡量""只要存在就有价值"</b>。机制：孩子收到的爱常带计算器——考好了温柔、摆烂了冷脸，久而久之她学会用表现给自我价值报价（岸见：从小被"真棒真厉害"喂大的人，将依赖他人的评价而活着）。存在句是反向操作：像发底薪一样，先无条件确认"你在，就好"——说的时候把行为、成绩、表现全部排除在外，所以说完就走，不加"但是"。本-沙哈尔从另一头算账：只有意义没有愉悦的关系是忙碌奔波型，存在句就是那个纯愉悦的瞬间。阿德勒的存在标准：别拿"理想女儿模板"做减法（从100分往下扣），从零起点对"她此刻的存在"喜悦。证据级：T3哲学对话体＋B2课程。咱家接口：卡67花径"无分别的爱"给它上底盘——存在层无条件不是溺爱补偿，是"人本圆满"的日常兑现。</div>
+<div class="sec"><h4>怎么做</h4>①挑一个自然瞬间（她在吃饭/玩手机/发呆都行）；②说一句"能看到你，真好啊"；③说完就走或转做别的事，绝不附加任何要求或"但是"。说不出口：先在心里真这么想一次——岸见原话，哪天能这么想就已经足够。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>老二躺平期的价值感充值＋老大报喜不报忧的松动钥匙。这句不解决任何具体问题，它解决的是"只有表现好才被看见"这个更底层的问题。</div>
+<div class="sec"><h4>做完怎么回味</h4>①说出口那一刻，你心里先冒出的是什么（尴尬/心虚/柔软）？②她的反应是什么（愣住/装没听见/眼圈红）？③如果给自己也说一句，你会怎么说？</div>
+<div class="anchor">锚：卡65/61/64 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d5"><input class="note" data-n="d5" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d6">
+<div class="dh" onclick="tg(this)"><b>D6</b><span class="tt">夸奖安全层<span class="sum">用感谢型或过程型夸一次——禁"真棒/真聪明"</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自德韦克成长型思维（实证心理学R1）×阿德勒横向关系（T3哲学）的合成，再加卡65存在层兜底，三层闭合。核心主张：<b>固定型把每次表现当身份判决（我聪明/我不行），成长型把表现当信息（学到什么、下一步练什么）</b>——家长嘴里流出的每句话，要么是判决书要么是进度条。机制：经典实验——被夸"聪明"的孩子遇难题后乐趣消失、表现崩、近40%谎报分数；被夸"努力"的孩子90%主动选更难的题。为什么夸聪明有毒？它把注意力从任务锁死到自我证明上。阿德勒再补一刀：表扬本身是"有能力者对没能力者的评价"，<b>人越被表扬越形成"自己没能力"的信念</b>——所以终点不是换个夸法，是换引擎：感谢（"帮了大忙"）让贡献感成为价值来源。三层口径：存在层无条件（65）→感谢型横向（61）→过程型真反馈（38）；"还没"两个字把身份句改成时间句。证据级：R1实证但诚实标注——大规模重复效应偏小，当零成本话术工具用，不当提分神器。</div>
+<div class="sec"><h4>怎么做</h4>①全天禁语：真棒/真聪明/这么快就做完了/你看姐姐；②换成感谢句："谢谢你___，帮了大忙"；或过程句："这两章还没拿下，我们看看卡在哪一环"；③晚餐试一次餐桌三问（今天学到什么/从错里学到什么/努力尝试了什么）——大人必须真讲自己的错。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>咱家两代好学生：老大优秀-自卑分裂风险（A+也被压），老二"我不行"钉死期望端。夸法换引擎是第3周学习施工的先决工程。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今天哪句禁语差点脱口而出？它通常在什么情境下出现？②说感谢句时，她当真了吗？③你自己从小被夸的方式，和今天说的哪句最像？</div>
+<div class="anchor">锚：卡38/61/65 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d6"><input class="note" data-n="d6" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d7">
+<div class="dh" onclick="tg(this)"><b>D7</b><span class="tt">例外问句<span class="sum">找一个她"本来会炸但没炸"的时刻，好奇问"那次有什么不一样？"</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自焦点解决短期治疗SFBT（德沙泽&伯格，后现代建构主义疗法）。核心主张：<b>不问"问题为什么发生"，问"问题没发生的那个时刻是什么样"——例外里藏着现成的解法</b>。机制：人会被自己的问题叙事统治——"她总是玩手机"这个故事一旦成立，眼睛就只收集证据，反例全部自动过滤。例外问句是叙事的破口：昨天她自己十一点放下了手机——那一刻的条件（不累/有盼头/约了同学）就是解法的原料，而且是"她自己的解法"，不是你强加的规则。李玫瑾的机制层同构：<b>观念不是道理是画面</b>——例外画面比道理有说服力，它直接进司机的脑子，不走副驾。配套工具：量尺问句（"今天几分？比昨天高的那一分是什么撑住的？"）、应对问句（"这么难你是怎么撑住的？"——把问题孩子重写成撑住的孩子）。证据级：T2（NICE认可低强度介入，对青少年家庭行为问题有对照研究）。红线：<b>例外一旦变成武器（"你看你明明能"），门永久关闭</b>——看到例外只做一件事：好奇地问下去。接口：卡09方案B的素材库，答案常藏在例外里。</div>
+<div class="sec"><h4>怎么做</h4>①找一个她"本来会炸但没炸/本来会刷但没刷"的时刻；②只好奇地问："那次有什么不一样？"问下去，不引导不总结；③可选量尺句："今天几分？高的那一分是什么撑住的？"</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>老二手机线的非战争路径＋老大主动开口的每次小互动都是例外——攒例外就是攒门。今晚同时做<b>复盘①</b>：这周哪个动作她有反应？保留／调整／放弃。</div>
+<div class="sec"><h4>做完怎么回味</h4>①她说的"那次不一样"，条件里有哪条是家里能给的？②听到例外时，你的第一冲动是惊喜还是想拿来用？③这周哪个动作你自己做得最不别扭？</div>
+<div class="anchor">锚：卡76/57 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d7"><input class="note" data-n="d7" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
 </div>
 
 <div class="week"><h2>第2周 · 关系修复（加余额）</h2>
-<div class="day" id="d8"><div class="dt"><b>D8</b>存款动作：从情感账户清单挑一个做（如提前把她要的东西备好、记得她说的小事）</div><div class="anchor">卡63</div><div class="rec"><input type="checkbox" data-k="d8"><input class="note" data-n="d8" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d9"><div class="dt"><b>D9</b>开机句式：用一句开机话术替换一句关机话术（如把"别玩了"换成"爸等你忙完"）</div><div class="anchor">卡58</div><div class="rec"><input type="checkbox" data-k="d9"><input class="note" data-n="d9" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d10"><div class="dt"><b>D10</b>倾听到底：她说话时只回"嗯，然后呢"——不打断、不纠正、不教，至少30秒抬眼看她</div><div class="anchor">卡63/73</div><div class="rec"><input type="checkbox" data-k="d10"><input class="note" data-n="d10" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d11"><div class="dt"><b>D11</b>道歉模板：若这周有说过头的话，用三R道一次歉（后悔＋责任＋补救）——没有就跳过，不强造</div><div class="anchor">卡43/75/69</div><div class="rec"><input type="checkbox" data-k="d11"><input class="note" data-n="d11" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d12"><div class="dt"><b>D12</b>情绪解码：她烦躁时试着说"你是不是有点累了"——只说不问，说完就走</div><div class="anchor">卡72/57/73</div><div class="rec"><input type="checkbox" data-k="d12"><input class="note" data-n="d12" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d13"><div class="dt"><b>D13</b>课题分离：拿一件事过两问（结果谁承担／选择谁在做）——是她的课题就只守护不干涉</div><div class="anchor">卡61</div><div class="rec"><input type="checkbox" data-k="d13"><input class="note" data-n="d13" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d14"><div class="dt"><b>D14</b>分别的爱：事照管、人格不打折——今天对俩女儿各做一次"按她要的方式"给</div><div class="anchor">卡67/68 ｜ <b>今晚复盘②</b>＋这周哪句关机话消失得最彻底</div><div class="rec"><input type="checkbox" data-k="d14"><input class="note" data-n="d14" placeholder="日期｜她反应一句话"></div></div>
+<div class="day" id="d8">
+<div class="dh" onclick="tg(this)"><b>D8</b><span class="tt">存款动作<span class="sum">从情感账户清单挑一个做（备好她要的/记得她的小事）</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自柯维《七个习惯》的"情感账户"（人本效能传统），武志红的家庭结构观察从另一头同判。核心主张：<b>账户里存的是信任和安全感；账户余额决定关键时刻她听不听你的</b>——"当你的儿子面临人生重大抉择的时候，他不会敞开心扉接受你的建议……因为你已经透支"。机制：青春期亲子交谈若只剩"该打扫房间啦、用功读书、把音量开小点"——只取不存，很快透支。存款五件套：买一本她正着迷东西的杂志（游戏/偶像都行）/做事时问一句"需要帮忙吗"/看电影吃冰激凌/<b>最有效的一笔：只是听她说说话，不插判断不搬自己的过去</b>/维护她不在场时的形象（你对别人的方式，就是她推演你待她的方式）。硬规则：<b>不停止取款光增加存款，账永远平不了</b>（提款黑名单：盘问查岗/陪伴夹带教育/翻旧账）。证据级：B2-B3实践工具＋武志红临床同向。咱家接口：C卷亲密度4/5＝账户余额不足的仪表盘读数；孩子怀疑"爸又想干什么"是正常的——不设回报预期。</div>
+<div class="sec"><h4>怎么做</h4>①从五件套里挑一件今天做（例：把她随口提过的东西买回来放在桌上，不说话）；②不设回报预期，不提"我为你做了…"；③顺手停一笔提款：今天不盘问、不翻旧账。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>开口权是存出来的——第3周要谈手机谈方案B，没有余额，开口就是战争重启。这周先铺路基。</div>
+<div class="sec"><h4>做完怎么回味</h4>①她当时的表情/一句回应是什么？②这笔存款里，哪一步你最不习惯（不说明目的/不求回应）？③家里最大的提款习惯是哪一条？</div>
+<div class="anchor">锚：卡63/69 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d8"><input class="note" data-n="d8" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d9">
+<div class="dh" onclick="tg(this)"><b>D9</b><span class="tt">开机句式<span class="sum">用一句开机话术替换一句关机话术（"别玩了"→"爸等你忙完"）</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自法伯&玛兹丽《如何说青少年才会听》（PET系沟通传统，吉诺特谱系）。核心主张：<b>孩子关机不是不听，是句式让他自动关机——改句式不改内容</b>。机制：关机七式（责怪/攻击人格/责备/威胁/训诫/审判/唠叨）共同点＝居高临下＋否定人格→防御启动，内容再对也进不去；开机八式共同点＝对事不对人＋把判断力还给孩子。几个关键机关："你没按时回来，我很担心"是说自己（她听到被在乎），"你让我担心"是审判对方（她听到被攻击）；给选择＝给自主权——<b>青少年宁可对着干也要赢回控制感，同样内容有选择就自愿执行</b>；描述句让大脑进解题模式；写字条绕开"听觉免疫系统"。证据级：B2-B3家长课工具，被半个世纪广泛复制。咱家接口（全书最狠一句）：<b>你怎么处理脏袜子，决定她遇到毒品/性/麻烦时会不会打你电话</b>——纽带是安全网，每句关机话都在剪网绳；卡44精神分析端作证：孩子撒谎时先问"说实话我们能接受吗"。</div>
+<div class="sec"><h4>怎么做</h4>①今天抓一句要说出口的关机话，当场换开机式；②替换表："你怎么还不写"→"作业还剩三样"（描述）或"作业。"（一词提醒）；"你让我担心"→"我没按时见到你，我很担心"（感受说成自己的）；③可选：给一件事一个选择——"现在收还是饭后收，你定。"</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>C卷沟通2/5：这个格子不是靠"多聊"提的，是靠少剪网绳。老二催作业是现成试验田，跑一周看反应。</div>
+<div class="sec"><h4>做完怎么回味</h4>①换成开机句之后，她的反应和往常差在哪？②哪句关机话是你的口头禅？它最早跟谁学的？③今天有没有一句关机话来不及拦住？明天同一情境打算换成什么？</div>
+<div class="anchor">锚：卡58/44 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d9"><input class="note" data-n="d9" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d10">
+<div class="dh" onclick="tg(this)"><b>D10</b><span class="tt">倾听到底<span class="sum">她说话时只回"嗯，然后呢"——不打断、不纠正、不教，至少30秒抬眼看她</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自柯维"知彼解己"（移情聆听，习惯五）×武志红《每一种孤独都有陪伴》双源。核心主张：<b>先寻求理解对方，再争取被理解</b>——"大部分人在聆听时并不是想理解对方，而是为了做出回应"。机制：四种自传式回应是亲子杀手——价值判断（"修车？别开玩笑了"）/追根究底（审问式"怎么回事"）/好为人师（"我当年…"）/自以为是（用自己的动机衡量她）；"青少年与朋友讲电话可以扯一两小时，跟父母却无话可说"——病理就在这四式。移情聆听四阶段：复述→加解释→渗入感觉→<b>既解释又带感情（"你对上学有很深的挫折感"）</b>——她自己说到真问题后，才是你发挥影响力的时刻。武志红补底层：假陪伴四相（评价/各说各话/强加/工具化）里"在喋喋不休的评价者面前，你不存在"；真陪伴＝心留空隙看见对方本来的样子；耳机、关门、发呆是正常独处不是病，<b>"乖到不再敲门"才是最危险的孤独信号</b>。证据级：B2-B3＋T2-T3临床。咱家接口：老大报喜不报忧的钥匙＝每周一对一15分钟不问学习；她敲门/凑过来的那一刻，放下手机抬眼。</div>
+<div class="sec"><h4>怎么做</h4>①她开口/敲门/凑过来时，放下手机抬眼应；②这次对话只听不插判断、不搬自己的过去、不刨根究底；③听完试第四式："你对___有很深的挫折感。"翻车了就修："对不起，我刚才并没有真的努力去理解你，我们可以再来一次吗？"</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>心理空气：人最大的心理需求是被理解、肯定、认可和欣赏——空气给足，才谈得上影响。这是D8那笔"最有效存款"的日常化。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今天哪一刻你差点打断她？想说什么？②她说的哪句让你意外（你原来以为…）？③听完你忍住没给的Advice，事后看需要给吗？</div>
+<div class="anchor">锚：卡63/73/57 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d10"><input class="note" data-n="d10" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d11">
+<div class="dh" onclick="tg(this)"><b>D11</b><span class="tt">道歉模板<span class="sum">若这周有说过头的话，用三R道一次歉——没有就跳过，不强造</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自尼尔森《正面管教》"矫正错误三R"（阿德勒-德雷克斯谱系家长课）＋武志红考砸/失利操作双源。核心主张：<b>孩子感觉更好时才做得更好；修复造责任人——惩罚造骗子</b>。机制：三R顺序不能乱——①承认（"我那天说的那句话不对"，只认自己的错，不说"但是你也"）；②和好（"对不起"）；③解决（"下次我先问你再说"，给新的行为承诺）。为什么道歉后孩子指责会像潮水涌来？那不是得寸进尺，是多年积压第一次找到出口——<b>不辩解只倾听</b>，最后常是号啕大哭后谅解；徐凯文：让孩子活下来的那一步常是父母认错。大人先道歉，孩子极善原谅。配套（夫妻冲突当孩子面发生过时）卡69处方三句："爸爸妈妈的问题是爸爸妈妈自己的问题，不关你的事，我们会努力解决"＋"你的牺牲对解决问题没有帮助，无论怎样我们都一如既往爱你"。证据级：B2家长课＋T3临床。咱家接口："无论你怎么样我们都爱你"要<b>在她考砸之前就说</b>，不要等砸了才补。</div>
+<div class="sec"><h4>怎么做</h4>①挑最近一次翻车（吼了/讽了/翻旧账了），按三R走完整三句；②道歉后她指责涌来：只听，不辩解；③若夫妻冲突当着孩子发生过，加说处方三句。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>道歉不是丢家长的份，是把"犯错＝世界末日"这个家里的旧模型换成"犯错＝可以修"——两个女儿将来考砸/失恋/出事时敢不敢打你电话，就看这个模型建没建起来。</div>
+<div class="sec"><h4>做完怎么回味</h4>①三R里哪一步最难开口（承认/对不起/新承诺）？②她指责涌来时，你心里的第一反应是什么？③这次道歉之后，你俩之间空气变了没有？怎么变的？</div>
+<div class="anchor">锚：卡43/75/69 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d11"><input class="note" data-n="d11" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d12">
+<div class="dh" onclick="tg(this)"><b>D12</b><span class="tt">情绪解码<span class="sum">她烦躁时试着说"你是不是有点累了"——只说不问，说完就走</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自武志红《心灵的七种兵器》情绪功能论＋李玫瑾"地下河"机制层。核心主张：<b>坏情绪不是敌人是兵器——悲伤完结悲剧、愤怒守住边界、内疚调节关系、恐惧点出最重要的东西；情绪是信号不是故障</b>。机制：压抑不会让它消失，只会让它改走地下河——李玫瑾：攻击性守恒，打架/运动/吵闹是身体泄压阀，堵死出口愤怒就回流心里积成恨（"从小打过架的，不搞爆炸"）；要警惕的反而是"当面永远客气"的那个。所以她炸毛时第一句是签收（"我看到你很生气"），不是纠错（"你这样不对"）——先签收信号，再谈内容。真而纯的悲伤自己会完结：允许哭完整场，坐在旁边不催不劝就是最好的陪伴。顶嘴重读为守边界：先自问"我侵入她哪块空间了"。翻译句的原理（卡73）：网恋/游戏依赖多是线上陪伴补偿——出口是家里长出真链接。证据级：T3临床经验＋机制层。咱家接口：两个都在"乖/闷"风险带（老大撑过、老二话少）——<b>把"允许吵架"当成家里的安全设施来维护</b>。</div>
+<div class="sec"><h4>怎么做</h4>①她炸毛/低落时，第一句说"我看到你很生气/难过"（签收，不问为什么）；②试着用一次翻译句：把"你怎么又在玩手机"换成"你是不是有点寂寞"；③她哭的时候：坐在旁边，不催不劝，允许哭完整场。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>情绪反馈2/5不是靠"讲道理控制情绪"提分，是靠"情绪在家有出口"。地下河的水位，就靠这些小出口降。</div>
+<div class="sec"><h4>做完怎么回味</h4>①签收之后，她的火是升了还是降了？②她这次情绪的"尺寸"正常吗——是不是大到不像话（那就是刻舟求剑警报，不是全冲你）？③你自己的情绪出口在哪？上一次用是什么时候？</div>
+<div class="anchor">锚：卡72/57/73 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d12"><input class="note" data-n="d12" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d13">
+<div class="dh" onclick="tg(this)"><b>D13</b><span class="tt">课题分离<span class="sum">拿一件事过两问（结果谁承担/选择谁在做）——是她的课题就只守护不干涉</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自阿德勒个体心理学经岸见一郎《被讨厌的勇气》（哲学对话体）。核心主张：<b>一切人际矛盾都来自"干涉别人的课题或被别人干涉"</b>。机制：判定只有两问——这个选择的结果最终谁承担？此刻做选择的是谁？不学习、手机怎么用、志愿选谁，结果承担者是女儿→是她的课题；家长的课题＝守护＋提供信息＋她求助时在场。<b>不干涉≠放任</b>：放任是"不知道也不想知道她在干什么"；正确姿势是"在了解的基础上加以守护，她想学时随时准备帮助，没求助时不指手画脚"——可以把马带到水边，但不能强迫其喝水。两个护栏：①"自由就是被别人讨厌"——坚定规则时她不高兴≠规则错了，别拿"别人怎么看"当家里决策主轴；②发火＝用怒气走捷径让她屈服，是工具不是失控。卡60从行为侧同判：替她担课题的施工＝干涉，没守护的放手＝放任。证据级：T3哲学对话体（阿德勒经岸见转述）。咱家接口：老二手机线＝定家庭底线（熄灯、餐桌上交是家长课题）＋守求助通道（不搜查、不逼老师盯）；"你不能要求孩子别让你焦虑"——焦虑归己。</div>
+<div class="sec"><h4>怎么做</h4>①跟女儿冲突前先跑两问：结果谁承担？此刻谁选择？②是她的课题就说守护句："这是你的事，需要帮时我随时在。"；③自查一句："我这是在要求她来消我的焦虑吗？"</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>家里的权力斗争（适应性2/5）多半是课题混乱：她的作业/手机/志愿被家长接管，家长的焦虑被塞给她。两问一切，各归各位。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今天这件事判定归谁？判定时你犹豫在哪一问？②守护句说出口后，你手痒想做的那件事是什么？③你的焦虑如果是课题，它的解法在你手上是什么？</div>
+<div class="anchor">锚：卡61/60 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d13"><input class="note" data-n="d13" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d14">
+<div class="dh" onclick="tg(this)"><b>D14</b><span class="tt">分别的爱<span class="sum">事照管、人格不打折——今天对俩女儿各做一次"按她要的方式"给</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自花径"无分别的爱"（林巨）＋武志红内在关系模式双源。核心主张：<b>爱不打折也不平均——人格上"你是你、事是事"，给法上"每个生命都不一样"：分别地爱，不是均等地爱</b>。机制：①不以事否人：她炸毛/考砸/出事时先切一刀——事照管（该管的管），人格不打折（"你这个人怎么这样"式定性句全部删掉）——"无分别"指的是人本圆满，操作核心就是这一刀；②分别地给：公平≠一样——给错位的爱（把她需要的安全给她姐姐需要的自由）才是最大的不公平；"生命的高贵在于每个生命都不一样"。卡44从精神分析侧补底层：定性句是内在父母的投射——我们怎么被对待就怎么对待人，越在乎的家人越首当其冲；改说事不说人，等于当场断一次传递。红线：无分别≠没规矩——安全类石板照立，只是立规矩时不附带人格审判。证据级：T3经验型＋临床同向。咱家接口：老大要的是放权＋万一脚本；老二要的是启动结构＋难度确认——各给各的。</div>
+<div class="sec"><h4>怎么做</h4>①挑一件要管的事（手机/作息/作业），只说事："手机十一点前放客厅充电位"——不说"你就是懒/没救了"；②分别地给：今天对老大给一次"放权/彩排万一"，对老二给一次"启动结构＋确认难度"；③自查：今天哪句话差点把事说成人？</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>俩女儿同龄不同需：同一句"为你好"对她俩是两种东西。切了这一刀，管教才不是人格审判，第3周的结构施工才装得进去。今晚同时做<b>复盘②</b>＋检查这周哪句关机话消失得最彻底。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今天对老大/老二各给了什么？是各自要的还是你以为公平的？②"事照管、人格不打折"这刀今天切在哪里最费劲？③这周哪句关机话消失得最彻底？哪句还在？</div>
+<div class="anchor">锚：卡67/68/44 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d14"><input class="note" data-n="d14" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
 </div>
 
 <div class="week"><h2>第3周 · 结构施工（花余额办正事）</h2>
-<div class="day" id="d15"><div class="dt"><b>D15</b>方案B全流程：挑一件小事走三步（问她→说你的顾虑→一起商量），<b>方案写下来</b>她签个字</div><div class="anchor">卡09/58 ｜ 写下来=产权效应</div><div class="rec"><input type="checkbox" data-k="d15"><input class="note" data-n="d15" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d16"><div class="dt"><b>D16</b>拖延施工：帮她启动一个"晚饭后我就写××第一题"（她自己说出口效果最好）</div><div class="anchor">卡19/27</div><div class="rec"><input type="checkbox" data-k="d16"><input class="note" data-n="d16" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d17"><div class="dt"><b>D17</b>习惯叠加：造一句"继[已有习惯]之后，我将[两分钟小动作]"——给她或给自己</div><div class="anchor">卡60</div><div class="rec"><input type="checkbox" data-k="d17"><input class="note" data-n="d17" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d18"><div class="dt"><b>D18</b>手机停战：手机话题今天只字不提；只检查"作业时段手机物理距离"这一件环境件</div><div class="anchor">卡63/37</div><div class="rec"><input type="checkbox" data-k="d18"><input class="note" data-n="d18" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d19"><div class="dt"><b>D19</b>睡眠红线：家里熄灯时间前移30分钟——你带头先睡</div><div class="anchor">卡50</div><div class="rec"><input type="checkbox" data-k="d19"><input class="note" data-n="d19" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d20"><div class="dt"><b>D20</b>家谱图自画：你画你自家三代（带气不画，改天画）</div><div class="anchor">卡56</div><div class="rec"><input type="checkbox" data-k="d20"><input class="note" data-n="d20" placeholder="日期｜她反应一句话"></div></div>
-<div class="day" id="d21"><div class="dt"><b>D21</b>C卷复测：重答家庭功能20题，对比10月7日基线——数字说话</div><div class="anchor">卡55 ｜ <b>复盘③</b>：三周总账＋下一步动哪一格</div><div class="rec"><input type="checkbox" data-k="d21"><input class="note" data-n="d21" placeholder="日期｜她反应一句话"></div></div>
+<div class="day" id="d15">
+<div class="dh" onclick="tg(this)"><b>D15</b><span class="tt">方案B全流程<span class="sum">挑一件小事走三步：问→说顾虑→一起商量，方案写下来她签个字</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自罗斯·格林Greene的CPS合作式解题（《暴脾气小孩》）——全库证据级最高的卡之一（随机对照试验R1-R2）。核心主张：<b>孩子炸毛不是故意作对，是"能做好就会做好"</b>——炸毛＝五项技能（灵活切换/抗挫/情绪调节/解决问题/适应变化）还不够用的信号；管行为不如解问题。机制：换镜头——"他就是故意的/欠管"全删，Greene原话：这些孩子选择炸毛，就像阅读障碍的孩子选择读不好一样，都不是选择；动机是满的，缺的是技能。所以奖惩没用：奖惩治"不想做"，可他想做也做不到——"如果后果有用，早就用了"。三个计划：Plan A（强压）火上浇油，最扛不住的孩子偏偏得到最多Plan A；<b>Plan B（一起解）＝正道</b>；Plan C（先放放）是排优先级不是认输。法伯补最关键两步：主意全部写下来＋共同筛选——<b>写下来就从"你强加的"变成"我们的规则"（产权效应）</b>。时机铁律：热头上不解决，提前在平静时谈。咱家接口：四轮方案B实操全败在"没写下来＋没余额"——今天两个都补上。</div>
+<div class="sec"><h4>怎么做</h4>①挑一个真实卡点（手机/作业/作息选一），平静时开问："我注意到你最近___，怎么了？"听完不打断不纠正；②说顾虑："爸担心的是你眼睛和睡眠——不是不让你玩"；③邀约："咱俩想个两边都能接受的办法？你先说"——主意全部写下来一起筛，她签个字。她拖到最后一刻就让她拖，只问："今晚要写多久？需要爸帮忙什么吗？"</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>咱家四轮实锤的败因清单：没写下来、没余额、热头上谈。第2周的存款是余额，今天是白纸黑字——两个一起到位才算跑完整流程。</div>
+<div class="sec"><h4>做完怎么回味</h4>①共情步里她说出的原因，跟你猜的差多远？②写下来的方案里，哪条是她提的？哪条是你提的？③签完字那一刻她的表情是什么？</div>
+<div class="anchor">锚：卡09/58 · 写下来＝产权效应</div>
+<div class="rec"><input type="checkbox" data-k="d15"><input class="note" data-n="d15" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d16">
+<div class="dh" onclick="tg(this)"><b>D16</b><span class="tt">拖延施工<span class="sum">环境先行＋最小启动：手机物理隔离，"先写数学第一题就行"</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自Steel拖延方程（动机科学，元分析R1-R2）×李玫瑾行为设计（经验型）×郭凤宜EF课（能力端）三层拼图。核心主张：<b>拖延不是懒、不是完美主义，是动机方程（期望×价值）÷（冲动×延迟）四变量失衡</b>——青春期孩子四个变量天然全红区。机制：拖延第一预测因子是冲动性不是懒；青春期前额叶19-20岁才完工，冲动是这个年龄的出厂设置——家长的角色书里原话叫"外部前额叶"。所以改环境不改嘴：<b>手机在桌上和在客厅是两个不同的方程</b>（诱惑邻近度是最致命变量）；她承诺"周末一定写"是真心的——意图-行动缺口是方程的数学预测，不是撒谎。EF课补能力端：启动难不是懒，是"开始"这项技能弱——塔台（前额叶）高二还在施工，修到25岁；把能力问题当态度问题处理＝批评制造皮质醇＝塔台当场罢工。证据级：R1-R2＋B2＋经验型分层。咱家接口：老二诊断＝高冲动×前额叶未完工×手机全天候×价值感低——拖延是系统的必然输出，不是态度问题。</div>
+<div class="sec"><h4>怎么做</h4>①环境先行一件：写作业时段手机放客厅充电位（不是没收，是隔离）；②帮她拆最小启动单元："你先写数学第一题就行"；③跟老二对一句执行意图："晚饭后我就写数学第一题"（"当X则Y"，跟进率几乎翻倍）。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>顺序铁律：先用方案B了解"为什么难"，再用方程定位哪个变量红了，再建外部结构——今天只做环境＋启动两件，不加压说教（家长施压制造焦虑＝把油门当刹车踩）。</div>
+<div class="sec"><h4>做完怎么回味</h4>①手机在客厅的时段，启动比平时快了吗？②"第一题"写完之后，她自己往下走了吗？③四变量里咱家最红的是哪一格（期望/价值/冲动/延迟）？</div>
+<div class="anchor">锚：卡19/27/36/39 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d16"><input class="note" data-n="d16" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d17">
+<div class="dh" onclick="tg(this)"><b>D17</b><span class="tt">习惯叠加<span class="sum">造一句"继[已有习惯]之后，我将[两分钟小动作]"——给她或给自己</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自克利尔《掌控习惯》（行为设计学，B2-B3——与卡27动机端、卡36能力端拼成完整链条）。核心主张：<b>习惯是自动化层：每个习惯走同一条回路"提示→渴求→反应→奖励"，改行为不是拼意志力，是当好自己环境的设计师</b>。机制：英国248人实验——只看动机的组毫无提升，填一句"我将于×天×时×处做至少20分钟运动"的组<b>91%动起来</b>——很多人不是缺动力，是缺明确的计划。习惯叠加公式："继[当前习惯]之后，我将[新习惯]"——把新行为挂在已有行为后面，蹭旧习惯的提示。两分钟规则：新习惯所用时间不应超过两分钟——"复习功课"→"打开笔记"，"跑3英里"→"系好鞋带"；先标准化后优化——你不能改善一个不存在的习惯；习惯基于次数不基于时长。身份层最深："每个行动都是投票给你想成为的那种人"——不需要全票，赢得多数即可；孩子说"我就不是学习的料"＝身份标签固结，用每天一张小选票改写，不辩论。铁律：<b>错过一次是意外，错过两次才是新习惯的开始</b>。咱家接口：老二启动困难——叠加句式现成抄用；盯决定性时刻（回家第一个分岔）不盯整晚。</div>
+<div class="sec"><h4>怎么做</h4>①帮她（或自己）设一个叠加点，句式照抄："继放回手机到客厅充电位之后，我将打开数学笔记"；②当天只要坐到书桌前打开笔记就算达标（两分钟版）；③完成就打叉——打卡本身就是即时奖励。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>第3周从"一次方案"走向"默认行为"的关节：方案B定做什么，方程定调哪格变量，习惯叠加把结论固化成环境和自动回路——不然每天重新打一仗。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今天这个"选票"投给的是她想成为的人，还是你想让她成为的人？②提示够具体吗（"午休时"无效，"合上饭盒时"有效）？③哪天断了没做——第二天回来了吗？</div>
+<div class="anchor">锚：卡60 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d17"><input class="note" data-n="d17" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d18">
+<div class="dh" onclick="tg(this)"><b>D18</b><span class="tt">手机停战<span class="sum">手机话题今天只字不提；只检查"作业时段手机物理距离"这一件环境件</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>三源合流：柯维影响圈（她的手机使用＝间接控制）＋海特《焦虑的一代》（R2流行病学）＋成瘾谱系判定（Vercillo）。核心主张：<b>手机对这一代的伤害主机制不是内容毒，是"经验阻断器"（experience blockers）</b>——把自由玩耍、现实社交、睡眠、注意力挤出24小时；家长的操作不是没收内容，是把被挤占的发育必需品还回去。机制：海特四伤害定位——社交剥夺（"与世界相连，却与身边的人断开"）/睡眠剥夺/注意碎片化（手机在桌上哪怕不看也占认知带宽）/成瘾（戒断四症状）。姿势：当园丁别当木匠——现实侧少管（给自由），虚拟侧除草（给结构）；"现实侧过度保护＋虚拟侧保护不足"双向都错。判定纪律：不问时长问三件事——不顾负面后果的强迫性使用＋耐受戒断＋功能损害（<b>功能损害是定盘星</b>：不造成问题就不算成瘾）；收设备后的脱机反应（攻击/抑郁）是最硬实弹测试。停战初期烦躁＝多巴胺重置的正常过程，不是报复。零花钱正门（李玫瑾）同日顺走：按规划给/超支断供/剩余归己。咱家接口：全家充电位＝睡眠剥夺拦截器，不是惩罚。</div>
+<div class="sec"><h4>怎么做</h4>①停战一天：不抢、不催、不说"你看看几点了"；②只检查一件环境件：作业时段手机物理距离（客厅充电位在不在位）；③发钱日顺口走一次正门："剩下的归你，攒大件爸不干涉。"看见她自己放下的时刻，说一句例外："昨天你自己十一点放下了，那会儿是啥状态？"</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>手机是咱家最大战场，也是方案A打得最多的地方——停战不是投降，是让第2周的余额不清零；间接控制＝停战、以身作则、存款先行。</div>
+<div class="sec"><h4>做完怎么回味</h4>①一天不提手机，你自己的焦虑在身体哪里？几点最强烈？②环境件检查结果：在位/不在位？明天怎么让"在位"更省力？③按三件事判定，她现在的档位更像哪级（正常沉浸/问题性/成瘾）？</div>
+<div class="anchor">锚：卡37/47/53/63 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d18"><input class="note" data-n="d18" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d19">
+<div class="dh" onclick="tg(this)"><b>D19</b><span class="tt">睡眠红线<span class="sum">家里熄灯时间前移30分钟——你带头先睡</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自沃克《我们为什么要睡觉》（睡眠神经科学，R2科普实证；争议数字已标注）×Maté压力身体记账双源。核心主张：<b>青少年晚睡晚起是生理不是叛逆</b>——青春期视交叉上核时相渐进前移，跨文化一致（" irrespective of culture or geography"）；睡眠是学习固化、情绪刹车、免疫底座的总地基。机制用人话三件：①换算器——让孩子22点睡＝让家长19点睡；"7点叫醒高中生＝凌晨4点叫醒你自己"——姿态从"纠正行为"换成"承认时差"；②睡眠×学习——"练习不能致完美，练习加一夜睡眠才能"：记忆巩固发生在当夜睡眠里，考前通宵＝40%学习亏损，两头烧双杀；③断睡×情绪——缺觉杏仁核情绪反应放大60%+、前额叶脱钩：<b>炸毛现场先查昨晚睡了几小时</b>；蓝光压制褪黑素过半是生理不是专制。补债悖论：睡眠不像银行，大脑永远还不回失去的睡眠——周末补觉只止损不回本。Maté补一笔：家里"没吵架但绷着的紧张"直接抬高孩子皮质醇。咱家接口：熬夜的账＝学40%亏＋情绪失控＋免疫垮，三头亏；老大23:30前必睡线。</div>
+<div class="sec"><h4>怎么做</h4>①今晚只做环境三件：睡前一小时暗光＋睡前热水澡＋手机出卧室充电；②固定起床时间比固定入睡更管用（第一定律）；③你带头先睡——家长是环境件的一部分；午后奶茶/可乐/能量饮料停掉（"没有孩子需要咖啡因"）。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>这是唯一一个"不用谈就能施工"的结构：不改人，只改环境。也是对老大最划算的投资——多睡一小时＝成绩提一档有实证。</div>
+<div class="sec"><h4>做完怎么回味</h4>①今晚家里谁先睡的？她实际几点？②明早叫醒冲突现场，用换算器默算一遍，你的语气变了吗？③家里最大的劫持源是哪件（蓝光/咖啡因/贪睡键/卧室温度）？</div>
+<div class="anchor">锚：卡50/30 · 想深挖再翻卡</div>
+<div class="rec"><input type="checkbox" data-k="d19"><input class="note" data-n="d19" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d20">
+<div class="dh" onclick="tg(this)"><b>D20</b><span class="tt">家谱图自画<span class="sum">你画你自家三代（带气不画，改天画）——这版不给女儿看</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自安多尔菲Andolfi跨代家庭治疗＋鲍恩Bowen多代系统（经Nichols流派地图，T2临床学派教科书）。核心主张：<b>孩子的症状不是孩子坏了，是家庭系统发的求救信号</b>——它标示着她的自主需求与家规刚性之间的失衡，还保护着家里的某个平衡；要改的是全家的互动，不是孩子一个人。机制：症状"替谁值班"——阻断姐妹正向关系／把某家长挤到边缘／替大人避开正面冲突；"症状是警报信号，指示一个长期扰动全家、却从未被直接处理过的困境"。鲍恩补传递链：<b>焦虑在三代之间流动，被三角化最深的孩子替全家吸收焦虑长症状</b>。家谱图是这套理论的工具：方＝男圆＝女；三种线必标——锯齿线＝冲突、虚线＝疏离、<b>粗箭头跨代联盟＝谁直插到底层把孩子拉成自己队友</b>；铁律：爸妈各自先画自己的原生家庭（帮孩子前先画自家）。心理动力眼光收尾：你给女儿贴过的标签（懒/叛逆），最先是谁的？两条防走火：症状是信号≠父母是罪人；铁律——带着气不画，先41后56别倒序（带气画出来的是罪状图）。咱家接口：正四层叠压——爸妈中年＋老大高三分离在即＋老二自主爬坡＋祖辈老去，多代同时过坎。</div>
+<div class="sec"><h4>怎么做</h4>①爸妈各自画自己的原生家庭三代图（30分钟）：方＝男、圆＝女，每格写名字/年龄/性格标签；②三种线必标：锯齿＝常年冲突、虚线＝疏离、粗箭头＝跨代联盟；标大事（断联/迁徙/早逝）；③画完问自己一句：我给女儿贴过的标签，最先是谁的？铁律：带气不画，这版不给女儿看。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>前三周的动作都往"现在和将来"使劲，这一天是唯一的"往回看"——找到情绪按钮的出厂地，才明白为什么有些线一点就着。看见即松动（卡44），画出来就是看见。</div>
+<div class="sec"><h4>做完怎么回味</h4>①画到哪个人/哪条线时笔停了？那个停顿在说什么？②哪条线跟你现在和女儿的相处最像？③"懒/叛逆"这些标签，在你家上一代是谁身上的？</div>
+<div class="anchor">锚：卡56/55 · 铁律：先41后56，带气不画</div>
+<div class="rec"><input type="checkbox" data-k="d20"><input class="note" data-n="d20" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
+<div class="day" id="d21">
+<div class="dh" onclick="tg(this)"><b>D21</b><span class="tt">C卷复测<span class="sum">重答家庭功能20题，对比10月7日基线——数字说话</span></span><span class="chev">▼</span></div>
+<div class="db">
+<div class="sec why"><h4>为什么 · 理论小课堂</h4>出自Olson环状模型（家庭功能测量，R2测量工具）＋Nichols《家庭治疗》流派地图。核心主张：<b>家庭健康不看单点看两根轴</b>——凝聚度（疏离→联结→纠缠）＋灵活度（僵化→弹性→混乱），沟通是润滑这两轴的第三维；<b>两轴都在中带＝均衡型，最能扛转折</b>；极端组合才出事：纠缠×僵化（亲死＋管死）、疏离×混乱（放任）。机制：青春期＝两轴同时要调的转折点——距离松一格、规矩弹性升一格；"失功能家庭把不工作的结构越抱越紧"。咱家基线判读（爸卷261007：亲密度4/适应性2/沟通2/情绪反馈2）：高凝聚×低灵活＝纠缠×僵化倾向——结构式解药是划界＋放权试验，不是多商量。为什么用数字收尾：行为疗法的自我记录效应——记录本身就有干预力；萨巴瑞框架收口：改动的主语永远先是自己，复测测的是"你改了之后家里动了哪一格"。证据级：R2测量工具＋教科书锚点。咱家接口：三周总账——D21复测不评对错，只找"哪个维度最卡"，下一轮就动那一格。</div>
+<div class="sec"><h4>怎么做</h4>①爸妈各答一遍C卷20题（家庭功能自评清单·Olson简版，在05_带练/），四维各记一档；②跟基线比（爸卷261007：亲密度4/适应性2/沟通2/情绪反馈2）：哪一格动了？③把三周复盘里"保留"的动作定成下月默认动作——练习册走完不是毕业，是开机。今晚<b>复盘③</b>：三周总账＋下一步动哪一格。</div>
+<div class="sec"><h4>有什么用（对咱家）</h4>不信人信数据：三周前你也不知道自己哪格最卡——现在有了两个时间点的读数，家里的"病情"第一次有了仪表盘。答案不分对错，找到"哪个维度最卡"就够了。</div>
+<div class="sec"><h4>做完怎么回味</h4>①四格里动的是哪格？没动的是哪格？②回头看记录栏：她反应最好的三个动作是哪三个？③下一轮21天，最想保住的三个动作：①＿＿ ②＿＿ ③＿＿</div>
+<div class="anchor">锚：卡55/41 · 复盘③：三周总账＋下一步动哪一格</div>
+<div class="rec"><input type="checkbox" data-k="d21"><input class="note" data-n="d21" placeholder="日期｜她反应一句话"></div>
+</div>
+</div>
 </div>
 
 <div class="theory">
 <h2>理论依据（为什么是这三周·这21天）</h2>
 <h3>最根本的主线</h3>
 家庭系统论＋"先大人后孩子"——孩子的症状是家庭的信号。五个独立传统（Greene随机对照试验／ACT／Maté／萨巴瑞／武志红）在六代交叉验证里同判：改变的杠杆在家长端。
-<h3>三周顺序</h3>
-"稳住自己→对齐→再上结构"＝交叉验证总接口判定——没有关系余额就上结构＝方案A战争（咱家四轮实锤：全败在没写下来＋没余额）。
 <h3>为什么每天只一个小动作</h3>
 两分钟规则（卡60）×执行意图（卡27·Steel元分析："晚饭后我就写X"跟进率近翻倍）×单焦点（意志力研究：一次一个习惯成活率最高）。
 <h3>21天这个数字（诚实说）</h3>
@@ -94,6 +333,7 @@ a{color:#9a6b2f;}
 </div>
 <div class="bar">已打卡 <span id="cnt">0</span> / 21 天 · 进度自动保存在本机</div>
 <script>
+function tg(el){el.closest('.day,.lg').classList.toggle('open');}
 document.querySelectorAll('input[data-k]').forEach(c=>{c.checked=localStorage.getItem('lx_'+c.dataset.k)==='1';c.onchange=()=>{localStorage.setItem('lx_'+c.dataset.k,c.checked?'1':'0');if(c.checked)c.closest('.day').classList.add('done');else c.closest('.day').classList.remove('done');cnt();};if(c.checked)c.closest('.day').classList.add('done');});
 document.querySelectorAll('input[data-n]').forEach(n=>{n.value=localStorage.getItem('lxn_'+n.dataset.n)||'';n.oninput=()=>localStorage.setItem('lxn_'+n.dataset.n,n.value);});
 function cnt(){document.getElementById('cnt').textContent=document.querySelectorAll('input[data-k]:checked').length;}
