@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家庭工具站·总入口</title>
+<style>
+html,body{margin:0;height:100%;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f7f5ef;overflow:hidden;}
+.tabs{display:flex;background:#2c2620;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tabs button{flex:1;min-width:96px;border:none;background:transparent;color:#cbbfa8;padding:13px 6px;font-size:.92rem;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.tabs button.active{background:#9a6b2f;color:#fff;}
+.home{position:fixed;right:10px;bottom:10px;z-index:20;background:#9a6b2f;color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:.85rem;cursor:pointer;display:none;font-family:inherit;}
+iframe{width:100%;height:calc(100% - 46px);border:none;display:none;}
+iframe.show{display:block;}
+</style>
+</head>
+<body>
+<div class="tabs">
+<button class="active" data-t="t1">问卷·C卷</button>
+<button data-t="t2">知识图谱</button>
+<button data-t="t3">练习册·21天</button>
+</div>
+<iframe id="t1" class="show" src="nfpp_jiazhang_wenjuan.html"></iframe>
+<iframe id="t2" data-src="qingshaonian_zhishi_tupu.html"></iframe>
+<iframe id="t3" data-src="jiazhang_lianxice_21tian.html"></iframe>
+<button class="home" onclick="goHome()">回总入口</button>
+<script>
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    document.querySelectorAll('iframe').forEach(function(f){f.classList.remove('show');});
+    var f=document.getElementById(b.dataset.t);
+    if(!f.src&&f.dataset.src)f.src=f.dataset.src;
+    f.classList.add('show');
+    if(b.dataset.t!=='t1')document.querySelector('.home').style.display='block';
+    else document.querySelector('.home').style.display='none';
+  };
+});
+function goHome(){
+  document.querySelector('.tabs button[data-t="t1"]').click();
+}
+</script>
+</body>
+</html>
