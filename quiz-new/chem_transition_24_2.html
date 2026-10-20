@@ -32,6 +32,7 @@ h1{text-align:center;font-size:1.3rem;color:#f0c060;padding-bottom:.5rem;border-
 #bar{position:fixed;bottom:0;left:0;right:0;background:#16162a;border-top:1px solid #2a2a3e;padding:10px 16px;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;z-index:9;font-size:.85rem}
 #bar button{border:none;border-radius:18px;padding:8px 16px;cursor:pointer;font-size:.85rem}
 #btnReset{background:#6b6257;color:#fff}
+.qimg{max-width:100%;border-radius:8px;margin:4px 0 10px;border:1px solid #2a2a3e;display:block;background:#fff}
 .setnote{font-size:.78rem;color:#8a8594;margin:14px 0 4px;line-height:1.7;background:#141426;border-radius:8px;padding:10px 12px;border:1px dashed #2a2a3e}
 </style>
 </head>
@@ -49,10 +50,10 @@ h1{text-align:center;font-size:1.3rem;color:#f0c060;padding-bottom:.5rem;border-
 <script>
 var DATA=[
 {name:"套1 配体交换",sub:"Cu²⁺/Co²⁺ 鉴别反应",qs:[
- {t:"sel",star:0,q:"1.1 向蓝色 [Cu(H₂O)₆]²⁺ 溶液中先加少量氨水、再加过量氨水，现象是——",opts:["一直保持蓝色溶液","先出淡蓝沉淀，后溶解成深蓝溶液","先出沉淀，后溶解成黄色溶液","无明显变化"],a:1,e:"少量碱出沉淀、过量氨变深蓝——鉴别 Cu²⁺ 的标准操作。沉淀是 Cu(OH)₂(H₂O)₄，深蓝溶液是 [Cu(H₂O)₂(NH₃)₄]²⁺。"},
+ {img:"img_chem24_2/image74.png",t:"sel",star:0,q:"1.1 向蓝色 [Cu(H₂O)₆]²⁺ 溶液中先加少量氨水、再加过量氨水，现象是——",opts:["一直保持蓝色溶液","先出淡蓝沉淀，后溶解成深蓝溶液","先出沉淀，后溶解成黄色溶液","无明显变化"],a:1,e:"少量碱出沉淀、过量氨变深蓝——鉴别 Cu²⁺ 的标准操作。沉淀是 Cu(OH)₂(H₂O)₄，深蓝溶液是 [Cu(H₂O)₂(NH₃)₄]²⁺。"},
  {t:"open",star:0,q:"1.2 写出\"少量氨水使 Cu²⁺ 出沉淀\"的离子方程式（氨当碱用）。",a:"[Cu(H₂O)₆]²⁺ + 2NH₃·H₂O → Cu(OH)₂(H₂O)₄↓ + 2NH₄⁺（也可写成 [Cu(H₂O)₆]²⁺+2OH⁻→Cu(OH)₂(H₂O)₄↓+2H₂O；蓝液→淡蓝沉淀）"},
- {t:"open",star:0,q:"1.3 向 Cu²⁺ 溶液中加浓盐酸：写方程、指出颜色变化和配位数/几何变化。",a:"[Cu(H₂O)₆]²⁺ + 4Cl⁻ → [CuCl₄]²⁻ + 6H₂O；蓝→黄；配位数 6→4，八面体→四面体。"},
- {t:"open",star:0,q:"1.4 向 Co²⁺ 溶液加过量氨水得到黄褐色溶液，静置空气中颜色继续变深。写出生成的配离子，并解释变深的原因。",a:"[Co(NH₃)₆]²⁺；被空气中的 O₂ 缓慢氧化成 Co(III) 配离子（颜色更深）。"},
+ {img:"img_chem24_2/image9.png",t:"open",star:0,q:"1.3 向 Cu²⁺ 溶液中加浓盐酸：写方程、指出颜色变化和配位数/几何变化。",a:"[Cu(H₂O)₆]²⁺ + 4Cl⁻ → [CuCl₄]²⁻ + 6H₂O；蓝→黄；配位数 6→4，八面体→四面体。"},
+ {img:"img_chem24_2/image79.png",t:"open",star:0,q:"1.4 向 Co²⁺ 溶液加过量氨水得到黄褐色溶液，静置空气中颜色继续变深。写出生成的配离子，并解释变深的原因。",a:"[Co(NH₃)₆]²⁺；被空气中的 O₂ 缓慢氧化成 Co(III) 配离子（颜色更深）。"},
  {t:"open",star:1,q:"1.5 ★ 两瓶无色标签溶液：Cu²⁺ 和 Zn²⁺。只用一种试剂（过量 NaOH 溶液）如何区分？写出两者现象差异。",a:"Cu²⁺：先淡蓝沉淀 Cu(OH)₂(H₂O)₄，加过量 NaOH 不溶解；Zn²⁺：白色沉淀后溶于过量碱成 [Zn(OH)₄]²⁻（两性差异）。"},
  {t:"sel",star:0,q:"1.6 \"在 [CuCl₄]²⁻ 中，Cu 的配位数是 6，几何构型为八面体。\"这句话——",opts:["完全正确","配位数错，应为 4","配位数和构型都错，应为 4 配位四面体","构型错，应为平面正方形"],a:2,e:"[CuCl₄]²⁻ 是 4 配位四面体：配位数 4、四面体几何，两处都错。"}
 ]},
@@ -65,11 +66,11 @@ var DATA=[
  {t:"open",star:1,q:"2.6 ★ 向下列离子溶液中分别加入过量 NaOH：哪些沉淀溶解、哪些不溶？Cu²⁺ / Zn²⁺ / Cr³⁺ / Fe³⁺",a:"溶：Zn²⁺→[Zn(OH)₄]²⁻、Cr³⁺→[Cr(OH)₆]³⁻（两性）；不溶：Cu(OH)₂（蓝）、Fe(OH)₃（红棕）。"}
 ]},
 {name:"套3 颜色原理",sub:"d 轨道分裂·晶体场",qs:[
- {t:"sel",star:0,q:"3.1 八面体配合物中能量升高的 d 轨道是——",opts:["dxy、dxz、dyz","dz²、dx²−y²","全部升高相同","全部降低"],a:1,e:"dz²、dx²−y² 的电子云瓣沿坐标轴伸展，与轴向配体负电迎头→静电排斥大→能量升高；轴间三个相对降低。"},
- {t:"open",star:0,q:"3.2 解释 3.1 的原因（用\"电子云取向+静电排斥\"）。",a:"配体（负点电荷或偶极）沿 ±x/±y/±z 方向接近；dz²、dx²−y² 电子云瓣正好沿轴、与配体迎头，静电排斥大→能量升高；dxy、dxz、dyz 在轴间、离配体远→能量相对降低。"},
- {t:"open",star:0,q:"3.3 填空：四面体场= ___ 个高能轨道 + ___ 个低能轨道；分裂能约为八面体的 ___。",a:"四面体：3 高 + 2 低（与八面体 2 高 3 低正好相反）；分裂能约为八面体的 4/9。"},
- {t:"open",star:0,q:"3.4 把 [Cu(H₂O)₆]²⁺ 中 4 个水换成 NH₃ 后，吸收光的平均频率如何变化？用 ΔE 与配体强度解释。",a:"升高。NH₃ 是比 H₂O 更强的路易斯碱（给电子能力更强），配位后对 d 轨道电子云排斥更强→分裂能 ΔE 增大；由 ΔE = h·f，吸收频率升高。"},
- {t:"sel",star:0,q:"3.5 某配合物溶液主要吸收绿光，它显——",opts:["红色","蓝色","紫红/品红色","黄色"],a:2,e:"看到的是没被吸收的互补色；绿的互补色在紫红/品红区。"},
+ {img:"img_chem24_2/image54.png",t:"sel",star:0,q:"3.1 八面体配合物中能量升高的 d 轨道是——",opts:["dxy、dxz、dyz","dz²、dx²−y²","全部升高相同","全部降低"],a:1,e:"dz²、dx²−y² 的电子云瓣沿坐标轴伸展，与轴向配体负电迎头→静电排斥大→能量升高；轴间三个相对降低。"},
+ {img:"img_chem24_2/image52.png",t:"open",star:0,q:"3.2 解释 3.1 的原因（用\"电子云取向+静电排斥\"）。",a:"配体（负点电荷或偶极）沿 ±x/±y/±z 方向接近；dz²、dx²−y² 电子云瓣正好沿轴、与配体迎头，静电排斥大→能量升高；dxy、dxz、dyz 在轴间、离配体远→能量相对降低。"},
+ {img:"img_chem24_2/image73.png",t:"open",star:0,q:"3.3 填空：四面体场= ___ 个高能轨道 + ___ 个低能轨道；分裂能约为八面体的 ___。",a:"四面体：3 高 + 2 低（与八面体 2 高 3 低正好相反）；分裂能约为八面体的 4/9。"},
+ {img:"img_chem24_2/image50.png",t:"open",star:0,q:"3.4 把 [Cu(H₂O)₆]²⁺ 中 4 个水换成 NH₃ 后，吸收光的平均频率如何变化？用 ΔE 与配体强度解释。",a:"升高。NH₃ 是比 H₂O 更强的路易斯碱（给电子能力更强），配位后对 d 轨道电子云排斥更强→分裂能 ΔE 增大；由 ΔE = h·f，吸收频率升高。"},
+ {img:"img_chem24_2/image40.png",t:"sel",star:0,q:"3.5 某配合物溶液主要吸收绿光，它显——",opts:["红色","蓝色","紫红/品红色","黄色"],a:2,e:"看到的是没被吸收的互补色；绿的互补色在紫红/品红区。"},
  {t:"open",star:1,q:"3.6 ★ 为什么 ZnSO₄ 溶液无色，而 CuSO₄ 溶液蓝色？",a:"Zn²⁺ 为 3d¹⁰ 全满，没有 d–d 电子跃迁可吸收可见光→无色；Cu²⁺ 为 3d⁹，d 轨道分裂后可发生 d–d 跃迁→显色。"},
  {t:"open",star:0,q:"3.7 填空：Cu²⁺ 的电子构型（spdf 记法）= ____。",a:"[Ar]3d⁹。"}
 ]},
@@ -81,10 +82,10 @@ var DATA=[
  {t:"sel",star:1,q:"4.5 ★ \"其他条件不变，把溶液稀释会改变 Kstab 的值。\"——",opts:["对，浓度变 Kstab 就变","错，稀释只让平衡移动，Kstab 只随温度变","对，稀释减小 Kstab","错，Kstab 随压强变"],a:1,e:"稀释改变各物种浓度（平衡移动），但 Kstab 是平衡常数，只随温度变化。"}
 ]},
 {name:"套5 综合卷",sub:"跨节综合+补充考点",qs:[
- {t:"open",star:0,q:"5.1 四瓶无标签溶液：Cu²⁺、Co²⁺、Fe³⁺、Zn²⁺。只用过量 NaOH 一种试剂，写出各自现象并完成鉴别。",a:"Cu²⁺：淡蓝沉淀不溶；Co²⁺：蓝色沉淀（Co(OH)₂）不溶；Fe³⁺：红棕沉淀不溶；Zn²⁺：白色沉淀溶→[Zn(OH)₄]²⁻。只有 Zn²⁺ 溶解，其余按沉淀颜色区分。"},
+ {img:"img_chem24_2/image3.png",t:"open",star:0,q:"5.1 四瓶无标签溶液：Cu²⁺、Co²⁺、Fe³⁺、Zn²⁺。只用过量 NaOH 一种试剂，写出各自现象并完成鉴别。",a:"Cu²⁺：淡蓝沉淀不溶；Co²⁺：蓝色沉淀（Co(OH)₂）不溶；Fe³⁺：红棕沉淀不溶；Zn²⁺：白色沉淀溶→[Zn(OH)₄]²⁻。只有 Zn²⁺ 溶解，其余按沉淀颜色区分。"},
  {t:"open",star:0,q:"5.2 为什么 Fe₂(SO₄)₃ 水溶液的 pH 明显低于同浓度 FeSO₄？",a:"Fe³⁺ 电荷高半径小，极化水配体释放 H⁺ 多（水解更强）；M³⁺ 比 M²⁺ 酸性强。"},
  {t:"open",star:0,q:"5.3 向黄色 [CuCl₄]²⁻ 溶液中加水，颜色渐变回蓝色。用\"平衡移动+颜色原理\"两步解释。",a:"① 加水稀释 [Cl⁻] 降低，平衡 [Cu(H₂O)₆]²⁺+4Cl⁻⇌[CuCl₄]²⁻+6H₂O 左移，回到水合离子；② 四面体分裂小、吸收低频（显黄），八面体组合吸收移向高频（显蓝）。"},
- {t:"open",star:0,q:"5.4 写出 Co²⁺ 与浓盐酸变蓝的方程；再写出加水稀释后变回的方程。",a:"[Co(H₂O)₆]²⁺ + 4Cl⁻ → [CoCl₄]²⁻ + 6H₂O（粉红→蓝）；[CoCl₄]²⁻ + 6H₂O → [Co(H₂O)₆]²⁺ + 4Cl⁻（加水左移回粉红）。"},
+ {img:"img_chem24_2/image18.png",t:"open",star:0,q:"5.4 写出 Co²⁺ 与浓盐酸变蓝的方程；再写出加水稀释后变回的方程。",a:"[Co(H₂O)₆]²⁺ + 4Cl⁻ → [CoCl₄]²⁻ + 6H₂O（粉红→蓝）；[CoCl₄]²⁻ + 6H₂O → [Co(H₂O)₆]²⁺ + 4Cl⁻（加水左移回粉红）。"},
  {t:"open",star:1,q:"5.5 ★ 同种配体下，Fe³⁺ 与 Fe²⁺ 的八面体水合离子谁吸收频率更高？为什么？",a:"Fe³⁺。氧化态更高→对配体电子云排斥更强→ΔE 更大→吸收频率更高（ΔE=h·f）。"},
  {t:"open",star:0,q:"5.6 晶体场理论的两条核心假设是什么？它\"不管什么\"、又\"足够解释什么\"？",a:"假设：①金属带正电，配体为负点电荷（或偶极，如 NH₃）；②d 轨道按配体排布分裂。不管：共价成键/轨道重叠（纯静电简化模型）。足够解释：颜色与 d 轨道分裂。"},
  {t:"open",star:0,q:"5.7 按顺序向 Cu²⁺ 溶液：①加少量 NaOH→②加过量氨水。写两步方程并描述颜色。",a:"① [Cu(H₂O)₆]²⁺+2OH⁻→Cu(OH)₂(H₂O)₄↓+2H₂O（蓝液→淡蓝沉淀）；② Cu(OH)₂(H₂O)₄+4NH₃→[Cu(H₂O)₂(NH₃)₄]²⁺+2H₂O+2OH⁻（沉淀溶解→深蓝溶液）。"}
@@ -101,13 +102,13 @@ function render(){
   s.qs.forEach(function(q,i){
     var no=(cur+1)+'.'+(i+1);
     if(q.t==='sel'){
-      h+='<div class="qcard"><span class="qtag tag-sel">选择题</span>'+(q.star?'<span class="qtag tag-star">★讲义外</span>':'')+'<div class="qt">'+q.q+'</div><div class="opts">';
+      h+='<div class="qcard"><span class="qtag tag-sel">选择题</span>'+(q.star?'<span class="qtag tag-star">★讲义外</span>':'')+'<div class="qt">'+q.q+'</div>'+(q.img?'<img class="qimg" src="'+q.img+'" alt="教材图">':'')+'<div class="opts">';
       q.opts.forEach(function(o,j){
         h+='<button class="opt" id="o'+i+'_'+j+'" onclick="pick('+i+','+j+')">'+String.fromCharCode(65+j)+'．'+o+'</button>';
       });
       h+='</div><div class="expl" id="ex'+i+'">'+q.e+'</div></div>';
     }else{
-      h+='<div class="qcard"><span class="qtag tag-open">简答/方程</span>'+(q.star?'<span class="qtag tag-star">★讲义外</span>':'')+'<div class="qt">'+q.q+'</div><button class="btnAns" id="ba'+i+'" onclick="reveal('+i+')">显示答案</button><div class="expl" id="ex'+i+'">✔ '+q.a+'</div></div>';
+      h+='<div class="qcard"><span class="qtag tag-open">简答/方程</span>'+(q.star?'<span class="qtag tag-star">★讲义外</span>':'')+'<div class="qt">'+q.q+'</div>'+(q.img?'<img class="qimg" src="'+q.img+'" alt="教材图">':'')+'<button class="btnAns" id="ba'+i+'" onclick="reveal('+i+')">显示答案</button><div class="expl" id="ex'+i+'">✔ '+q.a+'</div></div>';
     }
   });
   document.getElementById('content').innerHTML=h;
