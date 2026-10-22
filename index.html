@@ -250,9 +250,11 @@ var books = [
   var html = '';
   books.forEach((b,i)=>{
     var done = (allProgress[b.id]||{}).done || 0;
-    var pct = Math.round(done/b.count*100);
-    var badge = (i<3) ? '<span class="b-badge">热门</span>' : '';
-    html += `<div class="book-card" onclick="startQuiz('${b.id}')">${badge}<span class="b-icon">${b.icon}</span><div class="b-name">${b.name}</div><div class="b-desc">${b.desc}</div><div class="b-count">${b.count}题${pct>0?' · 已答'+pct+'%':''}</div></div>`;
+    var pct = b.url ? 0 : Math.round(done/b.count*100);
+    var badge = (i<3 && !b.url) ? '<span class="b-badge">热门</span>' : '';
+    var act = b.url ? `location.href='${b.url}'` : `startQuiz('${b.id}')`;
+    var cnt = b.url ? '入口' : b.count+'题'+(pct>0?' · 已答'+pct+'%':'');
+    html += `<div class="book-card" onclick="${act}">${badge}<span class="b-icon">${b.icon}</span><div class="b-name">${b.name}</div><div class="b-desc">${b.desc}</div><div class="b-count">${cnt}</div></div>`;
   });
   document.getElementById('bookGrid').innerHTML = html;
 })();
