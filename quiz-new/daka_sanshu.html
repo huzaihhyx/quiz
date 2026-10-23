@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三计数打卡表·网页版</title>
+<style>
+html,body{margin:0;background:#f7f5ef;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#2c2620;}
+.wrap{padding:12px;max-width:860px;margin:0 auto;}
+h1{font-size:1.15rem;margin:6px 0 2px;}
+.sub{font-size:.8rem;color:#8a7d68;margin-bottom:10px;}
+.bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.bar button{border:1px solid #c9bda4;background:#fff;border-radius:8px;padding:6px 12px;font-size:.9rem;cursor:pointer;font-family:inherit;}
+.bar .wk{font-weight:700;font-size:.95rem;}
+.rules{background:#fff8e8;border:1px solid #e6d9b8;border-radius:10px;padding:10px 12px;font-size:.82rem;line-height:1.7;margin-bottom:12px;}
+.rules b{color:#9a6b2f;}
+.twrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:#fff;border:1px solid #e2d9c6;border-radius:10px;}
+table{border-collapse:collapse;min-width:680px;width:100%;}
+th,td{border:1px solid #eee4d0;padding:6px 4px;text-align:center;font-size:.82rem;}
+th{background:#efe7d5;font-weight:600;white-space:nowrap;}
+td.day{background:#faf6ec;font-weight:600;white-space:nowrap;}
+.stepper{display:inline-flex;align-items:center;gap:4px;}
+.stepper button{width:26px;height:26px;border:none;border-radius:6px;background:#9a6b2f;color:#fff;font-size:1rem;cursor:pointer;line-height:1;font-family:inherit;}
+.stepper button:active{background:#7c541f;}
+.num{display:inline-block;min-width:22px;font-weight:700;font-size:1rem;}
+.cell-ck{cursor:pointer;font-size:1.2rem;user-select:none;}
+.cell-ck.on{color:#2e7d32;font-weight:700;}
+input.done{width:92px;border:1px solid #ddd0b8;border-radius:6px;padding:4px;font-size:.78rem;font-family:inherit;background:#fffdf6;}
+tr.sum td{background:#f3ecdc;font-weight:700;}
+.hint{font-size:.75rem;color:#a09274;}
+.bad{color:#c0392b;}
+.good{color:#2e7d32;}
+.hui{background:#fff;border:1px solid #e2d9c6;border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.85rem;line-height:1.9;}
+.hui label{margin-right:14px;cursor:pointer;}
+.hui input[type=text]{width:96%;border:1px solid #ddd0b8;border-radius:6px;padding:6px;font-size:.85rem;font-family:inherit;background:#fffdf6;margin-top:4px;}
+.redline{background:#fdeceb;border:1px solid #e8b4ae;border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.83rem;line-height:1.8;}
+.redline b{color:#c0392b;}
+.saved{font-size:.75rem;color:#8a7d68;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>三计数打卡表 <span style="font-size:.8rem;color:#8a7d68;">v1.1网页版</span></h1>
+<div class="sub">谷雨田家庭方案 · 六环链④施工件 · 内容与纸质打卡表v1.1完全一致 · 数据存本机不联网</div>
+
+<div class="bar">
+  <button onclick="shiftWeek(-1)">← 上周</button>
+  <span class="wk" id="wklabel"></span>
+  <button onclick="shiftWeek(1)">下周 →</button>
+  <button onclick="goToday()">回本周</button>
+</div>
+
+<div class="rules">
+<b>计数规则</b>（出自方案§三）：<b>否定语</b>=数落/催促/比较/纠正，当天次数·<b>爸妈两列相加每天≤1（全家口径）</b>｜<b>具体表扬</b>=条数，目标每人每天≥2条，要具体事实、夸过程，<b>禁"真好"空词</b>｜<b>睡眠</b>=23:30前上床且手机没进卧室记✓｜<b>特殊时光</b>=零说教陪伴记✓（周目标≥3次，不掐表）。<b>第1周只记不压</b>——先看见真实数字，再谈改。
+</div>
+
+<div class="twrap">
+<table id="grid"></table>
+</div>
+<div class="hint">点 [-][+] 计数；点格子打✓；"小完成"填她今天自己选的一件小完成。</div>
+
+<div class="hui">
+<b>周日对表会</b>（20:00·20分钟）：<br>
+<label><input type="checkbox" id="hui_a"> 各报各数</label>
+<label><input type="checkbox" id="hui_b"> 下周一条改进</label>
+<label><input type="checkbox" id="hui_c"> 互相一条表扬</label><br>
+待议单（定不下的写这里，48小时内二次谈）：<br>
+<input type="text" id="hui_yi" placeholder="……">
+</div>
+
+<div class="redline">
+<b>红线（出现即回医院，方案让位医嘱）</b>：连续2周拒学｜自伤念头或言行｜情绪持续加重超2周｜用药（加药/停药/换药）只听医生。
+</div>
+
+<div class="saved" id="savedtip"></div>
+</div>
+
+<script>
+var DAYS=["周一","周二","周三","周四","周五","周六","周日"];
+function monday(d){var x=new Date(d);var w=(x.getDay()+6)%7;x.setDate(x.getDate()-w);x.setHours(0,0,0,0);return x;}
+function fmt(x){return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");}
+function short(x){return (x.getMonth()+1)+"."+x.getDate();}
+var cur=monday(new Date());
+function wkkey(m){return "daka_w_"+fmt(m);}
+function blank(){var d={};for(var i=0;i<7;i++){d["d"+i]={bf:0,bb:0,mf:0,mb:0,sp:0,sl:0,done:""};}return {days:d,hui:[0,0,0],yi:""};}
+function load(m){var raw=null;try{raw=localStorage.getItem(wkkey(m));}catch(e){}return raw?JSON.parse(raw):blank();}
+function save(){try{localStorage.setItem(wkkey(cur),JSON.stringify(data));tip("已存本机 "+fmt(cur)+" 起这周 · "+new Date().toLocaleTimeString());}catch(e){tip("本机存储不可用（隐私模式？）");}}
+function tip(s){document.getElementById("savedtip").textContent=s;}
+var data=load(cur);
+
+function render(){
+  document.getElementById("wklabel").textContent=fmt(cur)+" ~ "+short(new Date(cur.getTime()+6*864e5));
+  var h='<tr><th style="min-width:64px;"></th>';
+  var cols=[["爸·否定语(次)","bf",1],["爸·表扬(条)","bb",1],["妈·否定语(次)","mf",1],["妈·表扬(条)","mb",1],["特殊时光✓","sp",0],["睡眠✓","sl",0],["她的小完成","done",2]];
+  for(var c=0;c<cols.length;c++)h+="<th>"+cols[c][0]+"</th>";
+  h+="</tr>";
+  var sum={bf:0,bb:0,mf:0,mb:0,sp:0,sl:0};
+  for(var i=0;i<7;i++){
+    var day=data.days["d"+i];
+    var dt=new Date(cur.getTime()+i*864e5);
+    h+='<tr><td class="day">'+DAYS[i]+'<br><span class="hint">'+short(dt)+"</span></td>";
+    for(var c=0;c<cols.length;c++){
+      var k=cols[c][0],f=cols[c][1],t=cols[c][2];
+      if(t===1){
+        var v=day[f];
+        var hot=(f==="bf"||f==="mf");
+        var cls=hot&&v>0?"num bad":"num";
+        h+='<td><span class="stepper"><button onclick="bump('+i+',\''+f+'\',-1)">−</button><span class="'+cls+'" id="c_'+i+'_'+f+'">'+v+'</span><button onclick="bump('+i+',\''+f+'\',1)">＋</button></span></td>';
+        sum[f]+=v;
+      }else if(t===0){
+        var on=day[f]?"on":"";
+        h+='<td><span class="cell-ck '+on+'" id="c_'+i+'_'+f+'" onclick="tog('+i+',\''+f+'\')">'+(day[f]?"✓":"")+"</span></td>";
+        if(day[f])sum[f]++;
+      }else{
+        h+='<td><input class="done" value="'+(day[f]||"").replace(/"/g,"&quot;")+'" onchange="setdone('+i+',this.value)"></td>';
+      }
+    }
+    h+="</tr>";
+  }
+  var fou=sum.bf+sum.mf;
+  var fouCls=fou<=7?"good":"bad";
+  h+='<tr class="sum"><td>周合计</td><td>'+sum.bf+'</td><td>'+sum.bb+" 条</td><td>"+sum.mf+'</td><td>'+sum.mb+" 条</td><td>"+sum.sp+"/≥3</td><td>"+sum.sl+"/7</td><td></td></tr>";
+  h+='<tr class="sum"><td>全家否定语</td><td colspan="7"><span class="'+fouCls+'">爸妈相加本周共 '+fou+' 次</span> <span class="hint">（口径：每天爸妈合计≤1，7天参考线≤7；超线不压数，周会对着数字谈）</span></td></tr>';
+  document.getElementById("grid").innerHTML=h;
+  document.getElementById("hui_a").checked=!!data.hui[0];
+  document.getElementById("hui_b").checked=!!data.hui[1];
+  document.getElementById("hui_c").checked=!!data.hui[2];
+  document.getElementById("hui_yi").value=data.yi||"";
+}
+function rerenderWeek(){data=load(cur);render();}
+function shiftWeek(n){cur=new Date(cur.getTime()+n*7*864e5);rerenderWeek();}
+function goToday(){cur=monday(new Date());rerenderWeek();}
+function bump(i,f,n){var d=data.days["d"+i];d[f]=Math.max(0,(d[f]||0)+n);if(d[f]===0&&n<0)d[f]=0;save();render();}
+function tog(i,f){var d=data.days["d"+i];d[f]=d[f]?0:1;save();render();}
+function setdone(i,v){data.days["d"+i].done=v;save();}
+document.getElementById("hui_a").onchange=function(){data.hui[0]=this.checked?1:0;save();};
+document.getElementById("hui_b").onchange=function(){data.hui[1]=this.checked?1:0;save();};
+document.getElementById("hui_c").onchange=function(){data.hui[2]=this.checked?1:0;save();};
+document.getElementById("hui_yi").onchange=function(){data.yi=this.value;save();};
+render();
+tip("数据只存在这台手机/电脑里，不上传；换设备不带走。每周自动按周一开新表。");
+</script>
+</body>
+</html>
