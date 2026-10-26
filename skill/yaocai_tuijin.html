@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>耀才推进哨兵 · 01428</title>
+<style>
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#0d1420;color:#dce4f0;margin:0;padding:16px;max-width:720px;margin:0 auto}
+h1{font-size:20px;margin:8px 0} .sub{color:#8fa3bf;font-size:13px;margin-bottom:14px}
+.card{background:#1a2332;border:1px solid #2a3a55;border-radius:14px;padding:14px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 8px}
+.ok{color:#5bd08a}.warn{color:#e8b84b}.bad{color:#e86868}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:4px 6px;border-bottom:1px solid #24334d;text-align:left}
+.big{font-size:26px;font-weight:700}
+.up{color:#e86868}.down{color:#5bd08a}
+.alert{background:#3a2430;border:1px solid #7a3a4a;border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px}
+footer{color:#5a6b85;font-size:11px;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>🚀 耀才推进哨兵 <span style="font-size:13px;color:#8fa3bf">01428 · 蚂蚁接管推进度</span></h1>
+<div class="sub" id="upd">加载中…</div>
+<div id="alerts"></div>
+<div id="body">读取数据中…</div>
+<footer>数据由服务器哨兵每周自动抓取推送 · 刷新本页即最新 · 月度经营路下期接入 · 不构成投资建议</footer>
+<script>
+const F = n => (n===undefined||n===null) ? '-' : n;
+fetch('yaocai_data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
+  const G = d['各路']||{};
+  document.getElementById('upd').textContent = '更新: '+d['更新时间']+' · 服务器哨兵自动抓取';
+  let h='';
+  (d['警报']||[]).forEach(a=>h+='<div class="alert">⚠️ '+a+'</div>');
+  document.getElementById('alerts').innerHTML=h;
+
+  // 股价卡
+  const pq=G['股价']||{}; let ph='<div class="card"><h2>📈 耀才股价</h2>';
+  if(pq['状态']==='OK'){
+    const pct=parseFloat(pq['涨跌幅%']); const cls=pct>=0?'up':'down';
+    ph+=`<div><span class="big">${F(pq['现价'])}</span> <span class="${cls}">${pct>=0?'+':''}${F(pq['涨跌幅%'])}%</span> <span style="color:#8fa3bf;font-size:12px">52周 ${F(pq['52周高'])} ~ ${F(pq['52周低'])} · ${F(pq['日期时间'])}</span></div>`;
+    const days=(pq['近20日']||[]); if(days.length){
+      const cl=days.map(x=>parseFloat(x[1])); const mn=Math.min(...cl),mx=Math.max(...cl);
+      ph+='<svg width="100%" height="60" viewBox="0 0 400 60" preserveAspectRatio="none">';
+      const pts=cl.map((c,i)=>`${(i/(cl.length-1)*390+5).toFixed(1)},${(55-(c-mn)/(mx-mn||1)*50).toFixed(1)}`).join(' ');
+      ph+=`<polyline points="${pts}" fill="none" stroke="#5b8dd0" stroke-width="2"/></svg>`;
+      ph+=`<div style="color:#8fa3bf;font-size:11px">近20日收盘 ${mn} ~ ${mx}</div>`;
+    }
+  } else ph+='<span class="bad">抓取失败: '+F(pq['状态'])+'</span>';
+  ph+='</div>'; document.getElementById('body').innerHTML+=ph;
+
+  // 招聘卡
+  const rq=G['招聘']||{}; let rh='<div class="card"><h2>👥 蚂蚁券商招聘 <span style="font-size:12px;color:#8fa3bf">系统建设进度</span></h2>';
+  if(rq['状态']==='OK'){
+    rh+=`<p>在招 <b>${rq['在招总数']}</b> 岗 · 信号灯（岗位名口径）：测试/QA=${(rq['信号灯']||{})['测试/QA']} · 压测/发布=${(rq['信号灯']||{})['压测/发布/灾备']} · 开户=${(rq['信号灯']||{})['eKYC/开户']} · 合规=${(rq['信号灯']||{})['合规官/RO/MLRO']} · 客服=${(rq['信号灯']||{})['客户服务']} · 投放增长=${(rq['信号灯']||{})['投放/增长']}</p>`;
+    const nw=rq['本周新增']||[];
+    if(nw.length){rh+='<details><summary>本周新增 '+nw.length+' 岗</summary><ul>'+nw.map(x=>'<li>'+x+'</li>').join('')+'</ul></details>';}
+  } else rh+='<span class="bad">失败: '+F(rq['状态'])+'</span>';
+  rh+='</div>'; document.getElementById('body').innerHTML+=rh;
+
+  // 公告卡
+  const an=G['公告']||{}; let ah='<div class="card"><h2>📜 港交所公告 <span style="font-size:12px;color:#8fa3bf">本月'+F(an['本月条数'])+'条</span></h2>';
+  (an['列表']||[]).forEach(a=>ah+=`<div style="font-size:13px;margin:4px 0"><a href="${a['PDF']}" style="color:#7fb3e8;text-decoration:none" target="_blank">${a['日期']} · ${a['标题']}</a></div>`);
+  if(!(an['列表']||[]).length) ah+='<span style="color:#8fa3bf">本月暂无</span>';
+  ah+='</div>'; document.getElementById('body').innerHTML+=ah;
+
+  // 商店卡
+  const st=G['商店']||{}; let sh='<div class="card"><h2>📱 应用商店监测 <span style="font-size:12px;color:#8fa3bf">HK App Store·新App上架警报</span></h2>';
+  (st['列表']||[]).slice(0,8).forEach(a=>sh+=`<div style="font-size:13px;margin:3px 0">${a['名称']} <span style="color:#8fa3bf">· 更新 ${a['更新日']}</span></div>`);
+  sh+='</div>'; document.getElementById('body').innerHTML+=sh;
+
+  // 月度经营+SFC
+  document.getElementById('body').innerHTML+=
+   '<div class="card"><h2>💰 月度经营数据</h2><span style="color:#8fa3bf;font-size:13px">'+F((G['月度经营']||{})['状态'])+'</span>'+
+   ((G['月度经营']||{})['最近月报表']?'<div style="font-size:13px;margin-top:6px"><a href="'+G['月度经营']['最近月报表']['PDF']+'" target="_blank" style="color:#7fb3e8">最新月报表: '+G['月度经营']['最近月报表']['标题']+'</a></div>':'')+'</div>'+
+   '<div class="card"><h2>🛡️ SFC 持牌档案</h2><span style="font-size:13px;color:#8fa3bf">'+F((G['SFC']||{})['说明'])+' · 下次核查 '+F((G['SFC']||{})['下次核查到期'])+'</span></div>';
+}).catch(e=>{document.getElementById('body').textContent='数据加载失败: '+e});
+</script>
+</body>
+</html>
