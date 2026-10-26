@@ -27,11 +27,18 @@ li{margin:4px 0;line-height:1.6}
 .stat .l{font-size:11px;color:#8fa0b8;margin-top:2px}
 .foot{text-align:center;color:#5a6a80;font-size:12px;margin:18px 0 8px}
 .hi{color:#ff9e64;font-weight:600}
+.tabbar{display:flex;gap:8px;margin:10px 0 14px}
+.tab{padding:8px 18px;border-radius:20px;background:#1a2332;border:1px solid #2a3a55;color:#8fa3bf;font-size:14px;cursor:pointer}
+.tab.on{background:#2a4a75;color:#fff;border-color:#3a6aa5}
+.up{color:#e86868}.down{color:#5bd08a}.alertbox{background:#3a2430;border:1px solid #7a3a4a;border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px}
+.big{font-size:26px;font-weight:700}
 </style>
 </head>
 <body>
 <h1>📊 基本面分析 · Skill工具箱</h1>
 <div class="sub">七件套 · 2026-10-25 · 对YY说话的版本</div>
+<div class="tabbar"><div class="tab on" id="tb-tool" onclick="sw('tool')">🧰 工具箱</div><div class="tab" id="tb-yaocai" onclick="sw('yaocai')">🚀 耀才推进</div></div>
+<div id="tab-tool">
 
 <div class="grid">
   <div class="stat"><div class="n">7</div><div class="l">个skill在役</div></div>
@@ -171,11 +178,69 @@ li{margin:4px 0;line-height:1.6}
 </div>
 
 <div class="foot">OpenClaw · hhyxL/61-ammo · skill全文均在盘可查 · 七件套随用随升版</div>
+</div>
+<div id="tab-yaocai" style="display:none">
+<div class="sub" id="y_upd">加载中…</div>
+<div id="y_alerts"></div>
+<div id="y_body"></div>
+<div style="color:#5a6b85;font-size:11px;margin-top:10px">数据由服务器哨兵每周一自动抓取推送 · 刷新本页即最新 · 不构成投资建议</div>
+</div>
+<script>
+function sw(t){
+  document.getElementById('tab-tool').style.display = t==='tool'?'':'none';
+  document.getElementById('tab-yaocai').style.display = t==='yaocai'?'':'none';
+  document.getElementById('tb-tool').className = 'tab'+(t==='tool'?' on':'');
+  document.getElementById('tb-yaocai').className = 'tab'+(t==='yaocai'?' on':'');
+  if(t==='yaocai') loadY();
+  if(history.replaceState) history.replaceState(null,'','#'+t);
+}
+const F = n => (n===undefined||n===null)?'-':n;
+function loadY(){
+  fetch('yaocai_data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
+    const G=d['各路']||{};
+    document.getElementById('y_upd').textContent='更新: '+d['更新时间']+' · 服务器哨兵自动抓取';
+    let h='';(d['警报']||[]).forEach(a=>h+='<div class="alertbox">⚠️ '+a+'</div>');
+    document.getElementById('y_alerts').innerHTML=h;
+    let b='';
+    const pq=G['股价']||{};
+    b+='<div class="card"><h2>📈 耀才股价</h2>';
+    if(pq['状态']==='OK'){const pct=parseFloat(pq['涨跌幅%']);const cls=pct>=0?'up':'down';
+      b+='<div><span class="big">'+F(pq['现价'])+'</span> <span class="'+cls+'">'+(pct>=0?'+':'')+F(pq['涨跌幅%'])+'%</span> <span style="color:#8fa3bf;font-size:12px">52周 '+F(pq['52周高'])+' ~ '+F(pq['52周低'])+' · '+F(pq['日期时间'])+'</span></div>';
+      const days=(pq['近20日']||[]);if(days.length){const cl=days.map(x=>parseFloat(x[1]));const mn=Math.min(...cl),mx=Math.max(...cl);
+        b+='<svg width="100%" height="60" viewBox="0 0 400 60" preserveAspectRatio="none">';
+        b+='<polyline points="'+cl.map((c,i)=>((i/(cl.length-1)*390+5).toFixed(1))+','+(55-(c-mn)/(mx-mn||1)*50).toFixed(1)).join(' ')+'" fill="none" stroke="#5b8dd0" stroke-width="2"/></svg>';
+        b+='<div style="color:#8fa3bf;font-size:11px">近20日收盘 '+mn+' ~ '+mx+'</div>';}}
+    else b+='<span class="bad">抓取失败: '+F(pq['状态'])+'</span>';
+    b+='</div>';
+    const rq=G['招聘']||{};
+    b+='<div class="card"><h2>👥 蚂蚁券商招聘 <span style="font-size:12px;color:#8fa3bf">系统建设进度</span></h2>';
+    if(rq['状态']==='OK'){const L=rq['信号灯']||{};
+      b+='<p>在招 <b>'+rq['在招总数']+'</b> 岗 · 信号灯：测试/QA='+F(L['测试/QA'])+' · 压测/发布='+F(L['压测/发布/灾备'])+' · 开户='+F(L['eKYC/开户'])+' · 合规='+F(L['合规官/RO/MLRO'])+' · 客服='+F(L['客户服务'])+' · 投放增长='+F(L['投放/增长'])+'</p>';
+      const nw=rq['本周新增']||[];if(nw.length)b+='<details><summary>本周新增 '+nw.length+' 岗</summary><ul>'+nw.map(x=>'<li>'+x+'</li>').join('')+'</ul></details>';}
+    else b+='<span class="bad">失败: '+F(rq['状态'])+'</span>';
+    b+='</div>';
+    const an=G['公告']||{};
+    b+='<div class="card"><h2>📜 港交所公告 <span style="font-size:12px;color:#8fa3bf">本月'+F(an['本月条数'])+'条</span></h2>';
+    (an['列表']||[]).forEach(a=>b+='<div style="font-size:13px;margin:4px 0"><a href="'+a['PDF']+'" style="color:#7fb3e8;text-decoration:none" target="_blank">'+a['日期']+' · '+a['标题']+'</a></div>');
+    if(!(an['列表']||[]).length)b+='<span style="color:#8fa3bf">本月暂无</span>';
+    b+='</div>';
+    const st=G['商店']||{};
+    b+='<div class="card"><h2>📱 应用商店监测 <span style="font-size:12px;color:#8fa3bf">HK App Store·新App上架警报</span></h2>';
+    (st['列表']||[]).slice(0,8).forEach(a=>b+='<div style="font-size:13px;margin:3px 0">'+a['名称']+' <span style="color:#8fa3bf">· 更新 '+a['更新日']+'</span></div>');
+    b+='</div>';
+    const mo=G['月度经营']||{},sf=G['SFC']||{};
+    b+='<div class="card"><h2>💰 月度经营数据</h2><span style="color:#8fa3bf;font-size:13px">'+F(mo['状态'])+'</span>'+((mo['最近月报表'])?'<div style="font-size:13px;margin-top:6px"><a href="'+mo['最近月报表']['PDF']+'" target="_blank" style="color:#7fb3e8">最新月报表: '+mo['最近月报表']['标题']+'</a></div>':'')+'</div>';
+    b+='<div class="card"><h2>🛡️ SFC 持牌档案</h2><span style="font-size:13px;color:#8fa3bf">'+F(sf['说明'])+' · 下次核查 '+F(sf['下次核查到期'])+'</span></div>';
+    document.getElementById('y_body').innerHTML=b;
+  }).catch(e=>{document.getElementById('y_body').textContent='数据加载失败: '+e});
+}
+if(location.hash==='#yaocai')sw('yaocai');
+</script>
 </body>
 </html>
 
 <div class="card">
   <h2>🚀 耀才推进 <span class="tag t3">新上线</span></h2>
   <p><b>干什么</b>：蚂蚁接管耀才(01428)推进度一页看全——招聘进度条/港交所公告/股价/应用商店新App警报，服务器哨兵每周自动抓。</p>
-  <div class="code"><a href="yaocai_tuijin.html" style="color:#7fb3e8">打开耀才推进页 →</a>（刷新即最新）</div>
+  <div class="code"><a href="#yaocai" onclick="sw('yaocai');return false" style="color:#7fb3e8">切换到耀才推进 →</a>（就在本页tab内·刷新即最新）</div>
 </div>
