@@ -26,6 +26,9 @@ COMPANIES = [
     ('603551', '奥普科技', [
         ('奥普科技603551_七件套合诊_261026_v1.md', f'{AMMO}/基本面穿透/奥普科技603551_七件套合诊_261026_v1.md', '⭐ 七件套合诊(261026)'),
     ]),
+    ('002294', '信立泰', [
+        ('信立泰002294_七件套合诊_261027_v1.md', f'{AMMO}/基本面穿透/信立泰002294_七件套合诊_261027_v1.md', '⭐ 七件套合诊(261027·26Q3当日)'),
+    ]),
     ('000915', '华特达因', [
         ('华特达因_六件套合诊_261024_v1.md', f'{AMMO}/基本面穿透/华特达因_六件套合诊_261024_v1.md', '⭐ 六件套全诊(261024)'),
     ]),
@@ -57,6 +60,7 @@ def md_html(path):
     txt = open(path, encoding='utf-8').read()
     return markdown.markdown(txt, extensions=['tables', 'attr_list'])
 
+SUMMARY_FIX = {'002294': '好生意+真钱+财报干净(15格全绿·18条零警)·Q3单季+19.2%创新药放量——但PE(市盈率)TTM47.8倍贵'}
 summary = {}
 for code, name, docs in COMPANIES:
     nav = ' '.join(f'<a href="#d{i}">{t}</a>' for i, (_, _, t) in enumerate(docs))
@@ -64,6 +68,8 @@ for code, name, docs in COMPANIES:
     first_txt = ''
     for i, (_, path, title) in enumerate(docs):
         raw = open(path, encoding='utf-8').read()
+        if code in SUMMARY_FIX:
+            first_txt = SUMMARY_FIX[code]
         if not first_txt:
             m = re.search(r'(总判一句话[^\n]*|总门[^\n]*|总评[^\n]*|一句话[^\n]*)', raw)
             if m:
