@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>基本面分析 · Skill工具箱</title>
+<title>Skill工具箱</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#0f1420;color:#e8ecf3;padding:16px;max-width:720px;margin:0 auto}
@@ -32,12 +32,13 @@ li{margin:4px 0;line-height:1.6}
 .tab.on{background:#2a4a75;color:#fff;border-color:#3a6aa5}
 .up{color:#e86868}.down{color:#5bd08a}.alertbox{background:#3a2430;border:1px solid #7a3a4a;border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px}
 .big{font-size:26px;font-weight:700}
+@media(max-width:640px){.tab{font-size:12px;padding:6px 8px}.tabbar{flex-wrap:wrap;gap:4px}}
 </style>
 </head>
 <body>
 <h1>📊 基本面分析 · Skill工具箱</h1>
 <div class="sub">七件套 · 2026-10-25 · 对YY说话的版本</div>
-<div class="tabbar"><div class="tab on" id="tb-tool" onclick="sw('tool')">🧰 工具箱</div><div class="tab" id="tb-tijian" onclick="sw('tijian')">🩺 A股体检</div><div class="tab" id="tb-yaocai" onclick="sw('yaocai')">🚀 耀才推进</div></div>
+<div class="tabbar"><div class="tab on" id="tb-tool" onclick="sw('tool')">🧰 基本面分析 工具箱</div><div class="tab" id="tb-tijian" onclick="sw('tijian')">🩺 A股体检</div><div class="tab" id="tb-yaocai" onclick="sw('yaocai')">🚀 耀才推进</div><div class="tab" id="tb-skill" onclick="sw('skill')">🛠 qq5技能库</div></div>
 <div id="tab-tool">
 
 <div class="grid">
@@ -184,7 +185,8 @@ li{margin:4px 0;line-height:1.6}
   <div class="code"><a href="#tijian" onclick="sw('tijian');return false" style="color:#7fb3e8">进入A股体检 →</a>（本页tab·A股5家+美股观察）</div>
 </div>
 </div>
-<div class="card" id="qq5_skills">
+
+<div id="tab-skill" style="display:none"><div class="card" id="qq5_skills">
   <h2>🛠 qq5技能库·白话版 <span class="tag t1">261118 搬家清点</span></h2>
   <p>两个月的家底，给主人看的导游图（细账：交接夹01/03/12号件）。</p>
   <details open><summary>镇宅三件</summary>
@@ -208,7 +210,7 @@ li{margin:4px 0;line-height:1.6}
     </ul>
   </details>
   <p style="color:#8fa3c8;font-size:12px">完整40工种见交接夹03号件；规矩制度见05/08号件。261118 qq5管家清点。</p>
-</div>
+</div></div>
 <div id="tab-yaocai" style="display:none">
 <div class="sub" id="y_upd">加载中…</div>
 <div id="y_alerts"></div>
