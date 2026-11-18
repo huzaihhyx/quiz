@@ -255,9 +255,11 @@ function sw(t){
   document.getElementById('tab-tool').style.display = t==='tool'?'':'none';
   document.getElementById('tab-tijian').style.display = t==='tijian'?'':'none';
   document.getElementById('tab-yaocai').style.display = t==='yaocai'?'':'none';
+  document.getElementById('tab-skill').style.display = t==='skill'?'':'none';
   document.getElementById('tb-tool').className = 'tab'+(t==='tool'?' on':'');
   document.getElementById('tb-tijian').className = 'tab'+(t==='tijian'?' on':'');
   document.getElementById('tb-yaocai').className = 'tab'+(t==='yaocai'?' on':'');
+  document.getElementById('tb-skill').className = 'tab'+(t==='skill'?' on':'');
   if(t==='yaocai') loadY();
   if(history.replaceState) history.replaceState(null,'','#'+t);
 }
