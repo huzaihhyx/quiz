@@ -321,23 +321,32 @@ if(location.hash==='#books')sw('books');
 function swb(t){
   ['hw','ours','reading'].forEach(x=>{document.getElementById('bk-'+x).style.display=x===t?'':'none';document.getElementById('tbk-'+x).className='tab'+(x===t?' on':'');});
 }
+let BKVIEW='cat';
+function setView(v){BKVIEW=v;loadBooks();}
 function loadBooks(){
   fetch('books_data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
     document.getElementById('bk-note').textContent=d['口径']||'';
     const hw=d['华为侧']||{},ours=d['咱们侧']||{};
     document.getElementById('bk-stat').innerHTML='📕 华为侧工读完 <b>'+F(hw['total'])+'</b> 册 · 📘 咱们侧工共读 <b>'+F(ours['total'])+'</b> 本 · 📖 在读 <b>'+F((d['在读']||[]).length)+'</b> · 排队 <b>'+F((d['排队']||[]).length)+'</b> · 更新: '+F(d['更新时间']);
     const CAT={心理:'🧠','成长':'🌱',金融:'💰',周期:'🔄',交易:'📈','量化与代码':'🧮',待分:'📦'};
+    const EPORD=['2026-09~10·老线期','2026-10月·queue线期','2026-11上旬·收尾期','2026-11-17后·V6期'];
     function render(side){
-      const g=(side==='hw'?hw:ours)['groups']||{};let h='';
-      Object.keys(g).forEach(cat=>{
-        const L=g[cat];
-        h+='<details style="margin:8px 0"><summary style="cursor:pointer;color:#c9d6ee;font-size:14px">'+(CAT[cat]||'📁')+' '+cat+' <span class="tag t1">'+L.length+'</span></summary>';
+      const S=(side==='hw'?hw:ours);const rows=S['rows']||[];let g={};let ord=null;
+      if(BKVIEW==='cat'){g=S['groups']||{};}
+      else if(BKVIEW==='epoch'){ord=EPORD.slice();rows.forEach(r=>{(ord.includes(r['epoch'])||ord.push(r['epoch']));(g[r['epoch']]=g[r['epoch']]||[]).push(r)});ord.sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));}
+      else{rows.forEach(r=>{const k=r['batch']||'其他';(g[k]=g[k]||[]).push(r)});}
+      let h='<div style="margin:4px 0 10px">'+[['cat','📋 分类'],['epoch','📅 时间轴'],['batch','🗂 书系']].map(x=>'<span class="tab'+(BKVIEW===x[0]?' on':'')+'" style="font-size:12px;padding:4px 12px" onclick="setView(\''+x[0]+'\')">'+x[1]+'</span>').join('')+'</div>';
+      const keys=ord?ord.filter(k=>g[k]):Object.keys(g);
+      keys.forEach(cat=>{
+        const L=g[cat];const icon=(BKVIEW==='cat')?(CAT[cat]||'📁'):'🗂';
+        h+='<details style="margin:8px 0"><summary style="cursor:pointer;color:#c9d6ee;font-size:14px">'+icon+' '+cat+' <span class="tag t1">'+L.length+'</span></summary>';
         h+='<div style="padding:6px 0 2px 14px">';
         L.forEach(b=>{
           const meta=[];
+          if(b['date'])meta.push(b['date']);
+          if(BKVIEW!=='cat'&&b['cat'])meta.push(b['cat']);
           if(b['degree'])meta.push(b['degree']);
           if(b['ver'])meta.push('工'+b['ver']);
-          if(b['fmt']&&b['fmt']!=='课程')meta.push(b['fmt']);
           h+='<div style="font-size:13px;color:#c9d6ee;margin:3px 0">'+b['name']+(meta.length?' <span style="color:#5a6b85;font-size:11px">('+meta.join('·')+')</span>':'')+'</div>';
         });
         h+='</div></details>';
@@ -345,7 +354,7 @@ function loadBooks(){
       return h;
     }
     document.getElementById('bk-hw').innerHTML=render('hw')+'<div style="color:#5a6b85;font-size:11px;margin-top:8px">附注: 另有小龙虾8-9月旧读约35本(前世档·另案) · 原书堆270件溯源对账中</div>';
-    document.getElementById('bk-ours').innerHTML=render('ours')+'<div style="color:#5a6b85;font-size:11px;margin-top:8px">附注: 浑水做空报告132件(报告非书·另案) · B7xx老卡55,050张(冻结另档) · 含同名跨线条目</div>';
+    document.getElementById('bk-ours').innerHTML=render('ours')+'<div style="color:#5a6b85;font-size:11px;margin-top:8px">附注: 浑水做空报告132件(报告非书·另案) · B7xx老卡55,050张(冻结另档) · 时间轴无日期的按批次粗分</div>';
     let rh='<div class="card"><h2>📖 在读</h2>';
     (d['在读']||[]).forEach(x=>rh+='<div style="font-size:13px;margin:4px 0">▪️ '+x['name']+' <span style="color:#8fa3bf;font-size:12px">'+x['note']+'</span></div>');
     rh+='</div><div class="card"><h2>⏳ 排队</h2>';
