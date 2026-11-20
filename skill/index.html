@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>基本面分析 · Skill工具箱</title>
+<title>Skill工具箱</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#0f1420;color:#e8ecf3;padding:16px;max-width:720px;margin:0 auto}
@@ -32,12 +32,13 @@ li{margin:4px 0;line-height:1.6}
 .tab.on{background:#2a4a75;color:#fff;border-color:#3a6aa5}
 .up{color:#e86868}.down{color:#5bd08a}.alertbox{background:#3a2430;border:1px solid #7a3a4a;border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px}
 .big{font-size:26px;font-weight:700}
+@media(max-width:640px){.tab{font-size:12px;padding:6px 8px}.tabbar{flex-wrap:wrap;gap:4px}}
 </style>
 </head>
 <body>
 <h1>📊 基本面分析 · Skill工具箱</h1>
 <div class="sub">七件套 · 2026-10-25 · 对YY说话的版本</div>
-<div class="tabbar"><div class="tab on" id="tb-tool" onclick="sw('tool')">🧰 工具箱</div><div class="tab" id="tb-tijian" onclick="sw('tijian')">🩺 A股体检</div><div class="tab" id="tb-yaocai" onclick="sw('yaocai')">🚀 耀才推进</div><div class="tab" id="tb-books" onclick="sw('books')">📚 读书</div></div>
+<div class="tabbar"><div class="tab on" id="tb-tool" onclick="sw('tool')">🧰 基本面分析 工具箱</div><div class="tab" id="tb-tijian" onclick="sw('tijian')">🩺 A股体检</div><div class="tab" id="tb-yaocai" onclick="sw('yaocai')">🚀 耀才推进</div><div class="tab" id="tb-skill" onclick="sw('skill')">🛠 qq5技能库</div><div class="tab" id="tb-books" onclick="sw('books')">📚 读书</div></div>
 <div id="tab-tool">
 
 <div class="grid">
@@ -184,10 +185,38 @@ li{margin:4px 0;line-height:1.6}
   <div class="code"><a href="#tijian" onclick="sw('tijian');return false" style="color:#7fb3e8">进入A股体检 →</a>（本页tab·A股5家+美股观察）</div>
 </div>
 </div>
+
+<div id="tab-skill" style="display:none"><div class="card" id="qq5_skills">
+  <h2>🛠 qq5技能库·白话版 <span class="tag t1">261118 搬家清点</span></h2>
+  <p>两个月的家底，给主人看的导游图（细账：交接夹01/03/12号件）。</p>
+  <details open><summary>镇宅三件</summary>
+    <ul>
+      <li><b>专家会诊</b>：文档托管给几家AI审→收卷对拍出共识表。06任务书就这么排的雷（1.3T落437G盘物理不可能）。</li>
+      <li><b>清单革命 deliverable_qc 2.0</b>：交付物出厂先列验收清单逐项对拍，账糊弄不了。</li>
+      <li><b>读书工 v5.6</b>：112本书的流水线（检视→精读→卡片→验收），五个月实战迭代。</li>
+    </ul>
+  </details>
+  <details><summary>常用家伙什</summary>
+    <ul>
+      <li><b>转写工</b>：扫描PDF/epub/mobi→标准文字档（库里5000+书档）</li>
+      <li><b>书猎工</b>：全网找书+验真身+入账（上役9本全中，<2元/本）</li>
+      <li><b>网盘备份</b>：每日13点自动备份对账；搬家七包全走它</li>
+      <li><b>公众号消化 / 文章卡</b>：微信链接→提取→六字段卡入档</li>
+      <li><b>回溯</b>：「咱在干啥来着」→日记拉时间线</li>
+      <li><b>花径心理</b>：功课带练+档案索引+原话导出（包5）</li>
+      <li><b>药材盯梢</b>：耀才01428公告→全文→信号解读（推进表v10）</li>
+      <li><b>图表复原</b>：书里老图用真实数据重画</li>
+      <li><b>搬家打包</b>：本役现攒——分包/manifest/上传对账/血统过滤</li>
+    </ul>
+  </details>
+  <p style="color:#8fa3c8;font-size:12px">完整40工种见交接夹03号件；规矩制度见05/08号件。261118 qq5管家清点。</p>
+</div></div>
 <div id="tab-yaocai" style="display:none">
 <div class="sub" id="y_upd">加载中…</div>
 <div id="y_alerts"></div>
 <div id="y_body"></div>
+
+
 <div class="card" id="y_s09" style="margin-top:14px">
   <h2>🧭 S0-S9 系统阶段框架 <span class="tag t3">v10 精化版 261115</span></h2>
   <p style="color:#8fa3c8;font-size:12px;margin:4px 0 8px">判据：69 档 JD 正文逐岗实证。S0-S9 为自造刻度尺（对标富途拆模块＋证券IT惯例＋三家史实＋15个月招聘批次校验），非蚂蚁官方路线图。主人两问定谳精化：验的是「可验之物」，正式切换必在验后。</p>
@@ -235,10 +264,12 @@ function sw(t){
   document.getElementById('tab-tool').style.display = t==='tool'?'':'none';
   document.getElementById('tab-tijian').style.display = t==='tijian'?'':'none';
   document.getElementById('tab-yaocai').style.display = t==='yaocai'?'':'none';
+  document.getElementById('tab-skill').style.display = t==='skill'?'':'none';
   document.getElementById('tb-tool').className = 'tab'+(t==='tool'?' on':'');
   document.getElementById('tb-tijian').className = 'tab'+(t==='tijian'?' on':'');
   document.getElementById('tb-yaocai').className = 'tab'+(t==='yaocai'?' on':'');
-  document.getElementById('tb-books').style.display = t==='books'?'':'none';
+  document.getElementById('tb-skill').className = 'tab'+(t==='skill'?' on':'');
+  document.getElementById('tab-books').style.display = t==='books'?'':'none';
   document.getElementById('tb-books').className = 'tab'+(t==='books'?' on':'');
   if(t==='yaocai') loadY();
   if(t==='books') loadBooks();
@@ -290,14 +321,12 @@ if(location.hash==='#books')sw('books');
 function swb(t){
   ['hw','ours','reading'].forEach(x=>{document.getElementById('bk-'+x).style.display=x===t?'':'none';document.getElementById('tbk-'+x).className='tab'+(x===t?' on':'');});
 }
-let BK=null;
 function loadBooks(){
   fetch('books_data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
-    BK=d;
     document.getElementById('bk-note').textContent=d['口径']||'';
     const hw=d['华为侧']||{},ours=d['咱们侧']||{};
     document.getElementById('bk-stat').innerHTML='📕 华为侧工读完 <b>'+F(hw['total'])+'</b> 册 · 📘 咱们侧工共读 <b>'+F(ours['total'])+'</b> 本 · 📖 在读 <b>'+F((d['在读']||[]).length)+'</b> · 排队 <b>'+F((d['排队']||[]).length)+'</b> · 更新: '+F(d['更新时间']);
-    const CAT={心理:'🧠','成长':'🌱','金融':'💰','周期':'🔄','交易':'📈','量化与代码':'🧮','待分':'📦'};
+    const CAT={心理:'🧠','成长':'🌱',金融:'💰',周期:'🔄',交易:'📈','量化与代码':'🧮',待分:'📦'};
     function render(side){
       const g=(side==='hw'?hw:ours)['groups']||{};let h='';
       Object.keys(g).forEach(cat=>{
