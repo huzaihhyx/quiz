@@ -327,8 +327,8 @@ let BKVIEW='cat';
 function setView(v){BKVIEW=v;loadBooks();}
 function bkFilter(q){
   q=(q||'').trim().toLowerCase();
-  document.querySelectorAll('#books [data-n]').forEach(el=>{el.style.display=(!q||el.getAttribute('data-n').toLowerCase().includes(q))?'':'none'});
-  document.querySelectorAll('#books details').forEach(dt=>{
+  document.querySelectorAll('#tab-books [data-n]').forEach(el=>{el.style.display=(!q||el.getAttribute('data-n').toLowerCase().includes(q))?'':'none'});
+  document.querySelectorAll('#tab-books details').forEach(dt=>{
     const vis=[...dt.querySelectorAll('[data-n]')].some(el=>el.style.display!=='none');
     const selfhit=dt.querySelector('summary')&&dt.querySelector('summary').textContent.toLowerCase().includes(q);
     dt.style.display=(vis||selfhit||!q)?'':'none';
