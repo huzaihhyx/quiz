@@ -253,6 +253,7 @@ li{margin:4px 0;line-height:1.6}
 <div id="tab-books" style="display:none">
 <div class="sub">读书台账 · 读过啥·哪套工读的·一查就有 · 261120版</div>
 <div class="tabbar"><div class="tab on" id="tbk-hw" onclick="swb('hw')">📕 华为侧读完</div><div class="tab" id="tbk-ours" onclick="swb('ours')">📘 咱们侧读完</div><div class="tab" id="tbk-reading" onclick="swb('reading')">📖 在读·排队</div><div class="tab" id="tbk-wish" onclick="swb('wish')">💭 意向读</div></div>
+<div style="margin:8px 0"><input id="bksearch" type="text" placeholder="🔍 搜书名：849本已读+27意向全搜（两个子页都生效）" oninput="bkFilter(this.value)" style="width:100%;max-width:520px;box-sizing:border-box;padding:8px 12px;border-radius:8px;border:1px solid #2a3a5c;background:#141d33;color:#c9d6ee;font-size:13px"></div>
 <div id="bk-stat" style="margin:6px 0;color:#8fa3bf;font-size:13px">加载中…</div>
 <div id="bk-hw"></div>
 <div id="bk-ours" style="display:none"></div>
@@ -324,11 +325,20 @@ function swb(t){
 }
 let BKVIEW='cat';
 function setView(v){BKVIEW=v;loadBooks();}
+function bkFilter(q){
+  q=(q||'').trim().toLowerCase();
+  document.querySelectorAll('#books [data-n]').forEach(el=>{el.style.display=(!q||el.getAttribute('data-n').toLowerCase().includes(q))?'':'none'});
+  document.querySelectorAll('#books details').forEach(dt=>{
+    const vis=[...dt.querySelectorAll('[data-n]')].some(el=>el.style.display!=='none');
+    const selfhit=dt.querySelector('summary')&&dt.querySelector('summary').textContent.toLowerCase().includes(q);
+    dt.style.display=(vis||selfhit||!q)?'':'none';
+  });
+}
 function loadBooks(){
   fetch('books_data.json?t='+Date.now()).then(r=>r.json()).then(d=>{
     document.getElementById('bk-note').textContent=d['口径']||'';
     const hw=d['华为侧']||{},ours=d['咱们侧']||{};
-    document.getElementById('bk-stat').innerHTML='📕 华为侧工读完 <b>'+F(hw['total'])+'</b> 册 · 📘 咱们侧工共读 <b>'+F(ours['total'])+'</b> 本 · 📖 在读 <b>'+F((d['在读']||[]).length)+'</b> · 排队 <b>'+F((d['排队']||[]).length)+'</b> · 更新: '+F(d['更新时间']);
+    document.getElementById('bk-stat').innerHTML='📕 华为侧读完 <b>'+F(hw['total'])+'</b> 册 · 📘 咱们侧共读 <b>'+F(ours['total'])+'</b> 本 · 📖 在读 <b>'+F((d['在读']||[]).length)+'</b> · 排队 <b>'+F((d['排队']||[]).length)+'</b> · 更新: '+F(d['更新时间']);
     const CAT={心理:'🧠','成长':'🌱',金融:'💰',周期:'🔄',交易:'📈','量化与代码':'🧮',待分:'📦'};
     const EPORD=['2026-09~10·老线期','2026-10月·queue线期','2026-11上旬·收尾期','2026-11-17后·V6期'];
     function render(side){
@@ -349,16 +359,24 @@ function loadBooks(){
           if(BKVIEW!=='cat'&&b['cat'])meta.push(b['cat']);
           if(b['degree'])meta.push(b['degree']);
           if(b['ver'])meta.push('工'+b['ver']);
-          h+='<div style="font-size:13px;color:#c9d6ee;margin:3px 0">'+b['name']+(meta.length?' <span style="color:#5a6b85;font-size:11px">('+meta.join('·')+')</span>':'')+'</div>';
+          if(b['files']!==undefined)meta.push('件套'+b['files']+'/9');
+          h+='<div data-n="'+String(b['name']).replace(/"/g,'')+'" style="font-size:13px;color:#c9d6ee;margin:3px 0">'+b['name']+(meta.length?' <span style="color:#5a6b85;font-size:11px">('+meta.join('·')+')</span>':'')+'</div>';
         });
         h+='</div></details>';
       });
       return h;
     }
     document.getElementById('bk-hw').innerHTML=render('hw')+'<div style="color:#5a6b85;font-size:11px;margin-top:8px">附注: 另有小龙虾8-9月旧读约35本(前世档·另案) · 原书堆270件溯源对账中</div>';
-    document.getElementById('bk-ours').innerHTML=render('ours')+'<div style="color:#5a6b85;font-size:11px;margin-top:8px">附注: 浑水做空报告132件(报告非书·另案) · B7xx老卡55,050张(冻结另档) · 时间轴无日期的按批次粗分</div>';
-    let rh='<div class="card"><h2>📖 在读</h2>';
-    (d['在读']||[]).forEach(x=>rh+='<div style="font-size:13px;margin:4px 0">▪️ '+x['name']+' <span style="color:#8fa3bf;font-size:12px">'+x['note']+'</span></div>');
+    const dated=(ours['rows']||[]).filter(r=>r['date']);const mon={};dated.forEach(r=>{const m=r['date'].slice(0,7);mon[m]=(mon[m]||0)+1;});
+    const mk=Object.keys(mon).sort();const mx=Math.max(1,...Object.values(mon));
+    let mh='<div class="card"><h2>📊 月度读完节奏 <span class="tag t1">有日期'+dated.length+'本</span></h2>';
+    mk.forEach(m=>{const v=mon[m];mh+='<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="color:#8fa3bf;font-size:12px;width:64px">'+m.replace('-','年')+'月</span><div style="flex:1;height:14px;background:#1a2742;border-radius:3px;overflow:hidden"><div style="width:'+(v/mx*100)+'%;height:100%;background:linear-gradient(90deg,#3d6fbf,#7fb3e8)"></div></div><span style="color:#c9d6ee;font-size:12px;width:40px;text-align:right">'+v+'本</span></div>';});
+    mh+='<p style="color:#5a6b85;font-size:11px;margin:6px 0 0">仅queue线有完工日存档·老线653本与华为侧111册无逐本日期档案(不造数)</p></div>';
+    document.getElementById('bk-ours').innerHTML=mh+render('ours')+'<div style="color:#5a6b85;font-size:11px;margin-top:8px">附注: 浑水做空报告132件(报告非书·另案) · B7xx老卡55,050张(冻结另档) · 时间轴无日期的按批次粗分</div>';
+    let rh='<div class="card"><h2>📝 考试记录 <span class="tag t1">学习线</span></h2>';
+    (d['考试记录']||[]).forEach(x=>{rh+='<div style="font-size:13px;margin:4px 0">🎯 '+x['what']+' <span style="color:'+(x['score']==='候考'?'#e8c57a':'#7fd8a0')+';font-weight:bold">'+x['score']+'</span> <span style="color:#5a6b85;font-size:11px">('+x['time']+'·'+x['note']+')</span></div>';});
+    rh+='</div><div class="card"><h2>📖 在读</h2>';
+    (d['在读']||[]).forEach(x=>{const p=x['progress']||{};rh+='<div data-n="'+x['name'].replace(/"/g,'')+'" style="margin:8px 0"><div style="font-size:13px;color:#c9d6ee">▪️ '+x['name']+' <span style="color:#8fa3bf;font-size:12px">'+x['note']+'</span></div>'+(p['text']?'<div style="display:flex;align-items:center;gap:8px;margin-top:3px"><div style="flex:1;height:6px;background:#1a2742;border-radius:3px;overflow:hidden"><div style="width:35%;height:100%;background:linear-gradient(90deg,#3d6fbf,#7fb3e8);border-radius:3px"></div></div><span style="color:#7fb3e8;font-size:11px;white-space:nowrap">'+p['text']+' · '+p['state']+'</span></div>':'')+'</div>';});
     rh+='</div><div class="card"><h2>⏳ 排队</h2>';
     (d['排队']||[]).forEach(x=>rh+='<div style="font-size:13px;margin:4px 0">▫️ '+x['name']+' <span style="color:#8fa3bf;font-size:12px">'+x['note']+'</span></div>');
     rh+='</div>';
@@ -372,7 +390,7 @@ function loadBooks(){
       if(lv==='两星')wh+='</div><div class="card"><h2>✨ 两星·好读 <span class="tag t1">'+L.length+'本</span></h2>';
       const byc={};L.forEach(b=>{(byc[b['cat']]=byc[b['cat']]||[]).push(b)});
       Object.keys(byc).forEach(c=>{wh+='<details style="margin:6px 0"><summary style="cursor:pointer;color:#c9d6ee;font-size:13px">'+c+' <span class="tag t1">'+byc[c].length+'</span></summary><div style="padding:4px 0 2px 14px">';
-      byc[c].forEach(b=>{wh+='<div style="font-size:13px;color:#c9d6ee;margin:3px 0">'+b['name']+(b['au']?' <span style="color:#5a6b85;font-size:11px">('+b['au']+')</span>':'')+'</div>';});
+      byc[c].forEach(b=>{wh+='<div data-n="'+b['name'].replace(/"/g,'')+'" style="font-size:13px;color:#c9d6ee;margin:3px 0">'+b['name']+(b['au']?' <span style="color:#5a6b85;font-size:11px">('+b['au']+')</span>':'')+'</div>';});
       wh+='</div></details>';});
     });
     wh+='</div>';
