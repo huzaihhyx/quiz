@@ -252,11 +252,12 @@ li{margin:4px 0;line-height:1.6}
 </div>
 <div id="tab-books" style="display:none">
 <div class="sub">读书台账 · 读过啥·哪套工读的·一查就有 · 261120版</div>
-<div class="tabbar"><div class="tab on" id="tbk-hw" onclick="swb('hw')">📕 华为侧工读完</div><div class="tab" id="tbk-ours" onclick="swb('ours')">📘 咱们侧工共读</div><div class="tab" id="tbk-reading" onclick="swb('reading')">📖 在读·排队</div></div>
+<div class="tabbar"><div class="tab on" id="tbk-hw" onclick="swb('hw')">📕 华为侧读完</div><div class="tab" id="tbk-ours" onclick="swb('ours')">📘 咱们侧读完</div><div class="tab" id="tbk-reading" onclick="swb('reading')">📖 在读·排队</div><div class="tab" id="tbk-wish" onclick="swb('wish')">💭 意向读</div></div>
 <div id="bk-stat" style="margin:6px 0;color:#8fa3bf;font-size:13px">加载中…</div>
 <div id="bk-hw"></div>
 <div id="bk-ours" style="display:none"></div>
 <div id="bk-reading" style="display:none"></div>
+<div id="bk-wish" style="display:none"></div>
 <div style="color:#5a6b85;font-size:11px;margin-top:10px">数据由大道读书线维护推送 · 页面每分钟自动拉最新 · 口径：<span id="bk-note"></span></div>
 </div>
 <script>
@@ -319,7 +320,7 @@ if(location.hash==='#yaocai')sw('yaocai');
 if(location.hash==='#tijian')sw('tijian');
 if(location.hash==='#books')sw('books');
 function swb(t){
-  ['hw','ours','reading'].forEach(x=>{document.getElementById('bk-'+x).style.display=x===t?'':'none';document.getElementById('tbk-'+x).className='tab'+(x===t?' on':'');});
+  ['hw','ours','reading','wish'].forEach(x=>{document.getElementById('bk-'+x).style.display=x===t?'':'none';document.getElementById('tbk-'+x).className='tab'+(x===t?' on':'');});
 }
 let BKVIEW='cat';
 function setView(v){BKVIEW=v;loadBooks();}
@@ -343,6 +344,7 @@ function loadBooks(){
         h+='<div style="padding:6px 0 2px 14px">';
         L.forEach(b=>{
           const meta=[];
+          if(b['star'])meta.push('★'.repeat(b['star']));
           if(b['date'])meta.push(b['date']);
           if(BKVIEW!=='cat'&&b['cat'])meta.push(b['cat']);
           if(b['degree'])meta.push(b['degree']);
@@ -363,15 +365,25 @@ function loadBooks(){
     if((d['待拍板']||[]).length){rh+='<div class="card"><h2>⚖️ 候您拍板</h2>';
     d['待拍板'].forEach(x=>rh+='<div style="font-size:13px;margin:4px 0">❓ '+x['name']+' <span style="color:#8fa3bf;font-size:12px">'+x['note']+'</span></div>');rh+='</div>';}
     document.getElementById('bk-reading').innerHTML=rh;
+    const W=d['意向读']||{};
+    let wh='<div class="card"><h2>⭐ 三星·公认奠基 <span class="tag t1">'+F((W['三星']||[]).length)+'本</span></h2><p style="color:#8fa3bf;font-size:12px">没读过但在库的好书·按类分·三星优先</p>';
+    ['三星','两星'].forEach(lv=>{
+      const L=W[lv]||[];if(!L.length)return;
+      if(lv==='两星')wh+='</div><div class="card"><h2>✨ 两星·好读 <span class="tag t1">'+L.length+'本</span></h2>';
+      const byc={};L.forEach(b=>{(byc[b['cat']]=byc[b['cat']]||[]).push(b)});
+      Object.keys(byc).forEach(c=>{wh+='<details style="margin:6px 0"><summary style="cursor:pointer;color:#c9d6ee;font-size:13px">'+c+' <span class="tag t1">'+byc[c].length+'</span></summary><div style="padding:4px 0 2px 14px">';
+      byc[c].forEach(b=>{wh+='<div style="font-size:13px;color:#c9d6ee;margin:3px 0">'+b['name']+(b['au']?' <span style="color:#5a6b85;font-size:11px">('+b['au']+')</span>':'')+'</div>';});
+      wh+='</div></details>';});
+    });
+    wh+='</div>';
+    const OT=W['在途找书']||[];
+    if(OT.length){wh+='<div class="card"><h2>🚚 在途找书 <span class="tag t1">'+OT.length+'本</span></h2>';OT.forEach(x=>wh+='<div style="font-size:13px;margin:3px 0">▫️ '+x['name']+' <span style="color:#5a6b85;font-size:11px">('+x['note']+')</span></div>');wh+='</div>';}
+    const OC=W['OCR欠账']||[];
+    if(OC.length){wh+='<div class="card"><h2>📷 OCR欠账 <span class="tag t1">'+OC.length+'本</span></h2><p style="color:#8fa3bf;font-size:12px">当年扫描精度不够(150dpi)·待重转300dpi后再读</p>';OC.forEach(x=>wh+='<div style="font-size:13px;margin:3px 0">📷 '+x['name']+' <span style="color:#5a6b85;font-size:11px">('+x['note']+')</span></div>');wh+='</div>';}
+    document.getElementById('bk-wish').innerHTML=wh;
   }).catch(e=>{document.getElementById('bk-stat').textContent='读书台账加载失败: '+e});
 }
 setInterval(()=>{if(document.getElementById('tab-books')&&document.getElementById('tab-books').style.display!=='none')loadBooks();},60000);
 </script>
 </body>
 </html>
-
-<div class="card">
-  <h2>🚀 耀才推进 <span class="tag t3">新上线</span></h2>
-  <p><b>干什么</b>：蚂蚁接管耀才(01428)推进度一页看全——招聘进度条/港交所公告/股价/应用商店新App警报，服务器哨兵每周自动抓。</p>
-  <div class="code"><a href="#yaocai" onclick="sw('yaocai');return false" style="color:#7fb3e8">切换到耀才推进 →</a>（就在本页tab内·刷新即最新）</div>
-</div>
